@@ -1,8 +1,8 @@
 # Index Power Forever — 진행 현황
 
-> 마지막 업데이트: 2026-03-22
+> 마지막 업데이트: 2026-03-22 (세션 #5)
 
-## 전체 진행률: 30/40 (75%)
+## 전체 진행률: 35/41 (85.4%)
 
 ---
 
@@ -46,7 +46,7 @@
 - [x] 2-1. SPA 기본 틀 (index.html, app.js, navbar.html, style.css)
 - [x] 2-2. 홈 화면 (home.html + home.js): 히어로 + 검색 + 프리셋
 - [x] 2-3. ETF 상세 탭1: 성과 비교 + Chart.js 수익률 비교 차트
-- [x] 2-4. ETF 상세 탭2: 이김/짐 분석 (초과수익률 차트, 연도별 승패)
+- [x] 2-4. ETF 상세 탭2: 인덱스 승률 (롤링 승률, 연도별 승패)
 - [x] 2-5. ETF 상세 탭3: 종목 정보 (구성종목 비중)
 - [x] 2-6. 랭킹 화면 (ranking.html + ranking.js)
 - [x] 2-7. 비용 시뮬레이터 (fee-simulator.html + fee-simulator.js)
@@ -55,13 +55,18 @@
 
 ---
 
-## 🚀 Phase 3: 안정화 및 배포 (2/5)
+## 🚀 Phase 3: 안정화 및 배포 (7/10)
 
 - [x] 3-1. 인사이트 화면 (insights.html + insights.js)
 - [x] 3-2. 책 소개 화면 (book.html + book.js)
-- [ ] 3-3. 에러 처리 + 로딩 상태 전체 검토
-- [ ] 3-4. 성능 최적화 (캐시 전략 검토)
-- [!] 3-5. 배포 (Cloudflare Pages + Workers)
+- [x] 3-3a. Cloudflare Pages ↔ GitHub 연결 + Workers/Pages 배포 완료
+- [x] 3-3b. defineAsyncComponent 뷰 로딩 수정 + insights 내부 링크 SPA 라우팅 수정
+- [x] 3-3c. 디자인 개선 (홈 히어로 + ETF 상세 페이지 + 인덱스 승률 관점 전환)
+- [x] 3-3d. Yahoo API 전체 기간 데이터 수정 (period1/period2 방식 + max 항상 Yahoo 직접 조회)
+- [x] 3-3e. ETF 설명 전문 표시 + Cloudflare Workers AI 한국어 번역 + 검색 드롭다운 정렬
+- [ ] 3-4. 에러 처리 + 로딩 상태 전체 검토
+- [ ] 3-5. 성능 최적화 (캐시 전략 검토)
+- [ ] 3-6. 책 소개 화면 구매 링크 입력 (URL 확정 후)
 
 ---
 
@@ -72,10 +77,11 @@
 | 0-1 | Git 초기화 + GitHub 레포 생성 | ✅ 완료 | https://github.com/JosephChoi/IndexPowerForever |
 | 0-2 | Cloudflare D1 생성 | ✅ 완료 | DB ID: `d83bdf6e-ce60-47d3-a415-455f24b69295` |
 | 0-2 | Cloudflare KV 생성 | ✅ 완료 | KV ID: `d9325ab1fd164d17bb4065dbcbb4515e` |
-| 0-2 | Cloudflare Pages 프로젝트 생성 | ✅ 완료 | `index-power-forever.pages.dev` |
-| 0-2 | Cloudflare Pages ↔ GitHub 연결 | [!] 미완 | 대시보드에서 직접 연결 필요 |
-| 3-5 | Workers 배포 | [!] 미완 | `backend/` push → GitHub Actions 자동 실행 |
-| 3-5 | Pages 배포 | [!] 미완 | `frontend/` push → GitHub Actions 자동 실행 |
+| 0-2 | Cloudflare Pages 프로젝트 생성 | ✅ 완료 | `indexpowerforever.pages.dev` |
+| 0-2 | Cloudflare Pages ↔ GitHub 연결 | ✅ 완료 | GitHub 연동 + wrangler deploy 방식 병행 |
+| 3-5 | Workers 배포 | ✅ 완료 | `index-power-forever.sixman-joseph.workers.dev` |
+| 3-5 | Pages 배포 | ✅ 완료 | `indexpowerforever.pages.dev` |
+| 3-6 | 책 구매 링크 입력 | [!] 미완 | URL 확정 후 book.html 수정 |
 
 ---
 

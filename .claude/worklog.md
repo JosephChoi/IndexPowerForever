@@ -2,6 +2,107 @@
 
 ---
 
+## 세션 #5 — 2026-03-22 (02:30 ~ 03:20 KST)
+
+### 시작 시 상태
+- Phase 0~2 완료, Phase 3 일부 완료 (5/8)
+- "전체" 기간 선택 시 데이터가 5년치로 제한되는 버그 존재
+
+### 작업 내용
+
+**Yahoo API 전체 기간 데이터 수정**
+- `range=max` 파라미터가 crumb 인증 시 5년치만 반환하는 Yahoo API 제한 발견
+- `period1=0&period2=now` 타임스탬프 방식으로 변경하여 전체 기간 데이터 정상 조회
+- `query1.finance.yahoo.com` → `query2.finance.yahoo.com`으로 변경
+- PriceService: `max` 기간은 D1 캐시 건너뛰고 항상 Yahoo 직접 조회 (D1에 부분 데이터만 있으면 잘못된 결과 방지)
+- 디버그 엔드포인트로 Worker→Yahoo API 응답 직접 확인하여 원인 규명
+
+**ETF 설명 전문 + 한국어 번역**
+- 설명 300자 하드코딩 잘림 → 3줄 미리보기 + "더보기/접기" 토글
+- Cloudflare Workers AI (`@cf/meta/m2m100-1.2b`) 바인딩 추가
+- `/api/translate` 엔드포인트 신규 생성 (영→한 번역, KV 7일 캐시)
+- "한국어로 보기" / "원문 보기" 토글 버튼 추가
+
+**검색 드롭다운 정렬 개선**
+- 히어로 `text-align: center` 상속으로 드롭다운 중앙 정렬 버그 수정
+- `display: flex` + `text-align: left` 적용
+- 티커를 파란색 뱃지(`badge bg-primary`)로 시각 구분
+
+### 이슈 및 해결
+- KV 캐시가 이전 잘못된 데이터를 계속 반환 → 전체 KV 벌크 삭제 (54개 키) + D1 price_cache 전체 삭제
+- `_needsYahooFetch` 6년 임계값 방식은 ETF 설정일을 모르므로 부정확 → max일 때 D1 캐시 자체를 건너뛰는 방식으로 단순화
+- WebFetch 15분 캐시로 API 결과 확인 시 혼동 → `_t=` 파라미터로 캐시 우회
+
+### 다음 세션 할 일
+1. **번역 기능 확인**: Workers AI 번역 품질 검토 (필요시 다른 모델로 교체)
+2. **Phase 3-4**: 에러 처리 + 로딩 상태 전체 검토
+3. **Phase 3-5**: 성능 최적화 (캐시 전략 검토)
+4. **책 구매 링크**: URL 확정 후 `book.html` 수정
+
+### 참고사항
+- Workers AI 바인딩: `wrangler.toml`에 `[ai] binding = "AI"` 추가됨
+- Yahoo API: crumb 인증은 quoteSummary에만 사용, chart API는 period1/period2 + crumb 조합
+- max 기간 데이터: KV 1시간 캐시만 적용, D1 캐시는 건너뜀 (항상 Yahoo 최신 데이터)
+
+---
+
+## 세션 #4 — 2026-03-22 (01:36 ~ 02:20 KST)
+
+### 시작 시 상태
+- Phase 0~2 완료, Phase 3 일부 완료 (인사이트/책 소개)
+- Workers/Pages 배포 미연결 상태
+
+### 작업 내용
+
+**배포 환경 구성**
+- Cloudflare Pages ↔ GitHub 연결 (사용자 수동 — 직접업로드 방식 Pages 삭제 후 Git 연결로 재생성)
+- Workers API URL 수정: `index-power-forever.sixman-joseph.workers.dev`
+- Pages 프로젝트명: `index-power-forever` (도메인: `indexpowerforever.pages.dev`)
+- GitHub Actions `deploy-frontend.yml`의 `--project-name` 이 실제 배포 담당 확인 (wrangler pages deploy 방식)
+
+**프론트엔드 버그 수정**
+- `app.js`: `beforeCreate` 템플릿 동적 설정 → `defineAsyncComponent` 패턴으로 수정 (스피너만 돌고 렌더링 안 되는 문제 해결)
+- `insights.html`: `:href="card.link"` → `@click.prevent="navigateTo(card.link)"` SPA 라우팅 수정
+
+**디자인 개선**
+- 홈 히어로 섹션 리디자인: 다크 테마 + 그리드 배경 + 그라디언트 발광 + 글래스모피즘 검색창
+- 히어로 제목: **"이길 수 있는 투자만 하라"** (책 제목 연계)
+- ETF 상세 페이지 전면 리디자인:
+  - 다크 헤더 배너 + 그라디언트 티커 + 풀네임 + 메타칩(운용보수/AUM/설정일)
+  - KPI 카드 4개 (총수익률/CAGR/MDD/샤프) 상단 배치
+  - 차트카드, 롤링카드, 테이블 스타일 전면 교체
+  - 탭바 sticky 적용
+
+**백엔드 수정**
+- `YahooService`: quoteSummary에 `quoteType` 모듈 추가
+- `EtfService`: ETF 이름을 `quoteType.longName`에서 가져오도록 수정 (기존: `${ticker} ETF`)
+- D1 + KV 캐시 수동 삭제 (기존 잘못된 name 데이터 제거)
+
+**인덱스 승률 관점 전환**
+- 탭명: "이김/짐 분석" → **"인덱스 승률"**
+- 관점: ETF 승률 → 인덱스 승률 (100 - ETF승률)로 전환
+- 설명 배너 추가: "인덱스 승률이란?" 한 줄 안내
+- 연도별 테이블: 인덱스 기준 승/패 표시, 열 순서 변경
+- 홈 화면 소개 문구 동기화
+
+### 이슈 및 해결
+- Pages GitHub 연동 후에도 wrangler deploy가 실제 배포 담당 → workflow에서 wrangler 제거 시 배포 실패 → 원복
+- KV 원격 캐시에 잘못된 ETF name이 남아 있어 풀네임 반영 안 됨 → `wrangler kv key delete` 로 수동 삭제
+
+### 다음 세션 할 일
+1. **Phase 3-4**: 에러 처리 + 로딩 상태 전체 검토
+2. **Phase 3-5**: 성능 최적화 (캐시 전략 검토)
+3. **책 구매 링크**: URL 확정 후 `book.html` 수정
+4. **ETF 풀네임 확인**: 새 ETF 검색 시 `quoteType.longName` 정상 반환 확인
+
+### 참고사항
+- Workers URL: `https://index-power-forever.sixman-joseph.workers.dev`
+- Pages URL: `https://indexpowerforever.pages.dev`
+- Pages 프로젝트명(`index-power-forever`)과 도메인(`indexpowerforever`)이 다름 주의
+- GitHub Actions가 wrangler로 Pages 배포함 (Pages GitHub 직접 연동과 별개)
+
+---
+
 ## 세션 #3 — 2026-03-22 (00:17 ~ 00:36 KST)
 
 ### 시작 시 상태
