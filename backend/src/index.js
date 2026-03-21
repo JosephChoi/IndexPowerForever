@@ -6,6 +6,7 @@ import { compareRoute } from './routes/compare.js';
 import { rankingRoute } from './routes/ranking.js';
 import { presetsRoute } from './routes/presets.js';
 import { timingRoute } from './routes/timing.js';
+import { translateRoute } from './routes/translate.js';
 
 const app = new Hono();
 
@@ -18,6 +19,7 @@ app.route('/api/etf', compareRoute);
 app.route('/api/ranking', rankingRoute);
 app.route('/api/presets', presetsRoute);
 app.route('/api/timing', timingRoute);
+app.route('/api/translate', translateRoute);
 
 // 헬스체크
 app.get('/health', (c) => c.json({ status: 'ok', service: 'index-power-forever' }));

@@ -28,7 +28,7 @@ export class YahooService {
     const cookie = cookieRes.headers.get('set-cookie') || '';
 
     // Step 2: crumb 취득
-    const crumbRes = await fetch('https://query1.finance.yahoo.com/v1/test/getcrumb', {
+    const crumbRes = await fetch('https://query2.finance.yahoo.com/v1/test/getcrumb', {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
         'Cookie': cookie,
@@ -49,11 +49,21 @@ export class YahooService {
   }
 
   // 일별 가격 데이터 조회 (v8 chart API)
+  // period1/period2 타임스탬프 방식 사용 (range= 파라미터는 데이터 제한 이슈)
   async getChart(ticker, period = '5Y') {
-    const range = PERIOD_TO_RANGE[period] || '5y';
     const { crumb, cookie } = await this.getCrumb();
+    const period2 = Math.floor(Date.now() / 1000);
+    let period1;
 
-    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ticker)}?interval=1d&range=${range}&crumb=${encodeURIComponent(crumb)}`;
+    if (period === 'max') {
+      period1 = 0;
+    } else {
+      const yearsMap = { '1Y': 1, '3Y': 3, '5Y': 5, '10Y': 10 };
+      const years = yearsMap[period] || 5;
+      period1 = Math.floor((Date.now() - years * 365.25 * 24 * 60 * 60 * 1000) / 1000);
+    }
+
+    const url = `https://query2.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ticker)}?interval=1d&period1=${period1}&period2=${period2}&crumb=${encodeURIComponent(crumb)}`;
 
     const res = await fetch(url, {
       headers: {
@@ -91,7 +101,7 @@ export class YahooService {
     const { crumb, cookie } = await this.getCrumb();
 
     const modules = 'summaryProfile,summaryDetail,defaultKeyStatistics,topHoldings,assetProfile,quoteType';
-    const url = `https://query1.finance.yahoo.com/v10/finance/quoteSummary/${encodeURIComponent(ticker)}?crumb=${encodeURIComponent(crumb)}&modules=${modules}`;
+    const url = `https://query2.finance.yahoo.com/v10/finance/quoteSummary/${encodeURIComponent(ticker)}?crumb=${encodeURIComponent(crumb)}&modules=${modules}`;
 
     const res = await fetch(url, {
       headers: {
@@ -117,7 +127,7 @@ export class YahooService {
   async search(query) {
     const { crumb, cookie } = await this.getCrumb();
 
-    const url = `https://query1.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(query)}&quotesCount=10&newsCount=0&enableFuzzyQuery=false&crumb=${encodeURIComponent(crumb)}`;
+    const url = `https://query2.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(query)}&quotesCount=10&newsCount=0&enableFuzzyQuery=false&crumb=${encodeURIComponent(crumb)}`;
 
     const res = await fetch(url, {
       headers: {

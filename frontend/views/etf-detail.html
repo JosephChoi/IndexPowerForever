@@ -263,7 +263,27 @@
                   <div class="info-row" v-if="etfInfo.inceptionDate"><span class="info-key">설정일</span><span>{{ etfInfo.inceptionDate }}</span></div>
                   <div class="info-row" v-if="etfInfo.aum"><span class="info-key">운용자산</span><span>{{ formatAum(etfInfo.aum) }}</span></div>
                 </div>
-                <p class="text-muted small px-3 pb-3 mb-0" v-if="etfInfo.description">{{ etfInfo.description.slice(0, 300) }}...</p>
+                <div class="px-3 pb-3" v-if="etfInfo.description">
+                  <div class="desc-toggle-wrap">
+                    <p class="text-muted small mb-1" :class="{ 'desc-collapsed': !descExpanded }">
+                      {{ showTranslated && translatedDesc ? translatedDesc : etfInfo.description }}
+                    </p>
+                    <div class="d-flex gap-2 align-items-center mt-1">
+                      <button class="btn btn-link btn-sm p-0 text-decoration-none" @click="descExpanded = !descExpanded">
+                        {{ descExpanded ? '접기' : '더보기' }}
+                      </button>
+                      <button
+                        class="btn btn-outline-secondary btn-sm py-0 px-2"
+                        style="font-size: 0.75rem;"
+                        @click="toggleTranslate"
+                        :disabled="isTranslating"
+                      >
+                        <span v-if="isTranslating"><span class="spinner-border spinner-border-sm me-1" style="width:0.7rem;height:0.7rem;"></span>번역 중...</span>
+                        <span v-else>{{ showTranslated && translatedDesc ? '원문 보기' : '한국어로 보기' }}</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
             <div class="col-12 col-md-6" v-if="etfInfo.topHoldings?.length">

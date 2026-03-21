@@ -15,7 +15,20 @@ export class PriceService {
     const cached = await this.env.KV.get(cacheKey);
     if (cached) return JSON.parse(cached);
 
-    // D1 캐시 확인
+    // max: 항상 Yahoo에서 전체 기간 조회 (D1에 부분 데이터만 있을 수 있음)
+    if (period === 'max') {
+      const prices = await this.yahoo.getChart(ticker, 'max');
+      if (prices.length === 0) {
+        const err = new Error(`${ticker} 가격 데이터를 찾을 수 없습니다.`);
+        err.name = 'NotFoundError';
+        throw err;
+      }
+      await this._saveToD1(ticker, prices);
+      await this.env.KV.put(cacheKey, JSON.stringify(prices), { expirationTtl: 3600 });
+      return prices;
+    }
+
+    // D1 캐시 확인 (max 이외 기간)
     const d1Prices = await this._getFromD1(ticker, period);
     if (d1Prices.length > 0) {
       await this.env.KV.put(cacheKey, JSON.stringify(d1Prices), { expirationTtl: 3600 });

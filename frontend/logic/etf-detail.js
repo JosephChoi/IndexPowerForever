@@ -13,6 +13,10 @@ window.__view_etf_detail = {
       comparisonChart: null,
       excessChart: null,
       annualChart: null,
+      descExpanded: false,
+      showTranslated: false,
+      translatedDesc: null,
+      isTranslating: false,
     };
   },
 
@@ -247,6 +251,30 @@ window.__view_etf_detail = {
       if (aum >= 1e9) return `$${(aum / 1e9).toFixed(1)}B`;
       if (aum >= 1e6) return `$${(aum / 1e6).toFixed(1)}M`;
       return `$${aum.toLocaleString()}`;
+    },
+
+    // 설명 번역 토글
+    async toggleTranslate() {
+      if (this.showTranslated && this.translatedDesc) {
+        this.showTranslated = false;
+        return;
+      }
+      if (this.translatedDesc) {
+        this.showTranslated = true;
+        return;
+      }
+      this.isTranslating = true;
+      try {
+        const res = await this.$api.post('/api/translate', { text: this.etfInfo.description });
+        this.translatedDesc = res.translated;
+        this.showTranslated = true;
+        this.descExpanded = true;
+      } catch {
+        this.translatedDesc = '번역에 실패했습니다. 잠시 후 다시 시도해주세요.';
+        this.showTranslated = true;
+      } finally {
+        this.isTranslating = false;
+      }
     },
 
     // 최근 검색 저장

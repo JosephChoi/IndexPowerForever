@@ -11,3 +11,6 @@ database_id = "d83bdf6e-ce60-47d3-a415-455f24b69295"
 [[kv_namespaces]]
 binding = "KV"
 id = "d9325ab1fd164d17bb4065dbcbb4515e"
+
+[ai]
+binding = "AI"

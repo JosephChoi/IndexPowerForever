@@ -647,6 +647,14 @@
   font-weight: 500;
 }
 
+/* 설명 접기/펼치기 */
+.desc-collapsed {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
 /* 인덱스 승률 설명 배너 */
 .index-win-banner {
   display: flex;
