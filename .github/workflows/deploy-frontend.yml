@@ -8,16 +8,11 @@ on:
       - 'frontend/**'
       - '.github/workflows/deploy-frontend.yml'
 
+# Cloudflare Pages가 GitHub에 직접 연결되어 자동 배포됨
+# 이 워크플로우는 트리거 기록용으로만 유지
 jobs:
-  deploy:
+  notify:
     runs-on: ubuntu-latest
-    name: Deploy to Cloudflare Pages
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Deploy to Cloudflare Pages
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy frontend --project-name=indexpowerforever --branch=main
+      - name: Frontend deployment triggered via Cloudflare Pages GitHub integration
+        run: echo "Cloudflare Pages will automatically deploy from the connected GitHub repo."
