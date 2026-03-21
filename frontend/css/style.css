@@ -320,6 +320,334 @@
   font-size: 1.3rem;
 }
 
+/* ── ETF 분석 페이지 ── */
+
+/* 헤더 배너 */
+.etf-header-banner {
+  background: linear-gradient(160deg, #060b18 0%, #0d1f3c 60%, #0a2a1a 100%);
+  color: #fff;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.etf-ticker-badge {
+  font-size: 2rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, #4a9eff, #38d9a9);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1;
+  min-width: 80px;
+}
+
+.etf-fullname {
+  font-size: 1rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.9);
+  margin: 0;
+}
+
+.etf-meta-chip {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.5);
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 0.2rem 0.6rem;
+  border-radius: 100px;
+}
+
+/* 기간 선택 */
+.etf-period-group {
+  display: flex;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  padding: 3px;
+  gap: 2px;
+}
+
+.etf-period-btn {
+  background: transparent;
+  border: none;
+  color: rgba(255,255,255,0.5);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.25rem 0.65rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.etf-period-btn.active {
+  background: rgba(255,255,255,0.15);
+  color: #fff;
+}
+
+.etf-period-btn:hover:not(.active) {
+  color: rgba(255,255,255,0.8);
+}
+
+/* 벤치마크 선택 */
+.etf-bench-group {
+  display: flex;
+  gap: 6px;
+}
+
+.etf-bench-btn {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.5);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.25rem 0.75rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.etf-bench-btn.spy.active {
+  background: rgba(25,135,84,0.25);
+  border-color: #198754;
+  color: #75d8a8;
+}
+
+.etf-bench-btn.qqq.active {
+  background: rgba(253,126,20,0.2);
+  border-color: #fd7e14;
+  color: #ffc07a;
+}
+
+.etf-bench-btn:hover:not(.active) {
+  color: rgba(255,255,255,0.8);
+  border-color: rgba(255,255,255,0.3);
+}
+
+/* 탭 바 */
+.etf-tab-bar {
+  background: #fff;
+  border-bottom: 1px solid #e9ecef;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.etf-tabs {
+  display: flex;
+  gap: 0;
+}
+
+.etf-tab {
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: #6c757d;
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 0.85rem 1.25rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.etf-tab:hover { color: #0d6efd; }
+
+.etf-tab.active {
+  color: #0d6efd;
+  border-bottom-color: #0d6efd;
+  font-weight: 600;
+}
+
+/* KPI 카드 */
+.kpi-card {
+  background: #fff;
+  border: 1px solid #e9ecef;
+  border-radius: 12px;
+  padding: 1.1rem 1.2rem;
+  transition: box-shadow 0.2s;
+}
+
+.kpi-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.07); }
+
+.kpi-label {
+  font-size: 0.75rem;
+  color: #6c757d;
+  font-weight: 500;
+  margin-bottom: 0.3rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.kpi-value {
+  font-size: 1.6rem;
+  font-weight: 800;
+  line-height: 1.1;
+  color: #212529;
+}
+
+.kpi-value.positive { color: #198754; }
+.kpi-value.negative { color: #dc3545; }
+
+.kpi-vs {
+  font-size: 0.72rem;
+  color: #adb5bd;
+  margin-top: 0.35rem;
+}
+
+/* 차트 카드 */
+.chart-card {
+  background: #fff;
+  border: 1px solid #e9ecef;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.chart-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem 0.75rem;
+  border-bottom: 1px solid #f1f3f5;
+}
+
+.chart-card-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #212529;
+}
+
+.chart-card .chart-container {
+  padding: 1rem 1.25rem 1.25rem;
+}
+
+.chart-legend {
+  display: flex;
+  align-items: center;
+  font-size: 0.75rem;
+  color: #6c757d;
+}
+
+.legend-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 4px;
+}
+
+/* 롤링 승률 카드 */
+.rolling-card {
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
+  border: 1px solid transparent;
+}
+
+.rolling-card.win {
+  background: rgba(25,135,84,0.07);
+  border-color: rgba(25,135,84,0.2);
+}
+
+.rolling-card.lose {
+  background: rgba(220,53,69,0.06);
+  border-color: rgba(220,53,69,0.15);
+}
+
+.rolling-rate {
+  font-size: 2.8rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.rolling-card.win .rolling-rate { color: #198754; }
+.rolling-card.lose .rolling-rate { color: #dc3545; }
+
+.rolling-unit {
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.rolling-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #495057;
+  margin-top: 0.4rem;
+}
+
+.rolling-sub {
+  font-size: 0.75rem;
+  color: #adb5bd;
+  margin-top: 0.2rem;
+}
+
+/* 승/패 배지 */
+.badge-win {
+  background: rgba(25,135,84,0.12);
+  color: #198754;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+}
+
+.badge-lose {
+  background: rgba(220,53,69,0.1);
+  color: #dc3545;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+}
+
+/* 상세 테이블 */
+.detail-table {
+  font-size: 0.875rem;
+}
+
+.detail-table thead th {
+  background: #f8f9fa;
+  color: #6c757d;
+  font-weight: 600;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid #e9ecef;
+  padding: 0.65rem 1rem;
+}
+
+.detail-table tbody td {
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid #f1f3f5;
+  vertical-align: middle;
+}
+
+.result-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.2rem 0.55rem;
+  border-radius: 6px;
+}
+
+.result-badge.win { background: rgba(25,135,84,0.12); color: #198754; }
+.result-badge.lose { background: rgba(220,53,69,0.1); color: #dc3545; }
+
+/* 기본정보 테이블 */
+.info-table { padding: 0 0.75rem 0.75rem; }
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.6rem 0.5rem;
+  border-bottom: 1px solid #f1f3f5;
+  font-size: 0.875rem;
+}
+
+.info-key {
+  color: #6c757d;
+  font-weight: 500;
+}
+
 /* 반응형 패딩 */
 @media (max-width: 576px) {
   .hero-section { min-height: auto; }
