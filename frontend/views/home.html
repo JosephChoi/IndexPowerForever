@@ -61,8 +61,8 @@
               :key="item.ticker"
               @click="onSelectResult(item.ticker)"
             >
-              <span class="fw-bold me-2">{{ item.ticker }}</span>
-              <span class="text-muted small">{{ item.name }}</span>
+              <span class="badge bg-primary me-2" style="min-width:52px;font-size:0.8rem;">{{ item.ticker }}</span>
+              <span class="text-truncate" style="color:#495057;">{{ item.name }}</span>
             </div>
           </div>
         </div>

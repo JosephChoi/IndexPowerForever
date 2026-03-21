@@ -202,10 +202,14 @@
 }
 
 .search-dropdown-item {
+  display: flex;
+  align-items: center;
+  text-align: left;
   padding: 0.65rem 1rem;
   cursor: pointer;
   transition: background-color 0.15s;
   border-bottom: 1px solid #f8f9fa;
+  color: #212529;
 }
 
 .search-dropdown-item:hover {
