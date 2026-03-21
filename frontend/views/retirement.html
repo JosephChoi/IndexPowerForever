@@ -1,0 +1,49 @@
+<div>
+  <div class="container py-4">
+    <h1 class="h3 fw-bold mb-1"><i class="bi bi-piggy-bank me-2 text-success"></i>퇴직연금 시뮬레이터</h1>
+    <p class="text-muted mb-4">원리금보장 상품 vs 인덱스 펀드, 퇴직 시 얼마나 차이날까요?</p>
+
+    <div class="row g-4">
+      <div class="col-12 col-md-4">
+        <div class="card border-0 shadow-sm">
+          <div class="card-body">
+            <h6 class="fw-bold mb-3">투자 조건</h6>
+            <div class="mb-3">
+              <label class="form-label small fw-medium">현재 적립금: {{ currentBalance.toLocaleString() }}만원</label>
+              <input type="range" class="form-range" min="0" max="50000" step="500" v-model.number="currentBalance" @input="calculate" />
+            </div>
+            <div class="mb-3">
+              <label class="form-label small fw-medium">월 납입액: {{ monthlyContrib.toLocaleString() }}만원</label>
+              <input type="range" class="form-range" min="10" max="500" step="10" v-model.number="monthlyContrib" @input="calculate" />
+            </div>
+            <div class="mb-3">
+              <label class="form-label small fw-medium">운용 기간: {{ years }}년</label>
+              <input type="range" class="form-range" min="5" max="40" v-model.number="years" @input="calculate" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-md-8">
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-body">
+            <h6 class="fw-bold mb-3">자산 성장 추이</h6>
+            <div class="chart-container" style="height:280px"><canvas id="retirementChart"></canvas></div>
+          </div>
+        </div>
+        <div class="row g-3">
+          <div class="col-12 col-sm-4" v-for="(r, i) in results" :key="i">
+            <div class="win-rate-card" :class="i === 0 ? 'bg-light' : i === 1 ? 'bg-outperform' : 'bg-outperform'">
+              <div class="fw-bold mb-2">{{ r.label }}</div>
+              <div class="stat-value" :class="i === 0 ? '' : 'text-outperform'">
+                {{ r.finalAmount.toLocaleString() }}<small class="fs-6">만</small>
+              </div>
+              <div class="text-muted small mt-1">수익금 {{ r.profit.toLocaleString() }}만원</div>
+              <div class="text-success small fw-bold" v-if="i > 0">+{{ r.extra.toLocaleString() }}만원 더</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

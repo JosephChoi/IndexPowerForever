@@ -1,0 +1,266 @@
+<div>
+  <div class="container py-4">
+    <!-- 로딩 -->
+    <div class="loading-overlay" v-if="isLoading && !etfInfo">
+      <div class="spinner-border text-primary"></div>
+    </div>
+
+    <!-- 에러 -->
+    <div class="alert alert-danger" v-if="error">
+      <i class="bi bi-exclamation-triangle me-2"></i>{{ error }}
+      <button class="btn btn-sm btn-outline-danger ms-2" @click="loadData">재시도</button>
+    </div>
+
+    <template v-if="etfInfo || compareData">
+      <!-- 헤더 -->
+      <div class="d-flex align-items-start justify-content-between flex-wrap gap-2 mb-4">
+        <div>
+          <h1 class="h2 fw-bold mb-1">{{ ticker }}</h1>
+          <p class="text-muted mb-0">{{ etfInfo?.name || '' }}</p>
+          <small class="text-muted" v-if="etfInfo?.expenseRatio">
+            운용보수 {{ (etfInfo.expenseRatio * 100).toFixed(2) }}% ·
+            AUM {{ etfInfo.aum ? formatAum(etfInfo.aum) : '-' }}
+          </small>
+        </div>
+        <button class="btn btn-outline-secondary btn-sm" @click="navigateTo('/')">
+          <i class="bi bi-arrow-left me-1"></i>검색으로
+        </button>
+      </div>
+
+      <!-- 기간 + 벤치마크 선택 -->
+      <div class="d-flex flex-wrap gap-3 mb-4 align-items-center">
+        <div class="btn-group btn-group-sm">
+          <button
+            class="btn btn-outline-primary period-btn"
+            :class="{ active: period === p }"
+            v-for="p in ['1Y','3Y','5Y','10Y','max']"
+            :key="p"
+            @click="onPeriodChange(p)"
+          >{{ p === 'max' ? '전체' : p }}</button>
+        </div>
+        <div class="btn-group btn-group-sm">
+          <button
+            class="btn btn-outline-success"
+            :class="{ active: benchmark === 'SPY' }"
+            @click="onBenchmarkChange('SPY')"
+          >S&P 500</button>
+          <button
+            class="btn btn-outline-warning"
+            :class="{ active: benchmark === 'QQQ' }"
+            @click="onBenchmarkChange('QQQ')"
+          >NASDAQ 100</button>
+        </div>
+        <span class="spinner-border spinner-border-sm text-secondary" v-if="isLoading"></span>
+      </div>
+
+      <!-- 탭 -->
+      <ul class="nav nav-tabs mb-4">
+        <li class="nav-item">
+          <button class="nav-link" :class="{ active: activeTab === 'comparison' }" @click="activeTab = 'comparison'">
+            <i class="bi bi-graph-up me-1"></i>성과 비교
+          </button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link" :class="{ active: activeTab === 'analysis' }" @click="activeTab = 'analysis'">
+            <i class="bi bi-trophy me-1"></i>이김/짐 분석
+          </button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link" :class="{ active: activeTab === 'info' }" @click="activeTab = 'info'">
+            <i class="bi bi-info-circle me-1"></i>종목 정보
+          </button>
+        </li>
+      </ul>
+
+      <!-- ===== 탭1: 성과 비교 ===== -->
+      <div v-show="activeTab === 'comparison'">
+        <div class="row g-3 mb-4" v-if="compareData">
+          <!-- 통계 지표 테이블 -->
+          <div class="col-12">
+            <div class="table-responsive">
+              <table class="table table-bordered align-middle text-center mb-0">
+                <thead class="table-dark">
+                  <tr>
+                    <th>지표</th>
+                    <th>{{ ticker }}</th>
+                    <th>S&P 500</th>
+                    <th>NASDAQ 100</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="text-start fw-medium">총수익률</td>
+                    <td :class="statClass('totalReturn', 'etf')">{{ compareData.stats.etf.totalReturn.toFixed(1) }}%</td>
+                    <td>{{ compareData.stats.spy.totalReturn.toFixed(1) }}%</td>
+                    <td>{{ compareData.stats.qqq.totalReturn.toFixed(1) }}%</td>
+                  </tr>
+                  <tr>
+                    <td class="text-start fw-medium">CAGR</td>
+                    <td :class="statClass('cagr', 'etf')">{{ compareData.stats.etf.cagr.toFixed(2) }}%</td>
+                    <td>{{ compareData.stats.spy.cagr.toFixed(2) }}%</td>
+                    <td>{{ compareData.stats.qqq.cagr.toFixed(2) }}%</td>
+                  </tr>
+                  <tr>
+                    <td class="text-start fw-medium">MDD</td>
+                    <td :class="mddClass('etf')">{{ compareData.stats.etf.mdd.toFixed(1) }}%</td>
+                    <td>{{ compareData.stats.spy.mdd.toFixed(1) }}%</td>
+                    <td>{{ compareData.stats.qqq.mdd.toFixed(1) }}%</td>
+                  </tr>
+                  <tr>
+                    <td class="text-start fw-medium">샤프 비율</td>
+                    <td :class="statClass('sharpe', 'etf')">{{ compareData.stats.etf.sharpe.toFixed(2) }}</td>
+                    <td>{{ compareData.stats.spy.sharpe.toFixed(2) }}</td>
+                    <td>{{ compareData.stats.qqq.sharpe.toFixed(2) }}</td>
+                  </tr>
+                  <tr>
+                    <td class="text-start fw-medium">연환산 변동성</td>
+                    <td>{{ compareData.stats.etf.annualVolatility.toFixed(1) }}%</td>
+                    <td>{{ compareData.stats.spy.annualVolatility.toFixed(1) }}%</td>
+                    <td>{{ compareData.stats.qqq.annualVolatility.toFixed(1) }}%</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- 수익률 비교 차트 -->
+          <div class="col-12">
+            <div class="card border-0 shadow-sm">
+              <div class="card-body">
+                <h6 class="card-title fw-bold mb-3">누적 수익률 비교</h6>
+                <div class="chart-container" style="height:320px">
+                  <canvas id="comparisonChart"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 초과수익률 차트 -->
+          <div class="col-12">
+            <div class="card border-0 shadow-sm">
+              <div class="card-body">
+                <h6 class="card-title fw-bold mb-3">초과수익률 ({{ ticker }} - {{ benchmark }})</h6>
+                <div class="chart-container" style="height:200px">
+                  <canvas id="excessChart"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== 탭2: 이김/짐 분석 ===== -->
+      <div v-show="activeTab === 'analysis'">
+        <template v-if="compareData">
+          <!-- 롤링 승률 카드 -->
+          <div class="row g-3 mb-4">
+            <div class="col-12 col-md-4" v-for="(data, period) in compareData.winAnalysis.rollingWin" :key="period">
+              <div class="win-rate-card" :class="data.winRate >= 50 ? 'bg-outperform' : 'bg-underperform'">
+                <div class="win-rate-value" :class="data.winRate >= 50 ? 'text-outperform' : 'text-underperform'">
+                  {{ data.winRate }}%
+                </div>
+                <div class="mt-1 fw-medium">{{ period }} 보유 승률</div>
+                <div class="text-muted small">{{ data.winCount }}승 / {{ data.totalWindows }}개 구간</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 연도별 승패 요약 -->
+          <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+              <h6 class="card-title fw-bold mb-1">연도별 승패 요약</h6>
+              <p class="text-muted small mb-3">
+                총 {{ compareData.winAnalysis.totalYears }}년 중
+                <span class="text-outperform fw-bold">{{ compareData.winAnalysis.winCount }}승</span>
+                /
+                <span class="text-underperform fw-bold">{{ compareData.winAnalysis.loseCount }}패</span>
+                (승률 {{ compareData.winAnalysis.winRate }}%)
+              </p>
+              <!-- 연도별 막대 차트 -->
+              <div class="chart-container" style="height:240px">
+                <canvas id="annualChart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- 연도별 수익률 테이블 -->
+          <div class="table-responsive">
+            <table class="table table-sm table-hover align-middle text-center">
+              <thead class="table-light">
+                <tr>
+                  <th>연도</th>
+                  <th>{{ ticker }}</th>
+                  <th>{{ benchmark }}</th>
+                  <th>초과수익률</th>
+                  <th>결과</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="row in compareData.winAnalysis.yearlyReturns" :key="row.year">
+                  <td class="fw-medium">{{ row.year }}</td>
+                  <td :class="row.etfReturn >= 0 ? 'text-outperform' : 'text-underperform'">
+                    {{ row.etfReturn > 0 ? '+' : '' }}{{ row.etfReturn.toFixed(1) }}%
+                  </td>
+                  <td :class="row.benchReturn >= 0 ? 'text-success' : 'text-danger'">
+                    {{ row.benchReturn > 0 ? '+' : '' }}{{ row.benchReturn.toFixed(1) }}%
+                  </td>
+                  <td :class="row.diff >= 0 ? 'text-outperform fw-bold' : 'text-underperform'">
+                    {{ row.diff > 0 ? '+' : '' }}{{ row.diff.toFixed(1) }}%
+                  </td>
+                  <td>
+                    <span class="badge" :class="row.win ? 'bg-success' : 'bg-danger'">
+                      {{ row.win ? '승' : '패' }}
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </template>
+      </div>
+
+      <!-- ===== 탭3: 종목 정보 ===== -->
+      <div v-show="activeTab === 'info'">
+        <template v-if="etfInfo">
+          <div class="row g-4">
+            <div class="col-12 col-md-6">
+              <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                  <h6 class="card-title fw-bold mb-3">기본 정보</h6>
+                  <table class="table table-sm mb-0">
+                    <tbody>
+                      <tr><td class="text-muted">티커</td><td class="fw-bold">{{ etfInfo.ticker }}</td></tr>
+                      <tr><td class="text-muted">종목명</td><td>{{ etfInfo.name }}</td></tr>
+                      <tr v-if="etfInfo.expenseRatio"><td class="text-muted">운용보수</td><td>{{ (etfInfo.expenseRatio * 100).toFixed(2) }}%</td></tr>
+                      <tr v-if="etfInfo.inceptionDate"><td class="text-muted">설정일</td><td>{{ etfInfo.inceptionDate }}</td></tr>
+                      <tr v-if="etfInfo.aum"><td class="text-muted">운용자산</td><td>{{ formatAum(etfInfo.aum) }}</td></tr>
+                    </tbody>
+                  </table>
+                  <p class="text-muted small mt-3" v-if="etfInfo.description">{{ etfInfo.description.slice(0, 300) }}...</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- 상위 보유 종목 -->
+            <div class="col-12 col-md-6" v-if="etfInfo.topHoldings?.length">
+              <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                  <h6 class="card-title fw-bold mb-3">주요 보유 종목 TOP 10</h6>
+                  <div v-for="holding in etfInfo.topHoldings.slice(0, 10)" :key="holding.ticker" class="mb-2">
+                    <div class="d-flex justify-content-between small mb-1">
+                      <span><span class="fw-bold me-1">{{ holding.ticker }}</span>{{ holding.name }}</span>
+                      <span class="text-muted">{{ (holding.weight * 100).toFixed(1) }}%</span>
+                    </div>
+                    <div class="progress" style="height:4px">
+                      <div class="progress-bar bg-primary" :style="{ width: (holding.weight * 100) + '%' }"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </template>
+      </div>
+    </template>
+  </div>
+</div>

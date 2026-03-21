@@ -1,0 +1,145 @@
+<div>
+  <!-- 히어로 섹션 -->
+  <section class="hero-section text-white py-5">
+    <div class="container position-relative">
+      <div class="row justify-content-center text-center mb-4">
+        <div class="col-lg-8">
+          <h1 class="display-4 fw-bold mb-2">지수는 영원하다</h1>
+          <p class="lead text-white-50 mb-4">ETF를 검색하여 S&P 500 / NASDAQ 100 지수와 성과를 비교해보세요</p>
+        </div>
+      </div>
+
+      <!-- 검색 입력 -->
+      <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8 position-relative">
+          <div class="input-group input-group-lg shadow">
+            <span class="input-group-text bg-white border-end-0">
+              <i class="bi bi-search text-muted"></i>
+            </span>
+            <input
+              type="text"
+              class="form-control border-start-0 ps-0"
+              placeholder="ETF 티커 또는 종목명 검색 (예: SPY, QQQ, SCHD)"
+              v-model="searchQuery"
+              @input="onSearchInput"
+              @keydown.enter="onEnterSearch"
+              @keydown.escape="searchResults = []"
+              autocomplete="off"
+            />
+            <button class="btn btn-primary px-4" @click="onEnterSearch">
+              <span v-if="isSearching" class="spinner-border spinner-border-sm"></span>
+              <span v-else>분석</span>
+            </button>
+          </div>
+
+          <!-- 자동완성 드롭다운 -->
+          <div class="search-dropdown" v-if="searchResults.length > 0">
+            <div
+              class="search-dropdown-item"
+              v-for="item in searchResults"
+              :key="item.ticker"
+              @click="onSelectResult(item.ticker)"
+            >
+              <span class="fw-bold me-2">{{ item.ticker }}</span>
+              <span class="text-muted small">{{ item.name }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 최근 검색 -->
+      <div class="row justify-content-center mt-3" v-if="recentTickers.length > 0">
+        <div class="col-lg-6 col-md-8 text-center">
+          <span class="text-white-50 small me-2">최근 검색:</span>
+          <span
+            class="badge bg-light text-dark me-1 ticker-badge"
+            v-for="ticker in recentTickers"
+            :key="ticker"
+            style="cursor:pointer"
+            @click="onSelectResult(ticker)"
+          >{{ ticker }}</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 메인 콘텐츠 -->
+  <div class="container py-5">
+    <!-- 에러 -->
+    <div class="alert alert-danger" v-if="error">
+      <i class="bi bi-exclamation-triangle me-2"></i>{{ error }}
+    </div>
+
+    <!-- 인기 검색 TOP 5 -->
+    <section class="mb-5" v-if="popularEtfs.length > 0">
+      <h2 class="h5 fw-bold mb-3">
+        <i class="bi bi-fire text-danger me-2"></i>인기 검색 ETF
+      </h2>
+      <div class="d-flex flex-wrap gap-2">
+        <button
+          class="btn btn-outline-secondary btn-sm"
+          v-for="(etf, idx) in popularEtfs"
+          :key="etf.ticker"
+          @click="onSelectResult(etf.ticker)"
+        >
+          <span class="badge bg-secondary me-1">{{ idx + 1 }}</span>
+          {{ etf.ticker }}
+        </button>
+      </div>
+    </section>
+
+    <!-- 인기 프리셋 -->
+    <section v-if="!isLoading">
+      <h2 class="h5 fw-bold mb-3">
+        <i class="bi bi-stars text-warning me-2"></i>인기 비교 프리셋
+      </h2>
+      <div class="row g-3">
+        <div
+          class="col-12 col-md-6 col-xl-4"
+          v-for="preset in presets"
+          :key="preset.id"
+        >
+          <div class="card preset-card h-100 border-0 shadow-sm" @click="onPresetClick(preset)">
+            <div class="card-body">
+              <h6 class="card-title fw-bold mb-2">{{ preset.name }}</h6>
+              <p class="card-text text-muted small mb-3">{{ preset.description }}</p>
+              <div class="d-flex flex-wrap gap-1">
+                <span
+                  class="badge bg-primary ticker-badge"
+                  v-for="ticker in preset.tickers"
+                  :key="ticker"
+                >{{ ticker }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 로딩 -->
+    <div class="loading-overlay" v-if="isLoading">
+      <div class="spinner-border text-primary"></div>
+    </div>
+
+    <!-- 서비스 소개 -->
+    <section class="mt-5 py-5 bg-light rounded-3 px-4">
+      <div class="row g-4 text-center">
+        <div class="col-12 col-md-4">
+          <i class="bi bi-graph-up-arrow display-5 text-primary mb-3 d-block"></i>
+          <h5 class="fw-bold">성과 비교 분석</h5>
+          <p class="text-muted small">ETF vs S&P 500 / NASDAQ 100 수익률 · CAGR · MDD · 샤프 비율 비교</p>
+        </div>
+        <div class="col-12 col-md-4">
+          <i class="bi bi-trophy display-5 text-warning mb-3 d-block"></i>
+          <h5 class="fw-bold">이김/짐 분석</h5>
+          <p class="text-muted small">연도별 승패 · 롤링 승률 · 연속 스트릭으로 지수 투자의 우월성 확인</p>
+        </div>
+        <div class="col-12 col-md-4">
+          <i class="bi bi-calculator display-5 text-success mb-3 d-block"></i>
+          <h5 class="fw-bold">시뮬레이터</h5>
+          <p class="text-muted small">비용 복리 효과 · 퇴직연금 전략 · 타이밍 실패 손실 체험</p>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>

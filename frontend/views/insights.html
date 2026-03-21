@@ -1,0 +1,37 @@
+<div>
+  <div class="container py-4">
+    <h1 class="h3 fw-bold mb-1"><i class="bi bi-lightbulb me-2 text-warning"></i>인사이트</h1>
+    <p class="text-muted mb-4">『이길 수 있는 투자만 하라』의 핵심 메시지를 데이터로 확인하세요</p>
+
+    <!-- 파트 필터 -->
+    <div class="d-flex flex-wrap gap-2 mb-4">
+      <button class="btn btn-sm" :class="activeSection === 'all' ? 'btn-dark' : 'btn-outline-secondary'" @click="activeSection = 'all'">전체</button>
+      <button class="btn btn-sm" :class="activeSection === 'part1' ? 'btn-primary' : 'btn-outline-primary'" @click="activeSection = 'part1'">PART 1 · 지수의 힘</button>
+      <button class="btn btn-sm" :class="activeSection === 'part2' ? 'btn-success' : 'btn-outline-success'" @click="activeSection = 'part2'">PART 2 · 비용의 함정</button>
+      <button class="btn btn-sm" :class="activeSection === 'part3' ? 'btn-warning' : 'btn-outline-warning'" @click="activeSection = 'part3'">PART 3 · 타이밍의 환상</button>
+      <button class="btn btn-sm" :class="activeSection === 'part4' ? 'btn-danger' : 'btn-outline-danger'" @click="activeSection = 'part4'">PART 4 · 퇴직연금 전략</button>
+    </div>
+
+    <div class="row g-3">
+      <div class="col-12 col-md-6" v-for="card in filteredCards" :key="card.id">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body">
+            <div class="d-flex align-items-start gap-3">
+              <div class="fs-2">{{ card.icon }}</div>
+              <div class="flex-grow-1">
+                <div class="d-flex align-items-center gap-2 mb-1">
+                  <span class="badge" :class="partBadgeClass(card.part)">{{ card.part }}</span>
+                  <h6 class="mb-0 fw-bold">{{ card.title }}</h6>
+                </div>
+                <p class="text-muted small mb-2">{{ card.message }}</p>
+                <a :href="card.link" class="btn btn-sm btn-outline-primary" v-if="card.link">
+                  <i class="bi bi-play me-1"></i>시뮬레이터로 확인
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

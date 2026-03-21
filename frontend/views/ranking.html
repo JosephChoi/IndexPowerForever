@@ -1,0 +1,52 @@
+<div>
+  <div class="container py-4">
+    <h1 class="h3 fw-bold mb-1"><i class="bi bi-trophy me-2 text-warning"></i>ETF 성과 랭킹</h1>
+    <p class="text-muted mb-4">기간별 S&P 500 / NASDAQ 100 대비 초과수익률 순위</p>
+
+    <!-- 필터 -->
+    <div class="d-flex flex-wrap gap-3 align-items-center mb-4">
+      <div class="btn-group btn-group-sm">
+        <button class="btn btn-outline-primary" :class="{ active: period === p }" v-for="p in ['1Y','3Y','5Y','10Y']" :key="p" @click="onFilterChange(p, benchmark)">{{ p }}</button>
+      </div>
+      <div class="btn-group btn-group-sm">
+        <button class="btn btn-outline-success" :class="{ active: benchmark === 'SPY' }" @click="onFilterChange(period, 'SPY')">S&P 500</button>
+        <button class="btn btn-outline-warning" :class="{ active: benchmark === 'QQQ' }" @click="onFilterChange(period, 'QQQ')">NASDAQ 100</button>
+      </div>
+      <span class="spinner-border spinner-border-sm text-secondary" v-if="isLoading"></span>
+    </div>
+
+    <div class="alert alert-danger" v-if="error"><i class="bi bi-exclamation-triangle me-2"></i>{{ error }}</div>
+
+    <div class="loading-overlay" v-if="isLoading && !rankings.length">
+      <div class="spinner-border text-primary"></div>
+    </div>
+
+    <div class="table-responsive" v-if="rankings.length">
+      <table class="table table-hover align-middle">
+        <thead class="table-dark">
+          <tr>
+            <th>순위</th><th>티커</th><th>종목명</th><th>카테고리</th>
+            <th>총수익률</th><th>초과수익률</th><th>CAGR</th><th>MDD</th><th>연승률</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="ranking-row" v-for="r in rankings" :key="r.ticker" @click="navigateTo('/etf/' + r.ticker)">
+            <td class="fw-bold">
+              <span class="badge" :class="r.rank <= 3 ? 'bg-warning text-dark' : 'bg-secondary'">{{ r.rank }}</span>
+            </td>
+            <td class="fw-bold text-primary">{{ r.ticker }}</td>
+            <td class="small">{{ r.name }}</td>
+            <td><span class="badge bg-light text-dark">{{ r.category || '-' }}</span></td>
+            <td :class="r.totalReturn >= 0 ? 'text-success' : 'text-danger'">{{ r.totalReturn.toFixed(1) }}%</td>
+            <td :class="r.excessReturn >= 0 ? 'text-outperform fw-bold' : 'text-underperform'">
+              {{ r.excessReturn > 0 ? '+' : '' }}{{ r.excessReturn.toFixed(1) }}%
+            </td>
+            <td>{{ r.cagr.toFixed(1) }}%</td>
+            <td class="text-danger">{{ r.mdd.toFixed(1) }}%</td>
+            <td>{{ r.winRate.toFixed(0) }}%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

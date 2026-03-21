@@ -1,0 +1,13 @@
+name = "index-power-forever"
+main = "src/index.js"
+compatibility_date = "2024-11-01"
+compatibility_flags = ["nodejs_compat"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "index-power-forever"
+database_id = "d83bdf6e-ce60-47d3-a415-455f24b69295"
+
+[[kv_namespaces]]
+binding = "KV"
+id = "d9325ab1fd164d17bb4065dbcbb4515e"

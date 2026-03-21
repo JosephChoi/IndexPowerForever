@@ -1,0 +1,169 @@
+/* Index Power Forever — 공통 스타일 */
+
+:root {
+  --color-outperform: #28a745;
+  --color-underperform: #dc3545;
+  --color-spy: #198754;
+  --color-ndx: #fd7e14;
+  --color-etf: #0d6efd;
+  --color-hero-bg: #0a0e1a;
+  --color-hero-accent: #1e3a5f;
+}
+
+/* 히어로 섹션 */
+.hero-section {
+  background: linear-gradient(135deg, var(--color-hero-bg) 0%, var(--color-hero-accent) 100%);
+  min-height: 45vh;
+  display: flex;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* 검색 자동완성 드롭다운 */
+.search-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: white;
+  border: 1px solid #dee2e6;
+  border-top: none;
+  border-radius: 0 0 0.5rem 0.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.search-dropdown-item {
+  padding: 0.65rem 1rem;
+  cursor: pointer;
+  transition: background-color 0.15s;
+  border-bottom: 1px solid #f8f9fa;
+}
+
+.search-dropdown-item:hover {
+  background-color: #f0f4ff;
+}
+
+.search-dropdown-item:last-child {
+  border-bottom: none;
+}
+
+/* 수익률 색상 */
+.text-outperform { color: var(--color-outperform) !important; }
+.text-underperform { color: var(--color-underperform) !important; }
+.bg-outperform { background-color: rgba(40, 167, 69, 0.1) !important; }
+.bg-underperform { background-color: rgba(220, 53, 69, 0.1) !important; }
+
+/* 통계 지표 카드 */
+.stat-card {
+  border: 1px solid #e9ecef;
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  text-align: center;
+  transition: box-shadow 0.2s;
+}
+
+.stat-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.stat-card .stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.stat-card .stat-label {
+  font-size: 0.8rem;
+  color: #6c757d;
+  margin-top: 0.25rem;
+}
+
+/* 롤링 승률 카드 */
+.win-rate-card {
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.win-rate-value {
+  font-size: 2.5rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+/* 프리셋 카드 */
+.preset-card {
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  border-radius: 0.75rem;
+}
+
+.preset-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+}
+
+/* ETF 배지 목록 */
+.ticker-badge {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.3rem;
+}
+
+/* 랭킹 테이블 */
+.ranking-row {
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.ranking-row:hover {
+  background-color: #f8f9fa;
+}
+
+/* 로딩 스피너 */
+.loading-overlay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+}
+
+/* 차트 컨테이너 */
+.chart-container {
+  position: relative;
+  width: 100%;
+}
+
+/* 기간 선택 버튼 */
+.period-btn.active {
+  background-color: var(--bs-primary);
+  color: white;
+}
+
+/* 시뮬레이터 슬라이더 */
+.form-range::-webkit-slider-thumb {
+  background-color: var(--bs-primary);
+}
+
+/* 네비게이션 */
+.navbar-brand {
+  font-weight: 800;
+  font-size: 1.3rem;
+}
+
+/* 반응형 패딩 */
+@media (max-width: 576px) {
+  .hero-section { min-height: 55vh; }
+  .win-rate-value { font-size: 2rem; }
+}
