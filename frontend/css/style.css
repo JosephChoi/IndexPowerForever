@@ -12,19 +12,177 @@
 
 /* 히어로 섹션 */
 .hero-section {
-  background: linear-gradient(135deg, var(--color-hero-bg) 0%, var(--color-hero-accent) 100%);
-  min-height: 45vh;
+  background: linear-gradient(160deg, #060b18 0%, #0d1f3c 55%, #0a2a1a 100%);
+  min-height: 52vh;
   display: flex;
   align-items: center;
   position: relative;
   overflow: hidden;
 }
 
-.hero-section::before {
-  content: '';
+/* 그리드 배경 */
+.hero-bg-grid {
   position: absolute;
   inset: 0;
-  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  background-image:
+    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none;
+}
+
+/* 발광 효과 */
+.hero-bg-glow {
+  position: absolute;
+  top: -80px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 700px;
+  height: 400px;
+  background: radial-gradient(ellipse at center, rgba(13,110,253,0.18) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* 배지 */
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(13,110,253,0.15);
+  border: 1px solid rgba(13,110,253,0.35);
+  color: #7eb8ff;
+  font-size: 0.8rem;
+  font-weight: 500;
+  padding: 0.35rem 0.9rem;
+  border-radius: 100px;
+  letter-spacing: 0.02em;
+}
+
+/* 타이틀 */
+.hero-title {
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: #fff;
+}
+
+.hero-title-accent {
+  background: linear-gradient(90deg, #4a9eff 0%, #38d9a9 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-subtitle {
+  font-size: 1rem;
+  color: rgba(255,255,255,0.55);
+  line-height: 1.7;
+}
+
+/* 검색 박스 */
+.hero-search-wrap {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 0.875rem;
+  padding: 5px;
+  backdrop-filter: blur(12px);
+}
+
+.hero-search-icon {
+  background: transparent;
+  color: rgba(255,255,255,0.4);
+  padding-left: 1rem;
+}
+
+.hero-search-input {
+  background: transparent;
+  color: #fff;
+  font-size: 1rem;
+}
+
+.hero-search-input::placeholder {
+  color: rgba(255,255,255,0.3);
+}
+
+.hero-search-input:focus {
+  background: transparent;
+  color: #fff;
+  box-shadow: none;
+}
+
+.hero-search-btn {
+  background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+  color: #fff;
+  border-radius: 0.6rem !important;
+  font-weight: 600;
+  font-size: 0.95rem;
+  border: none;
+}
+
+.hero-search-btn:hover {
+  background: linear-gradient(135deg, #3d8bfd 0%, #0d6efd 100%);
+  color: #fff;
+}
+
+/* 최근 검색 배지 */
+.hero-recent-badge {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.7);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.hero-recent-badge:hover {
+  background: rgba(255,255,255,0.15);
+  color: #fff;
+}
+
+/* 하단 지표 행 */
+.hero-stats-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 1rem;
+  padding: 1.25rem 1.5rem;
+}
+
+.hero-stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+}
+
+.hero-stat-num {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1;
+}
+
+.hero-stat-unit {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.5);
+  margin-left: 2px;
+}
+
+.hero-stat-label {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.4);
+  margin-top: 0.3rem;
+}
+
+.hero-stat-divider {
+  width: 1px;
+  height: 36px;
+  background: rgba(255,255,255,0.1);
+  margin: 0 1.5rem;
 }
 
 /* 검색 자동완성 드롭다운 */
@@ -164,6 +322,10 @@
 
 /* 반응형 패딩 */
 @media (max-width: 576px) {
-  .hero-section { min-height: 55vh; }
+  .hero-section { min-height: auto; }
   .win-rate-value { font-size: 2rem; }
+  .hero-stats-row { gap: 0; padding: 1rem; }
+  .hero-stat-divider { margin: 0 0.75rem; }
+  .hero-stat-num { font-size: 1.3rem; }
+  .hero-bg-glow { width: 340px; }
 }

@@ -1,35 +1,57 @@
 <div>
   <!-- 히어로 섹션 -->
-  <section class="hero-section text-white py-5">
-    <div class="container position-relative">
-      <div class="row justify-content-center text-center mb-4">
-        <div class="col-lg-8">
-          <h1 class="display-4 fw-bold mb-2">지수는 영원하다</h1>
-          <p class="lead text-white-50 mb-4">ETF를 검색하여 S&P 500 / NASDAQ 100 지수와 성과를 비교해보세요</p>
+  <section class="hero-section text-white">
+    <div class="hero-bg-grid"></div>
+    <div class="hero-bg-glow"></div>
+    <div class="container position-relative py-5">
+
+      <!-- 배지 -->
+      <div class="row justify-content-center mb-4">
+        <div class="col-auto">
+          <span class="hero-badge">
+            <i class="bi bi-bar-chart-line-fill me-1"></i>
+            S&P 500 · NASDAQ 100 지수 투자 분석
+          </span>
         </div>
       </div>
 
-      <!-- 검색 입력 -->
+      <!-- 타이틀 -->
+      <div class="row justify-content-center text-center mb-2">
+        <div class="col-lg-9">
+          <h1 class="hero-title mb-3">
+            당신의 ETF,<br>
+            <span class="hero-title-accent">지수를 이기고 있나요?</span>
+          </h1>
+          <p class="hero-subtitle mb-5">
+            ETF 티커 하나로 S&P 500 · NASDAQ 100 대비 성과를 즉시 분석합니다.<br class="d-none d-md-block">
+            CAGR · MDD · 샤프비율 · 롤링 승률까지, 데이터로 확인하세요.
+          </p>
+        </div>
+      </div>
+
+      <!-- 검색 -->
       <div class="row justify-content-center">
         <div class="col-lg-6 col-md-8 position-relative">
-          <div class="input-group input-group-lg shadow">
-            <span class="input-group-text bg-white border-end-0">
-              <i class="bi bi-search text-muted"></i>
-            </span>
-            <input
-              type="text"
-              class="form-control border-start-0 ps-0"
-              placeholder="ETF 티커 또는 종목명 검색 (예: SPY, QQQ, SCHD)"
-              v-model="searchQuery"
-              @input="onSearchInput"
-              @keydown.enter="onEnterSearch"
-              @keydown.escape="searchResults = []"
-              autocomplete="off"
-            />
-            <button class="btn btn-primary px-4" @click="onEnterSearch">
-              <span v-if="isSearching" class="spinner-border spinner-border-sm"></span>
-              <span v-else>분석</span>
-            </button>
+          <div class="hero-search-wrap">
+            <div class="input-group input-group-lg">
+              <span class="input-group-text hero-search-icon border-0">
+                <i class="bi bi-search"></i>
+              </span>
+              <input
+                type="text"
+                class="form-control hero-search-input border-0"
+                placeholder="ETF 티커 입력 (예: SPY, QQQ, SCHD, VOO)"
+                v-model="searchQuery"
+                @input="onSearchInput"
+                @keydown.enter="onEnterSearch"
+                @keydown.escape="searchResults = []"
+                autocomplete="off"
+              />
+              <button class="btn hero-search-btn px-4" @click="onEnterSearch">
+                <span v-if="isSearching" class="spinner-border spinner-border-sm me-1"></span>
+                <span>분석하기</span>
+              </button>
+            </div>
           </div>
 
           <!-- 자동완성 드롭다운 -->
@@ -50,16 +72,38 @@
       <!-- 최근 검색 -->
       <div class="row justify-content-center mt-3" v-if="recentTickers.length > 0">
         <div class="col-lg-6 col-md-8 text-center">
-          <span class="text-white-50 small me-2">최근 검색:</span>
+          <span class="text-white-50 small me-2">최근 검색</span>
           <span
-            class="badge bg-light text-dark me-1 ticker-badge"
+            class="badge hero-recent-badge me-1"
             v-for="ticker in recentTickers"
             :key="ticker"
-            style="cursor:pointer"
             @click="onSelectResult(ticker)"
           >{{ ticker }}</span>
         </div>
       </div>
+
+      <!-- 지표 요약 -->
+      <div class="row justify-content-center mt-5">
+        <div class="col-lg-8">
+          <div class="hero-stats-row">
+            <div class="hero-stat-item">
+              <span class="hero-stat-num">20<span class="hero-stat-unit">년+</span></span>
+              <span class="hero-stat-label">장기 데이터 분석</span>
+            </div>
+            <div class="hero-stat-divider"></div>
+            <div class="hero-stat-item">
+              <span class="hero-stat-num">6<span class="hero-stat-unit">개</span></span>
+              <span class="hero-stat-label">핵심 성과 지표</span>
+            </div>
+            <div class="hero-stat-divider"></div>
+            <div class="hero-stat-item">
+              <span class="hero-stat-num">무료<span class="hero-stat-unit"></span></span>
+              <span class="hero-stat-label">로그인 없이 즉시 사용</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </section>
 
