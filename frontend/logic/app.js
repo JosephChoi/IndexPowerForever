@@ -36,40 +36,15 @@ const apiPlugin = {
   },
 };
 
-// 뷰 파일 비동기 로드 (fetch로 HTML 불러와 Vue 컴포넌트로 변환)
-const loadView = (name) => ({
-  name,
-  template: null,
-  data() { return {}; },
-  async created() {
-    if (!loadView._cache) loadView._cache = {};
-    if (!loadView._cache[name]) {
-      const res = await fetch(`/views/${name}.html`);
-      loadView._cache[name] = await res.text();
-    }
-    this.$options.template = loadView._cache[name];
-  },
-  // 각 뷰의 로직은 별도 script 태그로 로드됨 (동적 import)
-});
-
 // 뷰 컴포넌트 정의 — views/*.html + logic/*.js 1:1 매칭
-const makeView = (name) => {
-  // kebab-case → snake_case (예: etf-detail → etf_detail)
-  const logicKey = name.replace(/-/g, '_');
-  return defineComponent({
-    name: `View_${name}`,
-    mixins: [window[`__view_${logicKey}`] || {}],
-    template: `<div id="view-${name}"><div class="loading-overlay"><div class="spinner-border text-primary"></div></div></div>`,
-    async beforeCreate() {
-      // 뷰 HTML 로드
-      if (!makeView._htmlCache) makeView._htmlCache = {};
-      if (!makeView._htmlCache[name]) {
-        const res = await fetch(`/views/${name}.html`);
-        makeView._htmlCache[name] = await res.text();
-      }
-      this.$options.template = makeView._htmlCache[name];
+const { defineAsyncComponent } = Vue;
 
-      // 로직 JS 로드
+const makeView = (name) => {
+  return defineAsyncComponent({
+    loader: async () => {
+      const logicKey = name.replace(/-/g, '_');
+
+      // 로직 JS 먼저 로드
       if (!window[`__logic_loaded_${name}`]) {
         await new Promise((resolve, reject) => {
           const script = document.createElement('script');
@@ -80,6 +55,16 @@ const makeView = (name) => {
         });
         window[`__logic_loaded_${name}`] = true;
       }
+
+      // 뷰 HTML 로드
+      const res = await fetch(`/views/${name}.html`);
+      const template = await res.text();
+
+      const mixin = window[`__view_${logicKey}`] || {};
+      return defineComponent({ name: `View_${name}`, mixins: [mixin], template });
+    },
+    loadingComponent: {
+      template: `<div class="d-flex justify-content-center align-items-center" style="min-height:60vh"><div class="spinner-border text-primary"></div></div>`,
     },
   });
 };
