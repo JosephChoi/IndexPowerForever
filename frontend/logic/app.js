@@ -5,7 +5,7 @@ const { createRouter, createWebHistory } = VueRouter;
 // API Base URL — 개발/운영 환경 자동 감지
 const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
   ? 'http://localhost:8787'
-  : 'https://index-power-forever.workers.dev';
+  : 'https://index-power-forever.sixman-joseph.workers.dev';
 
 // $api 플러그인 — JWT 없는 단순 fetch wrapper
 const apiPlugin = {
