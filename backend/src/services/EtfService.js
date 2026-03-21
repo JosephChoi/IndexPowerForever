@@ -90,6 +90,7 @@ export class EtfService {
     const profile = summary.summaryProfile || {};
     const stats = summary.defaultKeyStatistics || {};
     const holdings = summary.topHoldings || {};
+    const quoteType = summary.quoteType || {};
 
     const topHoldings = (holdings.holdings || []).slice(0, 10).map(h => ({
       ticker: h.symbol,
@@ -106,11 +107,12 @@ export class EtfService {
       }
     });
 
+    // 정식 펀드명: quoteType.longName > quoteType.shortName > ticker
+    const fullName = quoteType.longName || quoteType.shortName || ticker;
+
     return {
       ticker,
-      name: stats.fundFamily
-        ? `${ticker} ETF`
-        : (profile.longBusinessSummary?.slice(0, 50) || ticker),
+      name: fullName,
       category: holdings.equityHoldings?.priceToEarnings?.fmt ? 'ETF' : 'ETF',
       expenseRatio: detail.annualReportExpenseRatio?.raw || null,
       inceptionDate: stats.fundInceptionDate?.fmt || null,

@@ -90,7 +90,7 @@ export class YahooService {
   async getQuoteSummary(ticker) {
     const { crumb, cookie } = await this.getCrumb();
 
-    const modules = 'summaryProfile,summaryDetail,defaultKeyStatistics,topHoldings,assetProfile';
+    const modules = 'summaryProfile,summaryDetail,defaultKeyStatistics,topHoldings,assetProfile,quoteType';
     const url = `https://query1.finance.yahoo.com/v10/finance/quoteSummary/${encodeURIComponent(ticker)}?crumb=${encodeURIComponent(crumb)}&modules=${modules}`;
 
     const res = await fetch(url, {
