@@ -1,4 +1,4 @@
-// ETF 상세 화면 로직 — 성과 비교 + 이김/짐 분석 + 종목 정보
+// ETF 상세 화면 로직 — 성과 비교 + 인덱스 승률 + 종목 정보
 window.__view_etf_detail = {
   data() {
     return {
@@ -28,6 +28,19 @@ window.__view_etf_detail = {
     if (this.comparisonChart) this.comparisonChart.destroy();
     if (this.excessChart) this.excessChart.destroy();
     if (this.annualChart) this.annualChart.destroy();
+  },
+
+  computed: {
+    // 벤치마크 표시명
+    benchmarkName() {
+      return this.benchmark === 'SPY' ? 'S&P 500' : 'NASDAQ 100';
+    },
+    // 연도별 인덱스 승률
+    indexYearlyWinRate() {
+      if (!this.compareData) return 0;
+      const wa = this.compareData.winAnalysis;
+      return wa.totalYears ? ((wa.loseCount / wa.totalYears) * 100).toFixed(0) : 0;
+    },
   },
 
   watch: {
@@ -203,6 +216,12 @@ window.__view_etf_detail = {
           },
         },
       });
+    },
+
+    // 인덱스 승률 계산 (ETF 승률을 뒤집음)
+    indexWinRate(data) {
+      if (!data.totalWindows) return 0;
+      return (100 - data.winRate).toFixed(1);
     },
 
     // 통계 지표 강조 클래스 (ETF가 SPY보다 높으면 table-success)

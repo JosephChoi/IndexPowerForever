@@ -647,6 +647,26 @@
   font-weight: 500;
 }
 
+/* 인덱스 승률 설명 배너 */
+.index-win-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+  background: rgba(13,110,253,0.06);
+  border: 1px solid rgba(13,110,253,0.15);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  font-size: 0.875rem;
+  color: #495057;
+  line-height: 1.6;
+}
+
+.index-win-banner i {
+  color: #0d6efd;
+  font-size: 1.1rem;
+  margin-top: 2px;
+}
+
 /* 반응형 패딩 */
 @media (max-width: 576px) {
   .hero-section { min-height: auto; }

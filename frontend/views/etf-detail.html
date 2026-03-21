@@ -77,7 +77,7 @@
             <i class="bi bi-graph-up me-1"></i>성과 비교
           </button>
           <button class="etf-tab" :class="{ active: activeTab === 'analysis' }" @click="activeTab = 'analysis'">
-            <i class="bi bi-trophy me-1"></i>이김/짐 분석
+            <i class="bi bi-trophy me-1"></i>인덱스 승률
           </button>
           <button class="etf-tab" :class="{ active: activeTab === 'info' }" @click="activeTab = 'info'">
             <i class="bi bi-info-circle me-1"></i>종목 정보
@@ -171,29 +171,39 @@
         </template>
       </div>
 
-      <!-- ===== 탭2: 이김/짐 분석 ===== -->
+      <!-- ===== 탭2: 인덱스 승률 ===== -->
       <div v-show="activeTab === 'analysis'">
         <template v-if="compareData">
 
-          <!-- 롤링 승률 카드 -->
+          <!-- 설명 배너 -->
+          <div class="index-win-banner mb-4">
+            <i class="bi bi-lightbulb me-2"></i>
+            <span>
+              <strong>인덱스 승률</strong>이란?
+              {{ ticker }}를 매수해 일정 기간 보유했을 때, 같은 기간 <strong>{{ benchmarkName }}</strong>에 투자했다면 더 나았을 확률입니다.
+              보유 기간이 길수록 인덱스의 승률이 높아지는 경향이 있습니다.
+            </span>
+          </div>
+
+          <!-- 롤링 승률 카드 — 인덱스 관점 -->
           <div class="row g-3 mb-4">
             <div class="col-12 col-md-4" v-for="(data, period) in compareData.winAnalysis.rollingWin" :key="period">
-              <div class="rolling-card" :class="data.winRate >= 50 ? 'win' : 'lose'">
-                <div class="rolling-rate">{{ data.winRate }}<span class="rolling-unit">%</span></div>
-                <div class="rolling-label">{{ period }} 보유 승률</div>
-                <div class="rolling-sub">{{ data.winCount }}승 / {{ data.totalWindows }}개 구간</div>
+              <div class="rolling-card" :class="indexWinRate(data) >= 50 ? 'win' : 'lose'">
+                <div class="rolling-rate">{{ indexWinRate(data) }}<span class="rolling-unit">%</span></div>
+                <div class="rolling-label">{{ period }} 보유 시 인덱스 승률</div>
+                <div class="rolling-sub">{{ data.totalWindows - data.winCount }}승 / {{ data.totalWindows }}개 구간 중 인덱스가 우세</div>
               </div>
             </div>
           </div>
 
-          <!-- 연도별 승패 요약 + 차트 -->
+          <!-- 연도별 승패 요약 + 차트 — 인덱스 관점 -->
           <div class="chart-card mb-4">
             <div class="chart-card-header">
-              <span class="chart-card-title">연도별 초과수익률</span>
+              <span class="chart-card-title">연도별 인덱스 vs {{ ticker }}</span>
               <div class="d-flex gap-2 align-items-center">
-                <span class="badge-win">승 {{ compareData.winAnalysis.winCount }}</span>
-                <span class="badge-lose">패 {{ compareData.winAnalysis.loseCount }}</span>
-                <span class="text-muted small">승률 {{ compareData.winAnalysis.winRate }}%</span>
+                <span class="badge-win">인덱스 승 {{ compareData.winAnalysis.loseCount }}</span>
+                <span class="badge-lose">인덱스 패 {{ compareData.winAnalysis.winCount }}</span>
+                <span class="text-muted small">인덱스 승률 {{ indexYearlyWinRate }}%</span>
               </div>
             </div>
             <div class="chart-container" style="height:240px">
@@ -211,24 +221,24 @@
                 <thead>
                   <tr>
                     <th>연도</th>
+                    <th>{{ benchmarkName }}</th>
                     <th>{{ ticker }}</th>
-                    <th>{{ benchmark }}</th>
-                    <th>초과수익률</th>
+                    <th>인덱스 초과</th>
                     <th>결과</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr v-for="row in compareData.winAnalysis.yearlyReturns" :key="row.year">
                     <td class="fw-semibold">{{ row.year }}</td>
+                    <td class="text-muted">{{ row.benchReturn > 0 ? '+' : '' }}{{ row.benchReturn.toFixed(1) }}%</td>
                     <td :class="row.etfReturn >= 0 ? 'text-outperform' : 'text-underperform'">
                       {{ row.etfReturn > 0 ? '+' : '' }}{{ row.etfReturn.toFixed(1) }}%
                     </td>
-                    <td class="text-muted">{{ row.benchReturn > 0 ? '+' : '' }}{{ row.benchReturn.toFixed(1) }}%</td>
-                    <td :class="row.diff >= 0 ? 'text-outperform fw-bold' : 'text-underperform'">
-                      {{ row.diff > 0 ? '+' : '' }}{{ row.diff.toFixed(1) }}%
+                    <td :class="row.diff <= 0 ? 'text-outperform fw-bold' : 'text-underperform'">
+                      {{ (-row.diff) > 0 ? '+' : '' }}{{ (-row.diff).toFixed(1) }}%
                     </td>
                     <td>
-                      <span class="result-badge" :class="row.win ? 'win' : 'lose'">{{ row.win ? '승' : '패' }}</span>
+                      <span class="result-badge" :class="!row.win ? 'win' : 'lose'">{{ !row.win ? '인덱스 승' : '인덱스 패' }}</span>
                     </td>
                   </tr>
                 </tbody>
