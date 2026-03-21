@@ -330,7 +330,7 @@
 }
 
 .etf-ticker-badge {
-  font-size: 2rem;
+  font-size: 2.4rem;
   font-weight: 900;
   letter-spacing: -0.02em;
   background: linear-gradient(135deg, #4a9eff, #38d9a9);
@@ -338,13 +338,12 @@
   -webkit-text-fill-color: transparent;
   background-clip: text;
   line-height: 1;
-  min-width: 80px;
 }
 
 .etf-fullname {
-  font-size: 1rem;
-  font-weight: 600;
-  color: rgba(255,255,255,0.9);
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: rgba(255,255,255,0.65);
   margin: 0;
 }
 
