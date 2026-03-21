@@ -24,7 +24,7 @@
                   <h6 class="mb-0 fw-bold">{{ card.title }}</h6>
                 </div>
                 <p class="text-muted small mb-2">{{ card.message }}</p>
-                <a :href="card.link" class="btn btn-sm btn-outline-primary" v-if="card.link">
+                <a href="#" @click.prevent="navigateTo(card.link)" class="btn btn-sm btn-outline-primary" v-if="card.link">
                   <i class="bi bi-play me-1"></i>시뮬레이터로 확인
                 </a>
               </div>
