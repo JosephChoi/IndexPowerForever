@@ -119,14 +119,14 @@
       <h2 class="h5 fw-bold mb-3">
         <i class="bi bi-fire text-danger me-2"></i>인기 검색 ETF
       </h2>
-      <div class="d-flex flex-wrap gap-2">
+      <div class="btn-group-selector">
         <button
-          class="btn btn-outline-secondary btn-sm"
+          class="btn"
           v-for="(etf, idx) in popularEtfs"
           :key="etf.ticker"
           @click="onSelectResult(etf.ticker)"
         >
-          <span class="badge bg-secondary me-1">{{ idx + 1 }}</span>
+          <span class="badge bg-primary me-1">{{ idx + 1 }}</span>
           {{ etf.ticker }}
         </button>
       </div>
@@ -150,8 +150,8 @@
           v-for="preset in presets"
           :key="preset.id"
         >
-          <div class="card preset-card h-100 border-0 shadow-sm" @click="onPresetClick(preset)">
-            <div class="card-body">
+          <div class="card-base card-clickable h-100" @click="onPresetClick(preset)">
+            <div>
               <h6 class="card-title fw-bold mb-2">{{ preset.name }}</h6>
               <p class="card-text text-muted small mb-3">{{ preset.description }}</p>
               <div class="d-flex flex-wrap gap-1">
@@ -173,7 +173,7 @@
     </div>
 
     <!-- 서비스 소개 -->
-    <section class="mt-5 py-5 bg-light rounded-3 px-4">
+    <section class="mt-5 py-5 rounded-3 px-4" style="background:var(--bg-light)">
       <div class="row g-4 text-center">
         <div class="col-12 col-md-4">
           <i class="bi bi-graph-up-arrow display-5 text-primary mb-3 d-block"></i>

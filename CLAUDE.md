@@ -36,5 +36,6 @@
 | 프론트엔드 규칙 | `.claude/rules/frontend-guide.md` |
 | 아키텍처 | `.claude/rules/architecture.md` |
 | 코딩 컨벤션 | `.claude/rules/coding-conventions.md` |
+| 디자인 가이드 | `.claude/rules/design-guide.md` |
 | 진행 상황 | `.claude/progress.md` |
 | 작업 로그 | `.claude/worklog.md` |

@@ -1,32 +1,32 @@
 <div>
   <div class="container py-4">
-    <h1 class="h3 fw-bold mb-1"><i class="bi bi-clock-history me-2 text-primary"></i>타이밍 시뮬레이터</h1>
-    <p class="text-muted mb-4">상위 상승일을 놓쳤다면 수익률이 얼마나 달라질까요?</p>
+    <div class="page-header">
+      <h1 class="page-title"><i class="bi bi-clock-history me-2 text-primary"></i>타이밍 시뮬레이터</h1>
+      <p class="page-subtitle">상위 상승일을 놓쳤다면 수익률이 얼마나 달라질까요?</p>
+    </div>
 
     <div class="row g-4">
       <div class="col-12 col-md-4">
-        <div class="card border-0 shadow-sm">
-          <div class="card-body">
-            <h6 class="fw-bold mb-3">시뮬레이션 설정</h6>
-            <div class="mb-3">
-              <label class="form-label small fw-medium">시작 연도: {{ startYear }}</label>
-              <input type="range" class="form-range" min="1993" :max="endYear - 1" v-model.number="startYear" />
-            </div>
-            <div class="mb-3">
-              <label class="form-label small fw-medium">종료 연도: {{ endYear }}</label>
-              <input type="range" class="form-range" :min="startYear + 1" :max="maxYear" v-model.number="endYear" />
-            </div>
-            <div class="mb-3">
-              <label class="form-label small fw-medium">놓친 상위 상승일</label>
-              <div class="btn-group w-100 btn-group-sm flex-wrap">
-                <button class="btn btn-outline-primary" :class="{ active: missingDays === d }" v-for="d in [0,10,20,30,50]" :key="d" @click="missingDays = d">{{ d }}일</button>
-              </div>
-            </div>
-            <button class="btn btn-primary w-100" @click="simulate" :disabled="isLoading">
-              <span class="spinner-border spinner-border-sm me-1" v-if="isLoading"></span>
-              시뮬레이션 실행
-            </button>
+        <div class="sim-panel">
+          <div class="sim-panel-title">시뮬레이션 설정</div>
+          <div class="mb-3">
+            <div class="sim-slider-label"><span class="label">시작 연도</span><span class="value">{{ startYear }}</span></div>
+            <input type="range" class="sim-slider" min="1993" :max="endYear - 1" v-model.number="startYear" />
           </div>
+          <div class="mb-3">
+            <div class="sim-slider-label"><span class="label">종료 연도</span><span class="value">{{ endYear }}</span></div>
+            <input type="range" class="sim-slider" :min="startYear + 1" :max="maxYear" v-model.number="endYear" />
+          </div>
+          <div class="mb-3">
+            <div class="sim-slider-label"><span class="label">놓친 상위 상승일</span></div>
+            <div class="btn-group-selector">
+              <button class="btn" :class="{ active: missingDays === d }" v-for="d in [0,10,20,30,50]" :key="d" @click="missingDays = d">{{ d }}일</button>
+            </div>
+          </div>
+          <button class="btn btn-primary w-100 mt-2" @click="simulate" :disabled="isLoading">
+            <span class="spinner-border spinner-border-sm me-1" v-if="isLoading"></span>
+            시뮬레이션 실행
+          </button>
         </div>
       </div>
 
@@ -43,16 +43,16 @@
           </div>
           <div class="row g-3">
             <div class="col-12 col-sm-6" v-for="s in result.scenarios" :key="s.missingDays">
-              <div class="stat-card" :class="s.missingDays === 0 ? 'border-primary' : ''">
-                <div class="stat-label mb-1">
+              <div class="card-base" :class="s.missingDays === 0 ? 'card-highlight' : ''">
+                <div class="text-muted small fw-semibold mb-1">
                   <span v-if="s.missingDays === 0">전체 투자 시</span>
                   <span v-else>상위 <strong>{{ s.missingDays }}일</strong> 놓쳤을 때</span>
                 </div>
-                <div class="stat-value" :class="s.finalReturn >= 0 ? 'text-success' : 'text-danger'">
+                <div class="fw-bold" style="font-size:1.5rem" :class="s.finalReturn >= 0 ? 'text-success' : 'text-danger'">
                   {{ s.finalReturn.toFixed(1) }}%
                 </div>
                 <div class="text-muted small">CAGR {{ s.cagr.toFixed(1) }}%</div>
-                <div class="text-danger small" v-if="s.missingDays > 0 && result.scenarios[0]">
+                <div class="text-danger small fw-semibold" v-if="s.missingDays > 0 && result.scenarios[0]">
                   손실: {{ (s.finalReturn - result.scenarios[0].finalReturn).toFixed(1) }}%p
                 </div>
               </div>
