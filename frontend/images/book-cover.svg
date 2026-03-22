@@ -63,7 +63,7 @@
   <rect x="150" y="480" width="100" height="1" fill="rgba(255,255,255,0.2)"/>
 
   <!-- 저자 -->
-  <text x="200" y="510" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="16" font-family="sans-serif">김대중 · 최근민 지음</text>
+  <text x="200" y="510" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="16" font-family="sans-serif">김대중 · 최근민</text>
 
   <!-- 출판사 (더미) -->
   <text x="200" y="555" text-anchor="middle" fill="rgba(255,255,255,0.3)" font-size="12" font-family="sans-serif">2026년 4월 출간</text>
