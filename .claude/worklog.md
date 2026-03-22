@@ -2,6 +2,49 @@
 
 ---
 
+## 세션 #6 — 2026-03-22 (17:30 ~ 18:45 KST)
+
+### 시작 시 상태
+- Phase 0~2 완료, Phase 3 일부 완료 (7/10)
+- 승률 탐색기 Step 네비게이션 버그 (Step 2/3 진행 불가)
+
+### 작업 내용
+
+**승률 탐색기 Step 네비게이션 수정**
+- `step-dimmed` CSS 클래스의 `pointer-events: none`로 버튼 클릭 불가 → `v-if`로 Step 표시/숨김 전환
+- Step 1 하단: "다음: 투자 가능 시작일 알아보기" 버튼 추가
+- Step 2 하단: "다음: 승부 결과 확인하기" 버튼 이동
+
+**승률 탐색기 → 인덱스 승률 연결**
+- Step 3 결과 하단에 "더 많은 결과 보기" 버튼 추가
+- 클릭 시 인덱스 승률 탭(`activeTab = 'analysis'`)으로 전환
+
+**Phase 3-4: 에러 처리 + 로딩 상태 전체 검토**
+- 프론트엔드: Home/Ranking/Timing에 에러 재시도 버튼 + 빈 데이터 메시지 추가
+- 백엔드: 모든 `JSON.parse()` 호출에 try-catch (KV/D1 캐시 7곳, D1 JSON 필드 3곳)
+- translate.js: `c.req.json()` 파싱 + `AI.run()` 실패 처리
+- YahooService: `res.json()` 비JSON 응답 대응 (chart, quoteSummary, search)
+
+**Phase 3-5: 성능 최적화**
+- RankingService: 순차 ETF 분석 → 동시 3개 병렬 처리 (Promise.allSettled)
+- Rolling detail: 압축 필드명(d/e/er/br/w)으로 JSON 페이로드 ~50% 축소
+- 프론트엔드: computed에서 압축 필드 → 읽기 쉬운 필드로 변환
+
+**Phase 3-6: 책 소개 페이지 전면 개편**
+- PDF 내용 기반 5 PART, 21장 전체 목차 + 각 장별 요약
+- SVG 더미 표지 생성 (다크 배경 + 우상향 차트 + 제목)
+- 서문 발췌, 핵심 수치(SPIVA 데이터), 메시지 카드
+- 각 시뮬레이터 연계 링크 (장 번호 매핑)
+- 구매 URL은 `purchaseUrl: '#'` — URL 확정 시 교체
+
+### 다음 세션 할 일
+1. 전체 QA: 각 페이지 실사용 테스트
+2. 승률 탐색기 실사용 테스트 및 UX 개선
+3. 구매 링크 URL 확정 시 교체
+4. 실제 책 표지 이미지 교체
+
+---
+
 ## 세션 #5 — 2026-03-22 (02:30 ~ 03:20 KST)
 
 ### 시작 시 상태

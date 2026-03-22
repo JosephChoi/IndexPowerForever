@@ -120,6 +120,31 @@ Sharpe = (연환산 수익률 - 무위험 수익률) / 연환산 변동성
 
 ---
 
+## 배포 (필독)
+
+> **절대 수동 배포(`wrangler deploy`, `wrangler pages deploy`)하지 않는다.**
+> **모든 배포는 GitHub 커밋 + 푸시로만 이루어진다.**
+
+### 배포 파이프라인
+
+| 대상 | 트리거 | 워크플로우 | 배포 대상 |
+|---|---|---|---|
+| **Frontend** | `frontend/**` 변경 후 push | `.github/workflows/deploy-frontend.yml` | Cloudflare Pages (`index-power-forever`) |
+| **Backend** | `backend/**` 변경 후 push | `.github/workflows/deploy-backend.yml` | Cloudflare Workers (`index-power-forever`) |
+
+### 배포 규칙
+1. 코드 변경 후 반드시 `git add` → `git commit` → `git push` 순서로 진행
+2. **프론트엔드 변경 시**: `frontend/` 하위 파일이 커밋에 포함되어야 Pages 배포 트리거됨
+3. **백엔드 변경 시**: `backend/` 하위 파일이 커밋에 포함되어야 Workers 배포 트리거됨
+4. `.claude/`, 루트 파일 등은 배포와 무관 — 별도 커밋해도 배포 트리거 안 됨
+5. 프론트+백엔드 동시 변경 시 한 번의 커밋+푸시로 두 워크플로우 모두 트리거됨
+
+### 배포 URL
+- Frontend: `https://indexpowerforever.pages.dev`
+- Backend API: `https://index-power-forever.sixman-joseph.workers.dev`
+
+---
+
 ## 개발 진행
 
 현재 진행 상황: `.claude/progress.md`
