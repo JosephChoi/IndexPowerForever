@@ -13,20 +13,30 @@
             <i class="bi bi-trophy me-1"></i>랭킹
           </a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/timing">
-            <i class="bi bi-clock-history me-1"></i>타이밍 시뮬레이터
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-calculator me-1"></i>시뮬레이터
           </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/fee-simulator">
-            <i class="bi bi-percent me-1"></i>비용 시뮬레이터
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/retirement">
-            <i class="bi bi-piggy-bank me-1"></i>퇴직연금
-          </a>
+          <ul class="dropdown-menu dropdown-menu-dark">
+            <li>
+              <a class="dropdown-item" href="/fee-simulator">
+                <i class="bi bi-percent me-2 text-success"></i>비용 시뮬레이터
+                <small class="d-block text-muted">보수 차이가 장기 수익에 미치는 영향</small>
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item" href="/timing">
+                <i class="bi bi-clock-history me-2 text-warning"></i>타이밍 시뮬레이터
+                <small class="d-block text-muted">최고의 날을 놓치면 얼마나 손해인가</small>
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item" href="/retirement">
+                <i class="bi bi-piggy-bank me-2 text-danger"></i>퇴직연금 시뮬레이터
+                <small class="d-block text-muted">인덱스 기반 퇴직연금 전략 시뮬레이션</small>
+              </a>
+            </li>
+          </ul>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="/insights">

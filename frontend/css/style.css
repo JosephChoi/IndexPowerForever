@@ -892,3 +892,23 @@
 .book-promo-cover:hover {
   transform: scale(1.05);
 }
+
+/* 네비게이션 — 시뮬레이터 드롭다운 */
+.navbar .dropdown-menu-dark {
+  min-width: 280px;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  padding: 0.5rem 0;
+}
+.navbar .dropdown-item {
+  padding: 0.6rem 1rem;
+  white-space: normal;
+}
+.navbar .dropdown-item:hover,
+.navbar .dropdown-item:focus {
+  background-color: rgba(255,255,255,0.1);
+}
+.navbar .dropdown-item small {
+  font-size: 0.75rem;
+  opacity: 0.7;
+}

@@ -109,9 +109,19 @@ const loadNavbar = async () => {
   const container = document.getElementById('navbar-container');
   if (container) container.innerHTML = html;
 
-  // 현재 경로에 active 클래스 적용
+  // 현재 경로에 active 클래스 적용 (드롭다운 하위 항목 포함)
+  const simulatorPaths = ['/fee-simulator', '/timing', '/retirement'];
   router.afterEach((to) => {
     document.querySelectorAll('.nav-link').forEach(el => {
+      const href = el.getAttribute('href');
+      if (href === '#') {
+        // 드롭다운 토글: 하위 경로 중 하나가 현재 경로이면 active
+        el.classList.toggle('active', simulatorPaths.includes(to.path));
+      } else {
+        el.classList.toggle('active', href === to.path);
+      }
+    });
+    document.querySelectorAll('.dropdown-item').forEach(el => {
       el.classList.toggle('active', el.getAttribute('href') === to.path);
     });
   });
