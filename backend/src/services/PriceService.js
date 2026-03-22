@@ -15,15 +15,25 @@ export class PriceService {
     const cached = await this.env.KV.get(cacheKey);
     if (cached) return JSON.parse(cached);
 
-    // max: 항상 Yahoo에서 전체 기간 조회 (D1에 부분 데이터만 있을 수 있음)
+    // max: D1에 충분한 데이터가 있으면 사용, 없으면 Yahoo 조회
     if (period === 'max') {
+      const d1Prices = await this._getFromD1(ticker, 'max');
+      // D1에 데이터가 있고, 최신 데이터가 2일 이내면 D1 사용
+      if (d1Prices.length > 100 && this._isRecentEnough(d1Prices)) {
+        await this.env.KV.put(cacheKey, JSON.stringify(d1Prices), { expirationTtl: 3600 });
+        return d1Prices;
+      }
+      // Yahoo에서 전체 조회
       const prices = await this.yahoo.getChart(ticker, 'max');
       if (prices.length === 0) {
+        // Yahoo 실패 시 D1 데이터라도 반환
+        if (d1Prices.length > 0) return d1Prices;
         const err = new Error(`${ticker} 가격 데이터를 찾을 수 없습니다.`);
         err.name = 'NotFoundError';
         throw err;
       }
-      await this._saveToD1(ticker, prices);
+      // D1 저장은 백그라운드로 (응답 속도 우선)
+      this._saveToD1(ticker, prices).catch(() => {});
       await this.env.KV.put(cacheKey, JSON.stringify(prices), { expirationTtl: 3600 });
       return prices;
     }
@@ -81,6 +91,15 @@ export class PriceService {
       );
       await this.env.DB.batch(statements);
     }
+  }
+
+  // D1 데이터가 최신(2일 이내)인지 확인
+  _isRecentEnough(prices) {
+    if (!prices.length) return false;
+    const lastDate = new Date(prices.at(-1).date);
+    const now = new Date();
+    const diffDays = (now - lastDate) / (24 * 60 * 60 * 1000);
+    return diffDays < 3;
   }
 
   // period → 시작 날짜 변환

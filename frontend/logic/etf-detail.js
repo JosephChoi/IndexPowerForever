@@ -84,18 +84,34 @@ window.__view_etf_detail = {
       );
     },
 
-    onPeriodChange(p) {
+    async onPeriodChange(p) {
       this.period = p;
-      this.loadCompare().then(() => {
-        this.$nextTick(() => this.renderCharts());
-      });
+      this.isLoading = true;
+      this.error = null;
+      try {
+        await this.loadCompare();
+        await this.$nextTick();
+        this.renderCharts();
+      } catch (e) {
+        this.error = e.message || '데이터를 불러오는 중 오류가 발생했습니다.';
+      } finally {
+        this.isLoading = false;
+      }
     },
 
-    onBenchmarkChange(b) {
+    async onBenchmarkChange(b) {
       this.benchmark = b;
-      this.loadCompare().then(() => {
-        this.$nextTick(() => this.renderCharts());
-      });
+      this.isLoading = true;
+      this.error = null;
+      try {
+        await this.loadCompare();
+        await this.$nextTick();
+        this.renderCharts();
+      } catch (e) {
+        this.error = e.message || '데이터를 불러오는 중 오류가 발생했습니다.';
+      } finally {
+        this.isLoading = false;
+      }
     },
 
     // 차트 3개 렌더링

@@ -16,11 +16,18 @@ export class CompareService {
     if (cached) return JSON.parse(cached);
 
     // 3개 티커 가격 병렬 조회
-    const [etfPrices, spyPrices, qqqPrices] = await Promise.all([
+    let [etfPrices, spyPrices, qqqPrices] = await Promise.all([
       this.priceService.get(ticker, period),
       this.priceService.get('SPY', period),
       this.priceService.get('QQQ', period),
     ]);
+
+    // max: SPY/QQQ를 ETF 시작일 기준으로 자름 (불필요한 과거 데이터 제거)
+    if (period === 'max' && etfPrices.length > 0) {
+      const etfStartDate = etfPrices[0].date;
+      spyPrices = spyPrices.filter(p => p.date >= etfStartDate);
+      qqqPrices = qqqPrices.filter(p => p.date >= etfStartDate);
+    }
 
     const benchPrices = benchmark === 'QQQ' ? qqqPrices : spyPrices;
 
@@ -59,6 +66,12 @@ export class CompareService {
     const winCount = yearlyReturns.filter(y => y.win).length;
     const totalYears = yearlyReturns.length;
 
+    // 차트용 데이터 샘플링 (5년 초과 시 주간, 응답 크기 축소)
+    const chartEtf = years > 5 ? this._sampleWeekly(etfCumReturns) : etfCumReturns;
+    const chartSpy = years > 5 ? this._sampleWeekly(spyCumReturns) : spyCumReturns;
+    const chartQqq = years > 5 ? this._sampleWeekly(qqqCumReturns) : qqqCumReturns;
+    const chartExcess = years > 5 ? this._sampleWeekly(excessReturns, 'excess') : excessReturns;
+
     const result = {
       ticker,
       period,
@@ -68,12 +81,12 @@ export class CompareService {
         end: etfPrices.at(-1)?.date,
         years: parseFloat(years.toFixed(1)),
       },
-      // 차트 데이터 (날짜 + 수익률)
+      // 차트 데이터 (샘플링 적용)
       chart: {
-        etf: etfCumReturns,
-        spy: spyCumReturns,
-        qqq: qqqCumReturns,
-        excess: excessReturns,
+        etf: chartEtf,
+        spy: chartSpy,
+        qqq: chartQqq,
+        excess: chartExcess,
       },
       // 통계 지표
       stats: {
@@ -114,6 +127,26 @@ export class CompareService {
     await this.env.KV.put(cacheKey, JSON.stringify(result), { expirationTtl: 21600 });
 
     return result;
+  }
+
+  // 주간 샘플링 (매주 금요일 or 마지막 거래일)
+  _sampleWeekly(data, valueKey = 'return') {
+    if (data.length <= 500) return data;
+    const sampled = [data[0]];
+    let lastWeek = -1;
+    for (const d of data) {
+      const dt = new Date(d.date);
+      const week = Math.floor(dt.getTime() / (7 * 24 * 60 * 60 * 1000));
+      if (week !== lastWeek) {
+        sampled.push(d);
+        lastWeek = week;
+      }
+    }
+    // 마지막 데이터 포인트 보장
+    if (sampled.at(-1)?.date !== data.at(-1)?.date) {
+      sampled.push(data.at(-1));
+    }
+    return sampled;
   }
 
   // 가격 배열에서 보유 기간(년) 계산

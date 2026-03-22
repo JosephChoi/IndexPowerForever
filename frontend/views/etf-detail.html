@@ -1,11 +1,19 @@
 <div>
-  <!-- 로딩 -->
+  <!-- 초기 로딩 -->
   <div class="d-flex justify-content-center align-items-center" style="min-height:60vh" v-if="isLoading && !etfInfo && !compareData">
     <div class="spinner-border text-primary"></div>
   </div>
 
+  <!-- 기간 변경 로딩 오버레이 -->
+  <div v-if="isLoading && (etfInfo || compareData)" class="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center" style="z-index:1050;background:rgba(255,255,255,0.7);">
+    <div class="text-center">
+      <div class="spinner-border text-primary mb-2"></div>
+      <div class="text-muted small">데이터 로딩 중...</div>
+    </div>
+  </div>
+
   <!-- 에러 -->
-  <div class="container py-4" v-if="error">
+  <div class="container py-4" v-if="error && !isLoading">
     <div class="alert alert-danger">
       <i class="bi bi-exclamation-triangle me-2"></i>{{ error }}
       <button class="btn btn-sm btn-outline-danger ms-2" @click="loadData">재시도</button>
