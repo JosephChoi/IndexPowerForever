@@ -17,6 +17,11 @@ window.__view_etf_detail = {
       showTranslated: false,
       translatedDesc: null,
       isTranslating: false,
+      explorerData: null,
+      explorerLoading: false,
+      explorerHolding: 1,
+      explorerStep: 1,
+      selectedDot: null,
     };
   },
 
@@ -39,6 +44,16 @@ window.__view_etf_detail = {
     benchmarkName() {
       return this.benchmark === 'SPY' ? 'S&P 500' : 'NASDAQ 100';
     },
+    // 탐색기 전체 도트 (Step 1-2용)
+    explorerDots() {
+      if (!this.explorerData) return [];
+      return new Array(this.explorerData.totalTradingDays);
+    },
+    // 탐색기 결과 도트 (Step 3용)
+    explorerResultDots() {
+      if (!this.explorerData) return [];
+      return this.explorerData.results;
+    },
     // 연도별 인덱스 승률
     indexYearlyWinRate() {
       if (!this.compareData) return 0;
@@ -48,10 +63,13 @@ window.__view_etf_detail = {
   },
 
   watch: {
-    // 탭 전환 시 차트 렌더링
+    // 탭 전환 시 차트 렌더링 / 탐색기 데이터 로드
     activeTab(tab) {
       if (tab === 'comparison' || tab === 'analysis') {
         this.$nextTick(() => this.renderCharts());
+      }
+      if (tab === 'explorer' && !this.explorerData) {
+        this.loadExplorerData();
       }
     },
   },
@@ -267,6 +285,39 @@ window.__view_etf_detail = {
       if (aum >= 1e9) return `$${(aum / 1e9).toFixed(1)}B`;
       if (aum >= 1e6) return `$${(aum / 1e6).toFixed(1)}M`;
       return `$${aum.toLocaleString()}`;
+    },
+
+    // 탐색기 데이터 로드
+    async loadExplorerData() {
+      this.explorerLoading = true;
+      this.explorerStep = 1;
+      this.selectedDot = null;
+      try {
+        this.explorerData = await this.$api.get(
+          `/api/etf/${this.ticker}/rolling-detail?period=${this.period}&benchmark=${this.benchmark}&holding=${this.explorerHolding}`
+        );
+      } catch (e) {
+        this.error = e.message || '롤링 데이터를 불러오는 중 오류가 발생했습니다.';
+      } finally {
+        this.explorerLoading = false;
+      }
+    },
+
+    // 보유 기간 변경
+    onExplorerHoldingChange(h) {
+      this.explorerHolding = h;
+      this.loadExplorerData();
+    },
+
+    // Step 3 애니메이션 시작
+    startExplorerAnimation() {
+      this.explorerStep = 2;
+      setTimeout(() => { this.explorerStep = 3; }, 400);
+    },
+
+    // 도트 클릭
+    onDotClick(dot) {
+      this.selectedDot = dot;
     },
 
     // 설명 번역 토글

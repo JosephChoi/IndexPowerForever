@@ -120,6 +120,51 @@ export class CalculationService {
     };
   }
 
+  // 롤링 상세 결과 (각 시작일별 승/패 + 수익률)
+  static calcRollingDetail(etfPrices, benchPrices, holdingYears) {
+    if (!etfPrices.length || !benchPrices.length) {
+      return { totalTradingDays: 0, holdingDays: 0, possibleStarts: 0, indexWins: 0, indexWinRate: 0, results: [] };
+    }
+
+    const holdingDays = holdingYears * TRADING_DAYS_PER_YEAR;
+    const benchMap = new Map(benchPrices.map(p => [p.date, p.close]));
+    const common = etfPrices.filter(p => benchMap.has(p.date));
+
+    if (common.length <= holdingDays) {
+      return { totalTradingDays: common.length, holdingDays, possibleStarts: 0, indexWins: 0, indexWinRate: 0, results: [] };
+    }
+
+    const possibleStarts = common.length - holdingDays;
+    const results = [];
+    let indexWins = 0;
+
+    for (let i = 0; i < possibleStarts; i++) {
+      const startDate = common[i].date;
+      const endDate = common[i + holdingDays].date;
+      const etfReturn = ((common[i + holdingDays].close / common[i].close) - 1) * 100;
+      const benchReturn = ((benchMap.get(endDate) / benchMap.get(startDate)) - 1) * 100;
+      const indexWin = benchReturn > etfReturn;
+      if (indexWin) indexWins++;
+
+      results.push({
+        date: startDate,
+        endDate,
+        etfReturn: parseFloat(etfReturn.toFixed(2)),
+        benchReturn: parseFloat(benchReturn.toFixed(2)),
+        indexWin,
+      });
+    }
+
+    return {
+      totalTradingDays: common.length,
+      holdingDays,
+      possibleStarts,
+      indexWins,
+      indexWinRate: parseFloat(((indexWins / possibleStarts) * 100).toFixed(1)),
+      results,
+    };
+  }
+
   // 연도별 종가 그룹화 헬퍼 (연간 수익률: 연말 대비)
   static _groupByYear(prices) {
     const byYear = {};

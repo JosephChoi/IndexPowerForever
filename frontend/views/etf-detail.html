@@ -84,6 +84,9 @@
           <button class="etf-tab" :class="{ active: activeTab === 'comparison' }" @click="activeTab = 'comparison'">
             <i class="bi bi-graph-up me-1"></i>성과 비교
           </button>
+          <button class="etf-tab" :class="{ active: activeTab === 'explorer' }" @click="activeTab = 'explorer'">
+            <i class="bi bi-search-heart me-1"></i>승률 탐색기
+          </button>
           <button class="etf-tab" :class="{ active: activeTab === 'analysis' }" @click="activeTab = 'analysis'">
             <i class="bi bi-trophy me-1"></i>인덱스 승률
           </button>
@@ -179,7 +182,143 @@
         </template>
       </div>
 
-      <!-- ===== 탭2: 인덱스 승률 ===== -->
+      <!-- ===== 탭2: 승률 탐색기 ===== -->
+      <div v-show="activeTab === 'explorer'">
+
+        <!-- 보유 기간 선택 -->
+        <div class="d-flex gap-2 mb-4 align-items-center">
+          <span class="text-muted small fw-semibold">보유 기간:</span>
+          <button
+            class="btn btn-sm"
+            :class="explorerHolding === h ? 'btn-primary' : 'btn-outline-secondary'"
+            v-for="h in [1, 3, 5]"
+            :key="h"
+            @click="onExplorerHoldingChange(h)"
+          >{{ h }}년</button>
+        </div>
+
+        <!-- 로딩 -->
+        <div class="text-center py-5" v-if="explorerLoading">
+          <div class="spinner-border text-primary mb-2"></div>
+          <div class="text-muted small">롤링 데이터 분석 중...</div>
+        </div>
+
+        <!-- 스토리텔링 3단계 -->
+        <div v-if="explorerData && !explorerLoading">
+
+          <!-- Step 1 -->
+          <div class="explorer-step mb-4">
+            <div class="explorer-step-badge">Step 1</div>
+            <h5 class="fw-bold mb-2">전체 거래일</h5>
+            <p class="text-muted mb-3">
+              선택한 기간 동안 {{ ticker }}와 {{ benchmarkName }}이 동시에 거래된 날은 총
+              <strong class="text-primary">{{ explorerData.totalTradingDays.toLocaleString() }}일</strong>입니다.
+            </p>
+            <div class="dot-matrix-container">
+              <div class="dot-matrix">
+                <div
+                  v-for="(dot, i) in explorerDots"
+                  :key="i"
+                  class="dot"
+                  :class="explorerStep >= 2 && i >= explorerData.possibleStarts ? 'dot-excluded' : 'dot-neutral'"
+                ></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="explorer-step mb-4" :class="{ 'step-dimmed': explorerStep < 2 }">
+            <div class="explorer-step-badge">Step 2</div>
+            <h5 class="fw-bold mb-2">투자 가능한 시작일</h5>
+            <p class="text-muted mb-3">
+              {{ explorerHolding }}년({{ explorerData.holdingDays }}거래일) 보유하려면,
+              마지막 <strong>{{ explorerData.holdingDays }}일</strong>은 아직 {{ explorerHolding }}년이 안 되니 제외합니다.
+            </p>
+            <div class="d-flex align-items-center gap-3 mb-3">
+              <div class="explorer-calc">
+                <span class="calc-num">{{ explorerData.totalTradingDays.toLocaleString() }}</span>
+                <span class="calc-op">−</span>
+                <span class="calc-num">{{ explorerData.holdingDays }}</span>
+                <span class="calc-op">=</span>
+                <span class="calc-result">{{ explorerData.possibleStarts.toLocaleString() }}개 시작점</span>
+              </div>
+            </div>
+            <div class="d-flex gap-3 small">
+              <span><span class="dot-legend dot-neutral"></span> 투자 가능 ({{ explorerData.possibleStarts.toLocaleString() }}일)</span>
+              <span><span class="dot-legend dot-excluded"></span> 제외 ({{ explorerData.holdingDays }}일)</span>
+            </div>
+            <button class="btn btn-sm btn-outline-primary mt-3" @click="explorerStep = 2" v-if="explorerStep < 2">
+              다음 단계 보기 <i class="bi bi-arrow-right ms-1"></i>
+            </button>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="explorer-step mb-4" :class="{ 'step-dimmed': explorerStep < 3 }">
+            <div class="explorer-step-badge">Step 3</div>
+            <h5 class="fw-bold mb-2">{{ explorerData.possibleStarts.toLocaleString() }}번의 승부 결과</h5>
+            <p class="text-muted mb-3">
+              {{ explorerData.possibleStarts.toLocaleString() }}개의 시작일 중 어느 날 투자해도,
+              {{ explorerHolding }}년 후 {{ benchmarkName }}이 더 나았던 확률은
+              <strong :class="explorerData.indexWinRate >= 50 ? 'text-outperform' : 'text-underperform'">
+                {{ explorerData.indexWinRate }}%
+              </strong>입니다.
+            </p>
+            <button class="btn btn-sm btn-outline-primary mb-3" @click="startExplorerAnimation" v-if="explorerStep < 3">
+              결과 보기 <i class="bi bi-play-fill ms-1"></i>
+            </button>
+
+            <!-- 도트 매트릭스 (결과) -->
+            <div class="dot-matrix-container" v-if="explorerStep >= 3">
+              <div class="dot-matrix">
+                <div
+                  v-for="(dot, i) in explorerResultDots"
+                  :key="'r'+i"
+                  class="dot"
+                  :class="dot.indexWin ? 'dot-win' : 'dot-lose'"
+                  :title="dot.date + ' → ' + dot.endDate"
+                  @click="onDotClick(dot)"
+                ></div>
+              </div>
+              <div class="d-flex justify-content-between align-items-center mt-3">
+                <div class="d-flex gap-3 small">
+                  <span><span class="dot-legend dot-win"></span> 인덱스 승 ({{ explorerData.indexWins.toLocaleString() }})</span>
+                  <span><span class="dot-legend dot-lose"></span> 인덱스 패 ({{ (explorerData.possibleStarts - explorerData.indexWins).toLocaleString() }})</span>
+                </div>
+                <div class="fw-bold" :class="explorerData.indexWinRate >= 50 ? 'text-outperform' : 'text-underperform'">
+                  인덱스 승률 {{ explorerData.indexWinRate }}%
+                </div>
+              </div>
+            </div>
+
+            <!-- 선택된 점 상세 -->
+            <div class="explorer-detail-card mt-3" v-if="selectedDot">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <strong>{{ selectedDot.date }} 투자 시작</strong>
+                <span class="result-badge" :class="selectedDot.indexWin ? 'win' : 'lose'">
+                  {{ selectedDot.indexWin ? '인덱스 승' : '인덱스 패' }}
+                </span>
+              </div>
+              <div class="row g-2 text-center">
+                <div class="col-4">
+                  <div class="text-muted small">보유 기간</div>
+                  <div class="fw-semibold">{{ selectedDot.date }} ~ {{ selectedDot.endDate }}</div>
+                </div>
+                <div class="col-4">
+                  <div class="text-muted small">{{ benchmarkName }} 수익률</div>
+                  <div class="fw-bold text-outperform">{{ selectedDot.benchReturn > 0 ? '+' : '' }}{{ selectedDot.benchReturn }}%</div>
+                </div>
+                <div class="col-4">
+                  <div class="text-muted small">{{ ticker }} 수익률</div>
+                  <div class="fw-bold" :class="selectedDot.etfReturn >= 0 ? 'text-primary' : 'text-underperform'">{{ selectedDot.etfReturn > 0 ? '+' : '' }}{{ selectedDot.etfReturn }}%</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ===== 탭3: 인덱스 승률 ===== -->
       <div v-show="activeTab === 'analysis'">
         <template v-if="compareData">
 
