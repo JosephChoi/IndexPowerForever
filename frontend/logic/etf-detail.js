@@ -148,7 +148,7 @@ window.__view_etf_detail = {
 
     // ① 누적 수익률 비교 라인 차트
     renderComparisonChart() {
-      const ctx = document.getElementById('comparisonChart');
+      const ctx = this.$refs.comparisonChart;
       if (!ctx) return;
       if (this.comparisonChart) this.comparisonChart.destroy();
 
@@ -205,7 +205,7 @@ window.__view_etf_detail = {
 
     // ② 초과수익률 영역 차트
     renderExcessChart() {
-      const ctx = document.getElementById('excessChart');
+      const ctx = this.$refs.excessChart;
       if (!ctx) return;
       if (this.excessChart) this.excessChart.destroy();
 
@@ -235,7 +235,7 @@ window.__view_etf_detail = {
 
     // ③ 연도별 승패 막대 차트
     renderAnnualChart() {
-      const ctx = document.getElementById('annualChart');
+      const ctx = this.$refs.annualChart;
       if (!ctx) return;
       if (this.annualChart) this.annualChart.destroy();
 

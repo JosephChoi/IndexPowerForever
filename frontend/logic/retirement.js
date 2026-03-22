@@ -38,7 +38,7 @@ window.__view_retirement = {
     },
 
     renderChart() {
-      const ctx = document.getElementById('retirementChart');
+      const ctx = this.$refs.retirementChart;
       if (!ctx) return;
       if (this.chart) this.chart.destroy();
       const labels = Array.from({ length: this.years + 1 }, (_, i) => i);

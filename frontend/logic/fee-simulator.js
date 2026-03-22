@@ -38,7 +38,7 @@ window.__view_fee_simulator = {
     },
 
     renderChart() {
-      const ctx = document.getElementById('feeChart');
+      const ctx = this.$refs.feeChart;
       if (!ctx) return;
       if (this.chart) this.chart.destroy();
 
