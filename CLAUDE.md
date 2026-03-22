@@ -1,171 +1,40 @@
-# Index Power Forever — CLAUDE.md
+# Index Power Forever
 
-> "지수는 영원하다" — S&P 500 & NASDAQ 100 지수 투자의 장기 우월성을 데이터로 증명하는 웹앱
-> 📖 『이길 수 있는 투자만 하라』(2026년 4월 출간) 연계 웹서비스
+> ETF vs S&P 500 / NASDAQ 100 지수 성과 비교 웹서비스
+> 『이길 수 있는 투자만 하라』(2026년 4월 출간) 연계
 
----
+## 핵심 규칙
 
-## 프로젝트 개요
+- **로그인 없음** — 인증/JWT 불필요
+- **D1 (SQLite)** — `$1/$2` 금지, 반드시 `?` 파라미터
+- **코딩 규칙** — `.claude/rules/` 참조
 
-ETF를 선택하면 S&P 500 / NASDAQ 100 지수와 성과를 비교 분석하여, 지수 투자의 장기 우월성을 시각적으로 증명하는 웹 서비스.
+## 배포
 
-- **로그인 없음**: 회원가입 불필요, 즉시 사용
-- **미국 ETF 전용**: Yahoo Finance API 활용
-- **교육 목적**: 데이터로 보는 지수 투자의 과학
+> **수동 배포 금지. 모든 배포는 `git commit` + `git push`로만.**
 
----
-
-## 기술 스택
-
-| 레이어 | 기술 |
-|---|---|
-| Frontend | Cloudflare Pages + Vue 3 CDN + Bootstrap 5 (ViewLogic) |
-| Backend | Cloudflare Workers + Hono |
-| Database | Cloudflare D1 (SQLite) |
-| Cache | Cloudflare KV |
-| 데이터 소스 | Yahoo Finance API |
-| 차트 | Chart.js |
-
----
-
-## 프로젝트 구조
-
-```
-IndexPowerForever/
-├── frontend/
-│   ├── index.html          # SPA 진입점 (Vue 3 Router + Bootstrap 5 CDN)
-│   ├── css/
-│   │   └── style.css       # 공통 스타일
-│   ├── components/
-│   │   └── navbar.html     # 공통 네비게이션
-│   ├── views/              # HTML 뷰 (1:1 매칭 필수)
-│   └── logic/              # JS 로직 (1:1 매칭 필수)
-│       └── app.js          # Vue Router 초기화
-├── backend/
-│   ├── wrangler.toml       # Cloudflare Workers 설정
-│   ├── package.json
-│   └── src/
-│       ├── index.js        # Hono 앱 진입점
-│       ├── routes/         # API 라우트 (입력검증 + 서비스 호출만)
-│       ├── services/       # 비즈니스 로직 (export class, constructor(env))
-│       ├── middleware/      # cors, error, auth(미래)
-│       └── utils/          # 유틸리티
-└── .claude/
-    ├── agents/             # 에이전트 정의
-    ├── skills/             # 스킬 정의
-    ├── rules/              # 코딩 규칙
-    ├── docs/               # 스펙 문서
-    ├── templates/          # 코드 템플릿
-    ├── hooks/              # 검증 훅
-    ├── commands/           # 슬래시 커맨드
-    ├── progress.md         # 진행 상황
-    └── worklog.md          # 작업 로그
-```
-
----
-
-## 코딩 규칙 (필독)
-
-### Backend
-- `.claude/rules/backend-guide.md` 참조
-- Route: 입력 검증 + 서비스 호출만. 비즈니스 로직/DB 직접 접근 금지
-- Service: `export class`, `constructor(env)`, D1은 prepared statements 필수
-- 에러: ValidationError(400) / NotFoundError(404) / ServerError(500)
-- **D1 주의**: PostgreSQL `$1/$2` 대신 `?` 파라미터 사용
-
-### Frontend
-- `.claude/rules/frontend-guide.md` 참조
-- `src/views/{name}.html` ↔ `src/logic/{name}.js` 1:1 매칭 필수
-- API 호출: `this.$api.get/post/put/delete()`
-- 페이지 이동: `this.navigateTo('/path', { key: value })`
-
----
-
-## 주요 화면
-
-| 경로 | 화면 | 설명 |
+| 대상 | 트리거 | 워크플로우 |
 |---|---|---|
-| `/` | 홈 | 히어로 + ETF 검색 + 인기 프리셋 |
-| `/etf/:ticker` | ETF 상세 | 성과비교 + 이김/짐 분석 + 종목정보 탭 |
-| `/ranking` | 랭킹 | 기간별 지수 대비 성과 순위 |
-| `/timing` | 타이밍 시뮬레이터 | 상위 상승일 놓치면? (책 13장) |
-| `/fee-simulator` | 비용 시뮬레이터 | 비용 차이의 복리 효과 (책 9장, 14장) |
-| `/retirement` | 퇴직연금 시뮬레이터 | 원리금보장 vs 인덱스 (책 PART 4) |
-| `/insights` | 인사이트 | 교육 콘텐츠 (책 PART 1-4) |
-| `/book` | 책 소개 | 도서 연계 + 구매 링크 |
+| Frontend | `frontend/**` push | `deploy-frontend.yml` → Cloudflare Pages |
+| Backend | `backend/**` push | `deploy-backend.yml` → Cloudflare Workers |
 
----
-
-## 핵심 계산 로직
-
-```
-누적 수익률 = (현재가 / 시작가 - 1) × 100
-초과수익률 = ETF 누적수익률 - 지수 누적수익률
-CAGR = (최종가/시작가)^(1/년수) - 1
-MDD = (최저점 - 이전 최고점) / 이전 최고점 × 100
-Sharpe = (연환산 수익률 - 무위험 수익률) / 연환산 변동성
-롤링 N년 승률 = (N년 보유 후 지수를 이긴 시작점 수) / 전체 시작점 수
-```
-
----
-
-## 데이터 소스
-
-- **Yahoo Finance API** (Workers에서 fetch 직접 호출)
-  - v8 chart: 일별 종가, 기간별 가격 데이터
-  - quoteSummary: ETF 기본정보, 구성종목, 섹터 비중
-  - cookie + crumb 인증 방식
-- **벤치마크**: ^GSPC (S&P 500), ^NDX (NASDAQ 100) 또는 SPY, QQQ
-- **캐시 전략**: KV 1시간(가격), KV 24시간(ETF 정보), D1 영구(히스토리)
-
----
-
-## 배포 (필독)
-
-> **절대 수동 배포(`wrangler deploy`, `wrangler pages deploy`)하지 않는다.**
-> **모든 배포는 GitHub 커밋 + 푸시로만 이루어진다.**
-
-### 배포 파이프라인
-
-| 대상 | 트리거 | 워크플로우 | 배포 대상 |
-|---|---|---|---|
-| **Frontend** | `frontend/**` 변경 후 push | `.github/workflows/deploy-frontend.yml` | Cloudflare Pages (`index-power-forever`) |
-| **Backend** | `backend/**` 변경 후 push | `.github/workflows/deploy-backend.yml` | Cloudflare Workers (`index-power-forever`) |
-
-### 배포 규칙
-1. 코드 변경 후 반드시 `git add` → `git commit` → `git push` 순서로 진행
-2. **프론트엔드 변경 시**: `frontend/` 하위 파일이 커밋에 포함되어야 Pages 배포 트리거됨
-3. **백엔드 변경 시**: `backend/` 하위 파일이 커밋에 포함되어야 Workers 배포 트리거됨
-4. `.claude/`, 루트 파일 등은 배포와 무관 — 별도 커밋해도 배포 트리거 안 됨
-5. 프론트+백엔드 동시 변경 시 한 번의 커밋+푸시로 두 워크플로우 모두 트리거됨
-
-### 배포 URL
 - Frontend: `https://indexpowerforever.pages.dev`
-- Backend API: `https://index-power-forever.sixman-joseph.workers.dev`
+- Backend: `https://index-power-forever.sixman-joseph.workers.dev`
+- `.claude/`, 루트 파일 변경은 배포 트리거 안 됨
 
----
+## 구조
 
-## 개발 진행
+- `frontend/views/*.html` ↔ `frontend/logic/*.js` 1:1 매칭 필수
+- `backend/src/routes/` — 입력 검증 + 서비스 호출만
+- `backend/src/services/` — 비즈니스 로직 전담
 
-현재 진행 상황: `.claude/progress.md`
-작업 로그: `.claude/worklog.md`
+## 참조 문서
 
-### 주요 커맨드
-- `/pm` — 프로젝트 상태 확인
-- `/pm 시작` — 새 세션 시작
-- `/pm 완료` — 세션 마무리
-- `/new-page {name} {제목}` — 새 페이지 생성
-- `/new-api {route} {METHOD} {경로} {설명}` — 새 API 엔드포인트 생성
-- `/build-phase {N}` — Phase N 전체 빌드
-
----
-
-## SP500Simulator와의 차이점
-
-| 항목 | SP500Simulator | Index Power Forever |
-|---|---|---|
-| 목적 | 포트폴리오 리밸런싱 백테스팅 | 지수 대비 ETF 성과 비교 |
-| 인증 | JWT 필요 | 로그인 없음 |
-| DB | D1 (사용자 데이터) | D1 (캐시만) |
-| 한국 ETF | 지원 | 미지원 (미국 전용) |
-| SQL 파라미터 | `?` (D1/SQLite) | `?` (D1/SQLite) |
+| 문서 | 경로 |
+|---|---|
+| 백엔드 규칙 | `.claude/rules/backend-guide.md` |
+| 프론트엔드 규칙 | `.claude/rules/frontend-guide.md` |
+| 아키텍처 | `.claude/rules/architecture.md` |
+| 코딩 컨벤션 | `.claude/rules/coding-conventions.md` |
+| 진행 상황 | `.claude/progress.md` |
+| 작업 로그 | `.claude/worklog.md` |
