@@ -445,10 +445,68 @@ body { color: var(--text-primary); }
   background-color: var(--bs-primary);
 }
 
-/* 네비게이션 */
-.navbar-brand {
+/* ── 네비게이션 ── */
+.site-navbar {
+  background: linear-gradient(180deg, #0a0e1a 0%, #111827 100%);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  padding: 0.6rem 0;
+}
+.site-navbar .navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   font-weight: 800;
-  font-size: 1.3rem;
+  font-size: 1.2rem;
+  color: #fff;
+  text-decoration: none;
+}
+.navbar-brand-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, #0d6efd, #38d9a9);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #fff;
+}
+.navbar-brand-text {
+  background: linear-gradient(90deg, #fff 0%, rgba(255,255,255,0.8) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.site-navbar .nav-link {
+  color: rgba(255,255,255,0.6);
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  transition: all 0.15s;
+}
+.site-navbar .nav-link:hover,
+.site-navbar .nav-link:focus {
+  color: #fff;
+  background: rgba(255,255,255,0.08);
+}
+.site-navbar .nav-link.active {
+  color: #fff;
+  background: rgba(13,110,253,0.2);
+}
+.nav-link-book {
+  border: 1px solid rgba(255,255,255,0.15) !important;
+}
+.nav-link-book:hover {
+  border-color: rgba(255,255,255,0.3) !important;
+}
+.site-navbar .navbar-toggler {
+  border: 1px solid rgba(255,255,255,0.15);
+  padding: 0.35rem 0.6rem;
+}
+.site-navbar .navbar-toggler-icon {
+  width: 1.2em;
+  height: 1.2em;
 }
 
 /* ── ETF 분석 페이지 ── */
@@ -1041,22 +1099,48 @@ body { color: var(--text-primary); }
   transform: scale(1.05);
 }
 
-/* 네비게이션 — 시뮬레이터 드롭다운 */
-.navbar .dropdown-menu-dark {
-  min-width: 280px;
+/* 네비게이션 — 드롭다운 */
+.navbar-dropdown {
+  background: #1a1f2e;
   border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius-md);
+  padding: 0.5rem;
+  min-width: 300px;
+  box-shadow: var(--shadow-lg);
+  margin-top: 0.5rem;
+}
+.navbar-dropdown-item {
+  display: flex !important;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.65rem 0.75rem !important;
   border-radius: 8px;
-  padding: 0.5rem 0;
+  color: rgba(255,255,255,0.8) !important;
+  white-space: normal !important;
 }
-.navbar .dropdown-item {
-  padding: 0.6rem 1rem;
-  white-space: normal;
+.navbar-dropdown-item:hover,
+.navbar-dropdown-item:focus {
+  background: rgba(255,255,255,0.08) !important;
+  color: #fff !important;
 }
-.navbar .dropdown-item:hover,
-.navbar .dropdown-item:focus {
-  background-color: rgba(255,255,255,0.1);
+.navbar-dropdown-icon {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.08);
+  border-radius: 8px;
+  font-size: 1rem;
+  flex-shrink: 0;
+  margin-top: 2px;
 }
-.navbar .dropdown-item small {
-  font-size: 0.75rem;
-  opacity: 0.7;
+.navbar-dropdown-item small {
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.4);
+  line-height: 1.3;
+}
+.navbar-dropdown-item .fw-semibold {
+  font-size: 0.85rem;
+  color: #fff;
 }

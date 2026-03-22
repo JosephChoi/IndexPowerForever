@@ -1,13 +1,16 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<nav class="navbar navbar-expand-lg site-navbar">
   <div class="container">
     <a class="navbar-brand" href="/">
-      <i class="bi bi-graph-up-arrow me-1"></i>지수는 영원하다
+      <span class="navbar-brand-icon">
+        <i class="bi bi-graph-up-arrow"></i>
+      </span>
+      <span class="navbar-brand-text">지수는 영원하다</span>
     </a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu" aria-label="메뉴 열기">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navMenu">
-      <ul class="navbar-nav me-auto">
+      <ul class="navbar-nav ms-auto gap-1">
         <li class="nav-item">
           <a class="nav-link" href="/ranking">
             <i class="bi bi-trophy me-1"></i>랭킹
@@ -17,23 +20,32 @@
           <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
             <i class="bi bi-calculator me-1"></i>시뮬레이터
           </a>
-          <ul class="dropdown-menu dropdown-menu-dark">
+          <ul class="dropdown-menu navbar-dropdown">
             <li>
-              <a class="dropdown-item" href="/fee-simulator">
-                <i class="bi bi-percent me-2 text-success"></i>비용 시뮬레이터
-                <small class="d-block text-muted">보수 차이가 장기 수익에 미치는 영향</small>
+              <a class="dropdown-item navbar-dropdown-item" href="/fee-simulator">
+                <div class="navbar-dropdown-icon text-success"><i class="bi bi-percent"></i></div>
+                <div>
+                  <div class="fw-semibold">비용 시뮬레이터</div>
+                  <small>보수 차이가 장기 수익에 미치는 영향</small>
+                </div>
               </a>
             </li>
             <li>
-              <a class="dropdown-item" href="/timing">
-                <i class="bi bi-clock-history me-2 text-warning"></i>타이밍 시뮬레이터
-                <small class="d-block text-muted">최고의 날을 놓치면 얼마나 손해인가</small>
+              <a class="dropdown-item navbar-dropdown-item" href="/timing">
+                <div class="navbar-dropdown-icon text-warning"><i class="bi bi-clock-history"></i></div>
+                <div>
+                  <div class="fw-semibold">타이밍 시뮬레이터</div>
+                  <small>최고의 날을 놓치면 얼마나 손해인가</small>
+                </div>
               </a>
             </li>
             <li>
-              <a class="dropdown-item" href="/retirement">
-                <i class="bi bi-piggy-bank me-2 text-danger"></i>퇴직연금 시뮬레이터
-                <small class="d-block text-muted">인덱스 기반 퇴직연금 전략 시뮬레이션</small>
+              <a class="dropdown-item navbar-dropdown-item" href="/retirement">
+                <div class="navbar-dropdown-icon text-danger"><i class="bi bi-piggy-bank"></i></div>
+                <div>
+                  <div class="fw-semibold">퇴직연금 시뮬레이터</div>
+                  <small>인덱스 기반 퇴직연금 전략 시뮬레이션</small>
+                </div>
               </a>
             </li>
           </ul>
@@ -44,7 +56,7 @@
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/book">
+          <a class="nav-link nav-link-book" href="/book">
             <i class="bi bi-book me-1"></i>책 소개
           </a>
         </li>
