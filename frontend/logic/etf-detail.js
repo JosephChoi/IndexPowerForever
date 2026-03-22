@@ -49,10 +49,16 @@ window.__view_etf_detail = {
       if (!this.explorerData) return [];
       return new Array(this.explorerData.totalTradingDays);
     },
-    // 탐색기 결과 도트 (Step 3용)
+    // 탐색기 결과 도트 (Step 3용, 압축 필드 → 읽기 쉬운 필드로 변환)
     explorerResultDots() {
       if (!this.explorerData) return [];
-      return this.explorerData.results;
+      return this.explorerData.results.map(r => ({
+        date: r.d,
+        endDate: r.e,
+        etfReturn: r.er,
+        benchReturn: r.br,
+        indexWin: r.w === 1,
+      }));
     },
     // 연도별 인덱스 승률
     indexYearlyWinRate() {

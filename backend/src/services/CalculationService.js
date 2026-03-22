@@ -147,11 +147,11 @@ export class CalculationService {
       if (indexWin) indexWins++;
 
       results.push({
-        date: startDate,
-        endDate,
-        etfReturn: parseFloat(etfReturn.toFixed(2)),
-        benchReturn: parseFloat(benchReturn.toFixed(2)),
-        indexWin,
+        d: startDate,
+        e: endDate,
+        er: parseFloat(etfReturn.toFixed(1)),
+        br: parseFloat(benchReturn.toFixed(1)),
+        w: indexWin ? 1 : 0,
       });
     }
 

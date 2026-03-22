@@ -23,11 +23,18 @@ export class RankingService {
 
     if (etfList.length === 0) return [];
 
-    // 각 ETF 비교 분석 (순차 실행, Yahoo Finance 부하 방지)
+    // 각 ETF 비교 분석 (동시 3개씩 병렬 실행)
     const rankings = [];
-    for (const etf of etfList) {
-      try {
-        const compare = await this.compareService.analyze(etf.ticker, period, benchmark);
+    const CONCURRENCY = 3;
+    for (let i = 0; i < etfList.length; i += CONCURRENCY) {
+      const batch = etfList.slice(i, i + CONCURRENCY);
+      const results = await Promise.allSettled(
+        batch.map(etf => this.compareService.analyze(etf.ticker, period, benchmark))
+      );
+      results.forEach((result, idx) => {
+        if (result.status !== 'fulfilled') return;
+        const etf = batch[idx];
+        const compare = result.value;
         rankings.push({
           ticker: etf.ticker,
           name: etf.name,
@@ -41,9 +48,7 @@ export class RankingService {
           sharpe: compare.stats.etf.sharpe,
           winRate: compare.winAnalysis.winRate,
         });
-      } catch {
-        // 개별 ETF 오류는 무시하고 계속 진행
-      }
+      });
     }
 
     // 초과수익률 기준 내림차순 정렬
