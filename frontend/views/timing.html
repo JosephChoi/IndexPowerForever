@@ -8,25 +8,19 @@
     <div class="row g-4">
       <div class="col-12 col-md-4">
         <div class="sim-panel">
-          <div class="sim-panel-title">시뮬레이션 설정</div>
+          <div class="sim-panel-title">기간 설정</div>
           <div class="mb-3">
             <div class="sim-slider-label"><span class="label">시작 연도</span><span class="value">{{ startYear }}</span></div>
-            <input type="range" class="sim-slider" min="1993" :max="endYear - 1" v-model.number="startYear" />
+            <input type="range" class="sim-slider" min="1993" max="2023" v-model.number="startYear" @change="simulate" />
           </div>
           <div class="mb-3">
             <div class="sim-slider-label"><span class="label">종료 연도</span><span class="value">{{ endYear }}</span></div>
-            <input type="range" class="sim-slider" :min="startYear + 1" :max="maxYear" v-model.number="endYear" />
+            <input type="range" class="sim-slider" min="1994" :max="maxYear" v-model.number="endYear" @change="simulate" />
           </div>
-          <div class="mb-3">
-            <div class="sim-slider-label"><span class="label">놓친 상위 상승일</span></div>
-            <div class="btn-group-selector">
-              <button class="btn" :class="{ active: missingDays === d }" v-for="d in [0,10,20,30,50]" :key="d" @click="missingDays = d">{{ d }}일</button>
-            </div>
+          <div class="alert alert-light small mb-0 mt-3">
+            <i class="bi bi-info-circle me-1 text-primary"></i>
+            슬라이더를 조절하면 자동으로 시뮬레이션이 실행됩니다.
           </div>
-          <button class="btn btn-primary w-100 mt-2" @click="simulate" :disabled="isLoading">
-            <span class="spinner-border spinner-border-sm me-1" v-if="isLoading"></span>
-            시뮬레이션 실행
-          </button>
         </div>
       </div>
 
@@ -37,23 +31,23 @@
         </div>
 
         <template v-if="result">
-          <div class="alert alert-info small mb-3">
-            <i class="bi bi-info-circle me-1"></i>
-            {{ result.startYear }}년~{{ result.endYear }}년 S&P 500(SPY) 기준, 총 {{ result.tradingDays }}거래일
+          <div class="text-muted small mb-3">
+            <i class="bi bi-calendar3 me-1"></i>
+            {{ result.startYear }}년 ~ {{ result.endYear }}년 S&P 500(SPY) 기준 · 총 {{ result.tradingDays.toLocaleString() }}거래일
           </div>
           <div class="row g-3">
             <div class="col-12 col-sm-6" v-for="s in result.scenarios" :key="s.missingDays">
               <div class="card-base" :class="s.missingDays === 0 ? 'card-highlight' : ''">
                 <div class="text-muted small fw-semibold mb-1">
-                  <span v-if="s.missingDays === 0">전체 투자 시</span>
-                  <span v-else>상위 <strong>{{ s.missingDays }}일</strong> 놓쳤을 때</span>
+                  <span v-if="s.missingDays === 0"><i class="bi bi-check-circle text-success me-1"></i>전체 투자 시</span>
+                  <span v-else><i class="bi bi-x-circle text-danger me-1"></i>상위 <strong>{{ s.missingDays }}일</strong> 놓쳤을 때</span>
                 </div>
                 <div class="fw-bold" style="font-size:1.5rem" :class="s.finalReturn >= 0 ? 'text-success' : 'text-danger'">
                   {{ s.finalReturn.toFixed(1) }}%
                 </div>
                 <div class="text-muted small">CAGR {{ s.cagr.toFixed(1) }}%</div>
                 <div class="text-danger small fw-semibold" v-if="s.missingDays > 0 && result.scenarios[0]">
-                  손실: {{ (s.finalReturn - result.scenarios[0].finalReturn).toFixed(1) }}%p
+                  {{ (s.finalReturn - result.scenarios[0].finalReturn).toFixed(1) }}%p 손실
                 </div>
               </div>
             </div>
@@ -64,7 +58,7 @@
         </div>
         <div class="text-center text-muted py-5" v-else>
           <i class="bi bi-play-circle display-3 d-block mb-2"></i>
-          설정 후 시뮬레이션을 실행하세요
+          기간을 설정하면 자동으로 시뮬레이션됩니다
         </div>
       </div>
     </div>
