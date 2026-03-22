@@ -780,3 +780,98 @@
   .hero-stat-num { font-size: 1.3rem; }
   .hero-bg-glow { width: 340px; }
 }
+
+/* ──────── 책 소개 페이지 ──────── */
+.book-hero {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+.book-cover-wrap {
+  position: relative;
+  display: inline-block;
+  max-width: 280px;
+}
+.book-cover-img {
+  width: 100%;
+  border-radius: 8px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3), 0 0 0 1px rgba(0,0,0,0.05);
+  transition: transform 0.3s;
+}
+.book-cover-img:hover {
+  transform: translateY(-4px) rotate(-1deg);
+}
+.book-title {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: #1a1a2e;
+}
+.book-subtitle {
+  font-size: 1.1rem;
+  color: #6c757d;
+  font-weight: 500;
+}
+.book-quote {
+  border-left: 4px solid #0d6efd;
+  padding: 1rem 1.5rem;
+  background: rgba(13,110,253,0.04);
+  border-radius: 0 8px 8px 0;
+  margin-bottom: 1.5rem;
+}
+.book-quote p {
+  margin: 0;
+  font-style: italic;
+  color: #495057;
+  line-height: 1.7;
+}
+.book-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.75rem;
+  background: rgba(13,110,253,0.08);
+  color: #0d6efd;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+.book-excerpt {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  line-height: 1.8;
+}
+.book-excerpt p {
+  color: #495057;
+  margin-bottom: 1rem;
+}
+.book-chapter-item {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+.book-chapter-item:last-child {
+  border-bottom: none;
+}
+.book-message-card {
+  padding: 1.5rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  height: 100%;
+}
+.book-message-section {
+  background: #f8f9fa;
+}
+.book-final-quote {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #0d6efd;
+  font-style: italic;
+  margin: 1.5rem 0 0;
+}
+.book-link-card {
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.book-link-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+}

@@ -1,40 +1,126 @@
 <div>
-  <div class="container py-4">
-    <div class="row g-5 align-items-start">
-      <div class="col-12 col-md-4 text-center">
-        <div class="bg-light rounded-3 p-5 mb-3">
-          <i class="bi bi-book display-1 text-primary"></i>
-          <h3 class="h5 fw-bold mt-3">이길 수 있는 투자만 하라</h3>
-          <p class="text-muted small">2026년 4월 출간</p>
+  <!-- 히어로 섹션 -->
+  <section class="book-hero">
+    <div class="container py-5">
+      <div class="row g-5 align-items-center">
+        <!-- 표지 이미지 -->
+        <div class="col-12 col-md-5 col-lg-4 text-center">
+          <div class="book-cover-wrap">
+            <img src="images/book-cover.svg" alt="이길 수 있는 투자만 하라 표지" class="book-cover-img" />
+            <div class="book-cover-shadow"></div>
+          </div>
+          <div class="d-grid gap-2 mt-4" style="max-width:280px;margin:0 auto;">
+            <a :href="purchaseUrl" class="btn btn-primary btn-lg" target="_blank">
+              <i class="bi bi-cart3 me-2"></i>구매하기
+            </a>
+            <span class="text-muted small text-center">2026년 4월 출간 예정</span>
+          </div>
         </div>
-        <a href="#" class="btn btn-primary btn-lg w-100 mb-2" target="_blank">
-          <i class="bi bi-cart me-2"></i>구매하기
-        </a>
-        <a href="#" class="btn btn-outline-secondary w-100" target="_blank">
-          <i class="bi bi-book me-2"></i>미리보기
-        </a>
+
+        <!-- 소개 텍스트 -->
+        <div class="col-12 col-md-7 col-lg-8">
+          <span class="badge bg-primary bg-opacity-10 text-primary mb-3 px-3 py-2">
+            <i class="bi bi-bar-chart-line me-1"></i>지수 투자 · 데이터 분석
+          </span>
+          <h1 class="book-title mb-2">이길 수 있는 투자만 하라</h1>
+          <p class="book-subtitle mb-4">왜 인덱스 투자만이 승산 있는 게임인가</p>
+
+          <blockquote class="book-quote">
+            <p>"시장에는 언제나 확신에 찬 전망이 존재하지만, 장기적으로 반복 가능한 전략은 극히 제한적이라는 사실."</p>
+          </blockquote>
+
+          <p class="text-muted mb-4">
+            증권사와 투자자문사에서 오랫동안 일하며 자본시장의 한가운데에 있었던 저자가,
+            20년간의 데이터를 분석하여 도달한 결론. 시장 평균을 꾸준히 확보하는 전략이,
+            시장을 능가하려는 전략보다 훨씬 높은 확률의 게임이라는 사실을 증명합니다.
+          </p>
+
+          <div class="d-flex flex-wrap gap-2">
+            <span class="book-tag"><i class="bi bi-check-circle me-1"></i>SPIVA 데이터 분석</span>
+            <span class="book-tag"><i class="bi bi-check-circle me-1"></i>비용의 복리 효과</span>
+            <span class="book-tag"><i class="bi bi-check-circle me-1"></i>타이밍 실패 확률</span>
+            <span class="book-tag"><i class="bi bi-check-circle me-1"></i>퇴직연금 전략</span>
+            <span class="book-tag"><i class="bi bi-check-circle me-1"></i>장기투자 7원칙</span>
+          </div>
+        </div>
       </div>
+    </div>
+  </section>
 
-      <div class="col-12 col-md-8">
-        <h1 class="h3 fw-bold mb-1">이길 수 있는 투자만 하라</h1>
-        <p class="text-muted mb-3">지수 투자의 과학적 근거와 실천 전략</p>
-        <p class="mb-4">S&P 500과 NASDAQ 100 지수 투자가 왜 대부분의 액티브 투자를 이기는지, 데이터와 수식으로 증명합니다. 비용, 타이밍, 퇴직연금까지 투자의 모든 답은 지수에 있습니다.</p>
+  <!-- 핵심 수치 -->
+  <section class="bg-light py-5">
+    <div class="container">
+      <div class="row g-4">
+        <div class="col-6 col-md-3" v-for="h in highlights" :key="h.stat">
+          <div class="text-center">
+            <i :class="h.icon" class="bi display-5 text-primary d-block mb-2"></i>
+            <div class="h3 fw-bold text-dark mb-1">{{ h.stat }}</div>
+            <p class="text-muted small mb-0">{{ h.desc }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-        <h5 class="fw-bold mb-3"><i class="bi bi-list-ol me-2"></i>목차</h5>
-        <div class="accordion" id="tocAccordion">
-          <div class="accordion-item" v-for="chapter in chapters" :key="chapter.id">
-            <h2 class="accordion-header">
-              <button class="accordion-button collapsed fw-medium" type="button" data-bs-toggle="collapse" :data-bs-target="'#ch' + chapter.id">
-                {{ chapter.title }}
-              </button>
-            </h2>
-            <div :id="'ch' + chapter.id" class="accordion-collapse collapse" data-bs-parent="#tocAccordion">
-              <div class="accordion-body text-muted small">
-                {{ chapter.summary }}
-                <div class="mt-2" v-if="chapter.link">
-                  <a :href="chapter.link" class="btn btn-sm btn-outline-primary">
-                    <i class="bi bi-play me-1"></i>관련 시뮬레이터
-                  </a>
+  <!-- 서문 발췌 -->
+  <section class="container py-5">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <h2 class="h4 fw-bold mb-4"><i class="bi bi-quote me-2 text-primary"></i>서문에서</h2>
+        <div class="book-excerpt">
+          <h5 class="fw-bold mb-3">이미 끝난 게임에서, 나는 무엇을 보았는가</h5>
+          <p>
+            투자를 이야기할 때 우리는 흔히 전략을 말하고, 수익률을 말하며, 기회를 이야기한다.
+            그러나 내가 이 책을 쓰게 된 이유는 그런 투자 기술이나 전략을 설명하기 위해서가 아니다.
+          </p>
+          <p>
+            나는 오랫동안 증권사와 투자자문사에서 일하며 자본시장의 한가운데에 있었다.
+            시장에 대한 분석은 정교했고, 전망은 언제나 자신감으로 가득 차 있었다.
+            그러나 시간이 흐르면서 나는 한 가지 질문을 피할 수 없게 되었다.
+          </p>
+          <p class="fw-semibold fst-italic text-primary">
+            "그렇게 많은 분석과 전략이 존재하는데도, 왜 장기적으로 시장을 꾸준히 이기는 전략은 그렇게 드문 것일까."
+          </p>
+          <p>
+            인덱스를 선택한다는 것은 시장의 장기적인 성장 구조를 신뢰하겠다는 결정이다.
+            그것은 예측의 유혹을 내려놓겠다는 용기이며, 단기적인 소음 대신 장기적인 흐름을 선택하겠다는 태도다.
+            다시 말해 인덱스 투자는 수동적인 선택이 아니라 시장을 가장 깊이 이해한 투자자의 선택일 수도 있다.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 목차 -->
+  <section class="bg-white py-5">
+    <div class="container">
+      <h2 class="h4 fw-bold mb-4 text-center"><i class="bi bi-list-ol me-2 text-primary"></i>목차</h2>
+      <div class="row justify-content-center">
+        <div class="col-lg-9">
+          <div class="accordion" id="tocAccordion">
+            <div class="accordion-item border-0 mb-3 shadow-sm rounded-3" v-for="chapter in chapters" :key="chapter.id">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed fw-bold rounded-3" type="button" data-bs-toggle="collapse" :data-bs-target="'#ch' + chapter.id">
+                  <span class="badge bg-primary me-2">{{ chapter.part }}</span>
+                  {{ chapter.title }}
+                </button>
+              </h2>
+              <div :id="'ch' + chapter.id" class="accordion-collapse collapse" data-bs-parent="#tocAccordion">
+                <div class="accordion-body pt-0">
+                  <div class="book-chapter-item" v-for="item in chapter.items" :key="item.ch">
+                    <div class="d-flex gap-2">
+                      <span class="badge bg-secondary bg-opacity-25 text-dark">{{ item.ch }}</span>
+                      <div>
+                        <div class="fw-semibold">{{ item.title }}</div>
+                        <div class="text-muted small">{{ item.desc }}</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="mt-3" v-if="chapter.link">
+                    <a href="#" class="btn btn-sm btn-outline-primary" @click.prevent="navigateTo(chapter.link)">
+                      <i class="bi bi-play-circle me-1"></i>{{ chapter.linkText }}
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>
@@ -42,5 +128,79 @@
         </div>
       </div>
     </div>
-  </div>
+  </section>
+
+  <!-- 이 책의 메시지 -->
+  <section class="book-message-section py-5">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-lg-8 text-center">
+          <h2 class="h4 fw-bold mb-4">이 책이 전하는 메시지</h2>
+          <div class="row g-4 mb-4">
+            <div class="col-md-4">
+              <div class="book-message-card">
+                <i class="bi bi-x-circle display-5 text-danger d-block mb-2"></i>
+                <div class="fw-bold mb-1">비난이 아니라</div>
+                <p class="text-muted small mb-0">금융기관을 비난하기 위해 쓰인 책이 아닙니다. 구조에 대한 고백입니다.</p>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="book-message-card">
+                <i class="bi bi-lightbulb display-5 text-warning d-block mb-2"></i>
+                <div class="fw-bold mb-1">체념이 아니라 확신</div>
+                <p class="text-muted small mb-0">인덱스 투자는 포기가 아니라, 시장의 장기적 성장을 신뢰하는 능동적 결정입니다.</p>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="book-message-card">
+                <i class="bi bi-graph-up display-5 text-success d-block mb-2"></i>
+                <div class="fw-bold mb-1">구조 위에 서라</div>
+                <p class="text-muted small mb-0">승산이 낮은 게임에서 벗어나, 승산이 높은 구조 위에 서는 것이 본질입니다.</p>
+              </div>
+            </div>
+          </div>
+          <blockquote class="book-final-quote">
+            "이길 수 있는 투자만 하라."
+          </blockquote>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 연계 서비스 -->
+  <section class="bg-light py-5">
+    <div class="container">
+      <h2 class="h5 fw-bold mb-4 text-center">이 웹사이트에서 직접 체험해보세요</h2>
+      <div class="row g-3">
+        <div class="col-6 col-md-3">
+          <div class="card border-0 shadow-sm h-100 text-center p-3 book-link-card" @click="navigateTo('/')">
+            <i class="bi bi-search display-5 text-primary mb-2"></i>
+            <div class="fw-bold small">ETF 성과 비교</div>
+            <div class="text-muted" style="font-size:0.75rem;">1~5장 연계</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="card border-0 shadow-sm h-100 text-center p-3 book-link-card" @click="navigateTo('/fee-simulator')">
+            <i class="bi bi-calculator display-5 text-success mb-2"></i>
+            <div class="fw-bold small">비용 시뮬레이터</div>
+            <div class="text-muted" style="font-size:0.75rem;">4장, 9장, 14장 연계</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="card border-0 shadow-sm h-100 text-center p-3 book-link-card" @click="navigateTo('/timing')">
+            <i class="bi bi-clock-history display-5 text-warning mb-2"></i>
+            <div class="fw-bold small">타이밍 시뮬레이터</div>
+            <div class="text-muted" style="font-size:0.75rem;">13장 연계</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="card border-0 shadow-sm h-100 text-center p-3 book-link-card" @click="navigateTo('/retirement')">
+            <i class="bi bi-piggy-bank display-5 text-danger mb-2"></i>
+            <div class="fw-bold small">퇴직연금 시뮬레이터</div>
+            <div class="text-muted" style="font-size:0.75rem;">15~18장 연계</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 </div>
