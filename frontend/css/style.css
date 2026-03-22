@@ -875,4 +875,20 @@
   transform: translateY(-3px);
   box-shadow: 0 8px 25px rgba(0,0,0,0.1);
 }
-/* updated: 2026-03-22T09:55:07Z */
+/* 홈 — 책 프로모션 배너 */
+.book-promo-section {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid #dee2e6;
+}
+.book-promo-cover {
+  max-height: 220px;
+  width: auto;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  transition: transform 0.3s;
+}
+.book-promo-cover:hover {
+  transform: scale(1.05);
+}

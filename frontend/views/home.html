@@ -192,5 +192,32 @@
         </div>
       </div>
     </section>
+
+    <!-- 책 소개 배너 -->
+    <section class="mt-5 book-promo-section">
+      <div class="row g-0 align-items-center">
+        <div class="col-md-4 text-center p-4">
+          <img src="images/book-cover.svg" alt="이길 수 있는 투자만 하라" class="book-promo-cover" />
+        </div>
+        <div class="col-md-8 p-4">
+          <span class="badge bg-primary bg-opacity-10 text-primary mb-2 px-3 py-2">
+            <i class="bi bi-book me-1"></i>2026년 4월 출간
+          </span>
+          <h3 class="fw-bold mb-2">이길 수 있는 투자만 하라</h3>
+          <p class="text-muted mb-3">
+            증권사와 투자자문사에서 20년간 일하며 데이터로 도달한 결론 —
+            왜 인덱스 투자만이 승산 있는 게임인가.
+          </p>
+          <div class="d-flex flex-wrap gap-2 mb-3">
+            <span class="badge bg-light text-dark border">SPIVA 데이터 분석</span>
+            <span class="badge bg-light text-dark border">비용의 복리 효과</span>
+            <span class="badge bg-light text-dark border">장기투자 7원칙</span>
+          </div>
+          <button class="btn btn-primary" @click="navigateTo('/book')">
+            <i class="bi bi-arrow-right me-1"></i>자세히 보기
+          </button>
+        </div>
+      </div>
+    </section>
   </div>
 </div>
