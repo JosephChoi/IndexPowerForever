@@ -111,6 +111,7 @@
     <!-- 에러 -->
     <div class="alert alert-danger" v-if="error">
       <i class="bi bi-exclamation-triangle me-2"></i>{{ error }}
+      <button class="btn btn-sm btn-outline-danger ms-2" @click="loadPresets(); loadPopular()">재시도</button>
     </div>
 
     <!-- 인기 검색 TOP 5 -->
@@ -130,6 +131,13 @@
         </button>
       </div>
     </section>
+
+    <!-- 데이터 없음 -->
+    <div class="text-center text-muted py-4" v-if="!isLoading && !error && presets.length === 0 && popularEtfs.length === 0">
+      <i class="bi bi-inbox display-4 d-block mb-2"></i>
+      데이터를 불러올 수 없습니다.
+      <button class="btn btn-sm btn-outline-secondary ms-2" @click="loadPresets(); loadPopular()">다시 시도</button>
+    </div>
 
     <!-- 인기 프리셋 -->
     <section v-if="!isLoading">

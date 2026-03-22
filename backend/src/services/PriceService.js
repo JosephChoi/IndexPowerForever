@@ -13,7 +13,9 @@ export class PriceService {
 
     // KV 캐시 확인 (1h)
     const cached = await this.env.KV.get(cacheKey);
-    if (cached) return JSON.parse(cached);
+    if (cached) {
+      try { return JSON.parse(cached); } catch { /* 캐시 파싱 실패 시 재조회 */ }
+    }
 
     // max: D1에 충분한 데이터가 있으면 사용, 없으면 Yahoo 조회
     if (period === 'max') {

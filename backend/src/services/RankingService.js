@@ -12,7 +12,9 @@ export class RankingService {
     const cacheKey = `ranking:${period}:${benchmark}`;
 
     const cached = await this.env.KV.get(cacheKey);
-    if (cached) return JSON.parse(cached);
+    if (cached) {
+      try { return JSON.parse(cached); } catch { /* 캐시 파싱 실패 시 재계산 */ }
+    }
 
     // 랭킹 대상 ETF 목록 조회
     const { results: etfList } = await this.env.DB.prepare(

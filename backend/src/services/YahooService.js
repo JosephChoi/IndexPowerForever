@@ -15,7 +15,9 @@ export class YahooService {
   // cookie + crumb 취득 (KV 캐시 1시간)
   async getCrumb() {
     const cached = await this.env.KV.get('yahoo:crumb');
-    if (cached) return JSON.parse(cached);
+    if (cached) {
+      try { return JSON.parse(cached); } catch { /* crumb 캐시 파싱 실패 시 재취득 */ }
+    }
 
     // Step 1: Yahoo Finance 접속 → cookie 획득
     const cookieRes = await fetch('https://fc.yahoo.com', {
@@ -74,7 +76,14 @@ export class YahooService {
 
     this._handleHttpError(res.status, ticker);
 
-    const json = await res.json();
+    let json;
+    try {
+      json = await res.json();
+    } catch {
+      const err = new Error(`${ticker} 가격 데이터를 파싱할 수 없습니다.`);
+      err.name = 'ServerError';
+      throw err;
+    }
     const result = json?.chart?.result?.[0];
     if (!result) {
       const err = new Error(`티커 ${ticker}를 찾을 수 없습니다.`);
@@ -112,7 +121,14 @@ export class YahooService {
 
     this._handleHttpError(res.status, ticker);
 
-    const json = await res.json();
+    let json;
+    try {
+      json = await res.json();
+    } catch {
+      const err = new Error(`${ticker} 기본정보를 파싱할 수 없습니다.`);
+      err.name = 'ServerError';
+      throw err;
+    }
     const result = json?.quoteSummary?.result?.[0];
     if (!result) {
       const err = new Error(`티커 ${ticker}를 찾을 수 없습니다.`);
@@ -138,7 +154,12 @@ export class YahooService {
 
     if (!res.ok) return [];
 
-    const json = await res.json();
+    let json;
+    try {
+      json = await res.json();
+    } catch {
+      return [];
+    }
     return (json?.finance?.result?.[0]?.quotes || [])
       .filter(q => q.quoteType === 'ETF' || q.quoteType === 'EQUITY')
       .slice(0, 10)

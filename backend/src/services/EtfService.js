@@ -13,7 +13,9 @@ export class EtfService {
 
     // KV 캐시 확인 (24h)
     const cached = await this.env.KV.get(cacheKey);
-    if (cached) return JSON.parse(cached);
+    if (cached) {
+      try { return JSON.parse(cached); } catch { /* 캐시 파싱 실패 시 재조회 */ }
+    }
 
     // D1 캐시 확인 (1일 이내)
     const row = await this.env.DB.prepare(
@@ -63,7 +65,9 @@ export class EtfService {
     const cacheKey = `search:${query.toLowerCase()}`;
 
     const cached = await this.env.KV.get(cacheKey);
-    if (cached) return JSON.parse(cached);
+    if (cached) {
+      try { return JSON.parse(cached); } catch { /* 캐시 파싱 실패 시 재조회 */ }
+    }
 
     // D1에서 먼저 검색 (이미 캐시된 ETF)
     const { results } = await this.env.DB.prepare(
@@ -133,8 +137,8 @@ export class EtfService {
       inceptionDate: row.inception_date,
       aum: row.aum,
       description: row.description,
-      topHoldings: row.top_holdings ? JSON.parse(row.top_holdings) : [],
-      sectorWeights: row.sector_weights ? JSON.parse(row.sector_weights) : {},
+      topHoldings: (() => { try { return row.top_holdings ? JSON.parse(row.top_holdings) : []; } catch { return []; } })(),
+      sectorWeights: (() => { try { return row.sector_weights ? JSON.parse(row.sector_weights) : {}; } catch { return {}; } })(),
     };
   }
 }

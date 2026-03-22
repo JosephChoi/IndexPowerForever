@@ -31,7 +31,10 @@
       </div>
 
       <div class="col-12 col-md-8">
-        <div class="alert alert-danger" v-if="error"><i class="bi bi-exclamation-triangle me-2"></i>{{ error }}</div>
+        <div class="alert alert-danger" v-if="error">
+          <i class="bi bi-exclamation-triangle me-2"></i>{{ error }}
+          <button class="btn btn-sm btn-outline-danger ms-2" @click="simulate">재시도</button>
+        </div>
 
         <template v-if="result">
           <div class="alert alert-info small mb-3">

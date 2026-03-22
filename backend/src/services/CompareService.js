@@ -13,7 +13,9 @@ export class CompareService {
     const cacheKey = `compare:${ticker}:${period}:${benchmark}`;
 
     const cached = await this.env.KV.get(cacheKey);
-    if (cached) return JSON.parse(cached);
+    if (cached) {
+      try { return JSON.parse(cached); } catch { /* 캐시 파싱 실패 시 재계산 */ }
+    }
 
     // 3개 티커 가격 병렬 조회
     let [etfPrices, spyPrices, qqqPrices] = await Promise.all([

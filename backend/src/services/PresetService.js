@@ -14,7 +14,7 @@ export class PresetService {
       id: r.id,
       name: r.name,
       description: r.description,
-      tickers: JSON.parse(r.tickers),
+      tickers: (() => { try { return JSON.parse(r.tickers); } catch { return []; } })(),
     }));
   }
 
@@ -23,7 +23,9 @@ export class PresetService {
     const cacheKey = 'popular:etf';
 
     const cached = await this.env.KV.get(cacheKey);
-    if (cached) return JSON.parse(cached);
+    if (cached) {
+      try { return JSON.parse(cached); } catch { /* 캐시 파싱 실패 시 재조회 */ }
+    }
 
     const { results } = await this.env.DB.prepare(
       `SELECT ticker, COUNT(*) as count

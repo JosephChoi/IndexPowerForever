@@ -15,10 +15,18 @@
       <span class="spinner-border spinner-border-sm text-secondary" v-if="isLoading"></span>
     </div>
 
-    <div class="alert alert-danger" v-if="error"><i class="bi bi-exclamation-triangle me-2"></i>{{ error }}</div>
+    <div class="alert alert-danger" v-if="error">
+      <i class="bi bi-exclamation-triangle me-2"></i>{{ error }}
+      <button class="btn btn-sm btn-outline-danger ms-2" @click="loadRanking">재시도</button>
+    </div>
 
     <div class="loading-overlay" v-if="isLoading && !rankings.length">
       <div class="spinner-border text-primary"></div>
+    </div>
+
+    <div class="text-center text-muted py-5" v-if="!isLoading && !error && rankings.length === 0">
+      <i class="bi bi-inbox display-4 d-block mb-2"></i>
+      랭킹 데이터가 없습니다.
     </div>
 
     <div class="table-responsive" v-if="rankings.length">

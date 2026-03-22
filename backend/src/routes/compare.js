@@ -69,7 +69,9 @@ compareRoute.get('/:ticker/rolling-detail', async (c) => {
   // KV 캐시 확인 (6h)
   const cacheKey = `rolling:${ticker}:${period}:${benchmark}:${holding}Y`;
   const cached = await c.env.KV.get(cacheKey);
-  if (cached) return c.json({ data: JSON.parse(cached) });
+  if (cached) {
+    try { return c.json({ data: JSON.parse(cached) }); } catch { /* 캐시 파싱 실패 시 재계산 */ }
+  }
 
   const priceService = new PriceService(c.env);
   const benchTicker = benchmark === 'QQQ' ? 'QQQ' : 'SPY';
