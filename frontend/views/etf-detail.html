@@ -224,17 +224,20 @@
                 ></div>
               </div>
             </div>
+            <button class="btn btn-primary mt-3" @click="explorerStep = 2" v-if="explorerStep < 2">
+              다음: 투자 가능 시작일 알아보기 <i class="bi bi-arrow-right ms-1"></i>
+            </button>
           </div>
 
           <!-- Step 2 -->
-          <div class="explorer-step mb-4" :class="{ 'step-dimmed': explorerStep < 2 }">
+          <div class="explorer-step mb-4" v-if="explorerStep >= 2">
             <div class="explorer-step-badge">Step 2</div>
             <h5 class="fw-bold mb-2">투자 가능한 시작일</h5>
             <p class="text-muted mb-3">
               {{ explorerHolding }}년({{ explorerData.holdingDays }}거래일) 보유하려면,
               마지막 <strong>{{ explorerData.holdingDays }}일</strong>은 아직 {{ explorerHolding }}년이 안 되니 제외합니다.
             </p>
-            <div class="d-flex align-items-center gap-3 mb-3">
+            <div class="d-flex align-items-center gap-3 mb-3 flex-wrap">
               <div class="explorer-calc">
                 <span class="calc-num">{{ explorerData.totalTradingDays.toLocaleString() }}</span>
                 <span class="calc-op">−</span>
@@ -243,17 +246,17 @@
                 <span class="calc-result">{{ explorerData.possibleStarts.toLocaleString() }}개 시작점</span>
               </div>
             </div>
-            <div class="d-flex gap-3 small">
+            <div class="d-flex gap-3 small mb-3">
               <span><span class="dot-legend dot-neutral"></span> 투자 가능 ({{ explorerData.possibleStarts.toLocaleString() }}일)</span>
               <span><span class="dot-legend dot-excluded"></span> 제외 ({{ explorerData.holdingDays }}일)</span>
             </div>
-            <button class="btn btn-sm btn-outline-primary mt-3" @click="explorerStep = 2" v-if="explorerStep < 2">
-              다음 단계 보기 <i class="bi bi-arrow-right ms-1"></i>
+            <button class="btn btn-primary" @click="startExplorerAnimation" v-if="explorerStep < 3">
+              다음: 승부 결과 확인하기 <i class="bi bi-play-fill ms-1"></i>
             </button>
           </div>
 
           <!-- Step 3 -->
-          <div class="explorer-step mb-4" :class="{ 'step-dimmed': explorerStep < 3 }">
+          <div class="explorer-step mb-4" v-if="explorerStep >= 3">
             <div class="explorer-step-badge">Step 3</div>
             <h5 class="fw-bold mb-2">{{ explorerData.possibleStarts.toLocaleString() }}번의 승부 결과</h5>
             <p class="text-muted mb-3">
@@ -263,9 +266,6 @@
                 {{ explorerData.indexWinRate }}%
               </strong>입니다.
             </p>
-            <button class="btn btn-sm btn-outline-primary mb-3" @click="startExplorerAnimation" v-if="explorerStep < 3">
-              결과 보기 <i class="bi bi-play-fill ms-1"></i>
-            </button>
 
             <!-- 도트 매트릭스 (결과) -->
             <div class="dot-matrix-container" v-if="explorerStep >= 3">
