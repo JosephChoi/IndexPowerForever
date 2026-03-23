@@ -2,6 +2,83 @@
 
 ---
 
+## 세션 #8 — 2026-03-23
+
+### 시작 시 상태
+- Phase 0~4 전체 완료 (42/42 + 10)
+- Post-MVP 트래킹 체계 필요
+
+### 작업 내용
+
+**Post-MVP 트래킹 체계 구성 (P-000)**
+- `.claude/post-mvp.md` 신규 생성 (MVP 이후 추가 기능 별도 관리)
+- `progress.md` 하단에 Post-MVP 문서 참조 링크 추가
+
+**P-001: 프리셋 카드 개별 티커 클릭**
+- 카드 전체 클릭(`onPresetClick`) → 개별 뱃지 클릭(`onSelectResult`)으로 변경
+- `ticker-badge-clickable` 호버 스타일 추가 (translateY + scale + box-shadow)
+- 카드에서 `card-clickable` 제거
+
+**P-002: 10Y 기간 선택 시 5Y 데이터만 반환되는 버그 수정**
+- 원인: D1에 5Y 데이터만 캐시된 상태에서 10Y 요청 시 `d1Prices.length > 0`이면 바로 반환
+- KV 캐시에도 잘못된 5Y 데이터가 `price:DVY:10Y` 키로 저장됨
+- PriceService: `_coversRequestedPeriod()` 메서드 추가 (데이터 시작일 vs 요청 시작일 비교, 90일 허용)
+- KV 캐시 반환 시에도 동일 검증 적용
+- CompareService: `_cacheCoversperiod()` 메서드 추가 (`dataRange.start` 기준 검증)
+
+**P-003: 로딩 화면 맞춤 메시지 적용**
+- CSS: `loading-context`, `loading-fullscreen` 컴포넌트 추가 (회전 애니메이션 + 점 애니메이션)
+- 홈: "인기 프리셋을 불러오는 중..."
+- ETF 상세 초기: "{ticker} 성과 데이터를 수집하는 중..."
+- ETF 상세 기간 변경: "{period} 기간 성과를 분석하는 중..." (글래스모피즘 오버레이)
+- 승률 탐색기: "{N}년 보유 시 승률을 계산하는 중..."
+- 랭킹: "ETF 성과 랭킹을 집계하는 중..."
+- 타이밍: "타이밍 시뮬레이션을 실행하는 중..."
+- 라우터 전환: "페이지를 준비하는 중..."
+- 아이콘 `bi-arrow-repeat` 통일 + `loading-spin` 회전 애니메이션 적용
+
+**P-004: D1 가격 데이터 최신성 자동 보충**
+- 문제: D1에 3/20까지 데이터 → 3/23에 검색해도 3/20 데이터 반환 (최신 종가 미반영)
+- PriceService 전면 개편:
+  - 모든 기간에 `_isRecentEnough` 체크 적용 (4일 허용, 주말/공휴일 고려)
+  - D1 데이터가 있지만 오래된 경우 → Yahoo에서 부족분만 보충 (`_fetchRecent`)
+  - `_mergePrices`: 기존 D1 + 신규 Yahoo 병합 (중복 제거, 날짜순 정렬)
+- CompareService: `_cacheIsRecent` 검증 추가 (`dataRange.end` 기준 4일 체크)
+- D1 현황: 29개 종목, SPY 8342건(1993~), 전체 최신 날짜 3/20
+
+### 결과 파일 목록
+- `.claude/post-mvp.md` — 신규 생성 + P-004 추가
+- `.claude/progress.md` — Post-MVP 참조 추가
+- `frontend/views/home.html` — 프리셋 뱃지 클릭 + 로딩 메시지
+- `frontend/views/etf-detail.html` — 로딩 메시지 3곳
+- `frontend/views/ranking.html` — 로딩 메시지
+- `frontend/views/timing.html` — 로딩 메시지
+- `frontend/css/style.css` — ticker-badge-clickable + loading-context/fullscreen + spin
+- `frontend/logic/app.js` — 라우터 로딩 컴포넌트
+- `backend/src/services/PriceService.js` — 캐시 기간 검증 + 최신성 검증 + 부족분 보충
+- `backend/src/services/CompareService.js` — 캐시 기간/최신성 검증
+
+### 커밋 이력
+- `852f961` feat: preset card individual ticker navigation + post-MVP tracking
+- `7194035` fix: D1 cache returning incomplete data for longer periods
+- `654c08d` fix: validate KV cache coverage for requested period
+- `697080e` design: contextual loading messages with pulse animation
+- `0784f8a` design: spinning arrow icon for loading states
+
+### 다음 세션 할 일
+1. ETF 상세 페이지 디자인 표준 적용 (세션 #7에서 미완)
+2. book.html 디자인 개선
+3. 책 구매 링크 URL 확정 시 교체
+4. 실제 책 표지 이미지 교체 (현재 SVG 더미)
+5. 10Y 데이터 실제 동작 확인 (배포 후)
+
+### 참고사항
+- Post-MVP 작업은 `.claude/post-mvp.md`에서 별도 관리 (안정화 후 Phase 5+로 통합)
+- 캐시 기간 검증: 데이터 시작일이 요청 시작일보다 90일 이상 늦으면 Yahoo 재조회
+- Workers epoch 문제: 모듈 스코프 `new Date()` 사용 금지 (세션 #7 참고)
+
+---
+
 ## 세션 #7 — 2026-03-22 (저녁 KST)
 
 ### 시작 시 상태

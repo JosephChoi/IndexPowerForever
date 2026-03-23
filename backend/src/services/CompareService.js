@@ -17,7 +17,7 @@ export class CompareService {
       try {
         const parsed = JSON.parse(cached);
         // 캐시된 데이터가 요청 기간을 충분히 커버하는지 검증
-        if (this._cacheCoversperiod(parsed, period)) return parsed;
+        if (this._cacheCoversperiod(parsed, period) && this._cacheIsRecent(parsed)) return parsed;
       } catch { /* 캐시 파싱 실패 시 재계산 */ }
     }
 
@@ -153,6 +153,15 @@ export class CompareService {
       sampled.push(data.at(-1));
     }
     return sampled;
+  }
+
+  // KV 캐시 데이터가 최신인지 검증 (dataRange.end 기준 4일 이내)
+  _cacheIsRecent(data) {
+    if (!data?.dataRange?.end) return true;
+    const endDate = new Date(data.dataRange.end);
+    const now = new Date();
+    const diffDays = (now - endDate) / (24 * 60 * 60 * 1000);
+    return diffDays < 4;
   }
 
   // KV 캐시 데이터가 요청 기간을 커버하는지 검증
