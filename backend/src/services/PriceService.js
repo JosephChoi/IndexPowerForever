@@ -42,7 +42,7 @@ export class PriceService {
 
     // D1 캐시 확인 (max 이외 기간)
     const d1Prices = await this._getFromD1(ticker, period);
-    if (d1Prices.length > 0) {
+    if (d1Prices.length > 0 && this._coversRequestedPeriod(d1Prices, period)) {
       await this.env.KV.put(cacheKey, JSON.stringify(d1Prices), { expirationTtl: 3600 });
       return d1Prices;
     }
@@ -102,6 +102,19 @@ export class PriceService {
     const now = new Date();
     const diffDays = (now - lastDate) / (24 * 60 * 60 * 1000);
     return diffDays < 3;
+  }
+
+  // D1 데이터가 요청 기간을 충분히 커버하는지 확인
+  _coversRequestedPeriod(prices, period) {
+    if (!prices.length || period === 'max') return true;
+    const years = { '1Y': 1, '3Y': 3, '5Y': 5, '10Y': 10 }[period];
+    if (!years) return true;
+    const requestedStart = new Date();
+    requestedStart.setFullYear(requestedStart.getFullYear() - years);
+    const dataStart = new Date(prices[0].date);
+    // D1 데이터 시작일이 요청 시작일보다 90일 이상 늦으면 부족한 것으로 판단
+    const diffDays = (dataStart - requestedStart) / (24 * 60 * 60 * 1000);
+    return diffDays < 90;
   }
 
   // period → 시작 날짜 변환
