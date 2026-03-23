@@ -409,6 +409,14 @@ body { color: var(--text-primary); }
   padding: 0.25rem 0.5rem;
   border-radius: 0.3rem;
 }
+.ticker-badge-clickable {
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.ticker-badge-clickable:hover {
+  transform: translateY(-2px) scale(1.08);
+  box-shadow: 0 3px 8px rgba(13, 110, 253, 0.35);
+}
 
 /* 랭킹 테이블 */
 .ranking-row {

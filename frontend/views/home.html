@@ -150,15 +150,16 @@
           v-for="preset in presets"
           :key="preset.id"
         >
-          <div class="card-base card-clickable h-100" @click="onPresetClick(preset)">
+          <div class="card-base h-100">
             <div>
               <h6 class="card-title fw-bold mb-2">{{ preset.name }}</h6>
               <p class="card-text text-muted small mb-3">{{ preset.description }}</p>
               <div class="d-flex flex-wrap gap-1">
                 <span
-                  class="badge bg-primary ticker-badge"
+                  class="badge bg-primary ticker-badge ticker-badge-clickable"
                   v-for="ticker in preset.tickers"
                   :key="ticker"
+                  @click="onSelectResult(ticker)"
                 >{{ ticker }}</span>
               </div>
             </div>

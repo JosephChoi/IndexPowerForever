@@ -2,6 +2,94 @@
 
 ---
 
+## 세션 #7 — 2026-03-22 (저녁 KST)
+
+### 시작 시 상태
+- Phase 0~3 전체 완료 (42/42)
+- 전체 QA 후 디자인 개선 필요 (6.8/10 평가)
+
+### 작업 내용
+
+**홈 페이지 프로모션 배너**
+- 책 표지 이미지 + 소개 문구 + "자세히 보기" 버튼 추가
+- book.html 연결
+
+**네비게이션 바 구조 개편**
+- 시뮬레이터 3개(타이밍/비용/퇴직연금)를 "시뮬레이터" 드롭다운으로 그룹화
+- 각 항목에 한 줄 설명 텍스트 추가
+
+**Navbar DOM 위치 수정**
+- `#navbar-container`가 `#app` 내부에 있어 Vue 마운트 시 덮어씌워지는 문제 발생
+- `#navbar-container`를 `#app` 바깥(상위)으로 이동하여 해결
+
+**저자명 업데이트**
+- 책 표지 SVG 및 book.html에 "김대중 · 최근민" 반영
+
+**디자인 감수**
+- 전체 8개 페이지 디자인 분석 (평균 6.8/10)
+- 주요 문제: 페이지 간 디자인 불일치, 카드/테이블 스타일 혼재, 타이포그래피 체계 부재
+
+**디자인 가이드 문서 생성**
+- `.claude/rules/design-guide.md` 생성
+- CSS 변수 체계(색상/간격/라운딩/그림자), 컴포넌트 표준, 반응형 전략 정의
+
+**CSS 디자인 시스템 v3 적용 (`frontend/css/style.css`)**
+- CSS 변수: `--color-*`, `--space-*`, `--radius-*`, `--shadow-*`
+- 표준 컴포넌트 6종: `card-base`, `table-standard`, `btn-group-selector`, `sim-slider`, `page-header`, `sim-panel`
+
+**6개 페이지 디자인 표준 적용**
+- `home.html` / `timing.html` / `fee-simulator.html` / `retirement.html` / `ranking.html` / `insights.html`
+- 각 페이지에 `page-header`, `card-base`, `table-standard` 등 표준 클래스 적용
+
+**네비게이션 바 리디자인 (`frontend/components/navbar.html`)**
+- 다크 그라데이션 배경
+- 브랜드 아이콘(차트 아이콘) 추가
+- 드롭다운 메뉴 레이아웃 개선 (아이콘 + 설명 텍스트)
+
+**차트 렌더링 수정**
+- `document.getElementById('canvas')` 방식 → `this.$refs.canvas` 방식으로 전환
+- 대상: `fee-simulator.js`, `retirement.js`, `etf-detail.js`
+- Vue 라이프사이클 내 올바른 DOM 참조 확보
+
+**타이밍 시뮬레이터 백엔드 수정 (`backend/src/services/TimingService.js`)**
+- `MAX_YEAR`를 모듈 스코프(`const MAX_YEAR = new Date().getFullYear()`)에서 요청 핸들러 내부로 이동
+- Cloudflare Workers epoch 문제: 모듈 스코프에서 `new Date()`가 배포 시점 기준으로 고정되는 현상 해결
+
+**타이밍 시뮬레이터 UX 개선 (`frontend/logic/timing.js`, `timing.html`)**
+- "놓친 상승일" 수동 입력 버튼 제거
+- 슬라이더 연동 제거
+- 슬라이더 값 변경 시 자동으로 시뮬레이션 실행 (즉각 반응)
+
+### 결과 파일 목록
+- `frontend/css/style.css` — CSS 디자인 시스템 v3
+- `frontend/components/navbar.html` — 리디자인
+- `frontend/views/home.html` — 프로모션 배너 + 디자인 표준
+- `frontend/views/timing.html` — 디자인 표준 + UX 개선
+- `frontend/views/fee-simulator.html` — 디자인 표준
+- `frontend/views/retirement.html` — 디자인 표준
+- `frontend/views/ranking.html` — 디자인 표준
+- `frontend/views/insights.html` — 디자인 표준
+- `frontend/logic/timing.js` — 자동 시뮬레이션
+- `frontend/logic/fee-simulator.js` — $refs 차트 수정
+- `frontend/logic/retirement.js` — $refs 차트 수정
+- `frontend/logic/etf-detail.js` — $refs 차트 수정
+- `backend/src/services/TimingService.js` — MAX_YEAR 스코프 수정
+- `.claude/rules/design-guide.md` — 신규 생성
+
+### 다음 세션 할 일
+1. ETF 상세 페이지 디자인 표준 적용 (현재 세션 미완)
+2. book.html 디자인 개선
+3. 책 구매 링크 URL 확정 시 교체 (`book.html` 내 `purchaseUrl: '#'`)
+4. 실제 책 표지 이미지 교체 (현재 SVG 더미)
+5. 전체 QA: 디자인 개선 후 실사용 테스트
+
+### 참고사항
+- CSS 변수 체계는 `.claude/rules/design-guide.md` 참조
+- Navbar는 `#app` 바깥에 위치 — Vue 마운트 범위 밖이므로 Vue 데이터 바인딩 불가
+- 타이밍 시뮬레이터: Workers epoch 문제로 모듈 스코프 `new Date()` 사용 금지
+
+---
+
 ## 세션 #6 — 2026-03-22 (17:30 ~ 18:45 KST)
 
 ### 시작 시 상태
