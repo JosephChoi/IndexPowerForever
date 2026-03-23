@@ -25,7 +25,7 @@ export class PriceService {
     // D1 캐시 확인
     const d1Prices = await this._getFromD1(ticker, period);
     const coversRange = period === 'max'
-      ? d1Prices.length > 100
+      ? this._coversMaxPeriod(d1Prices)
       : d1Prices.length > 0 && this._coversRequestedPeriod(d1Prices, period);
 
     // D1 데이터가 기간도 커버하고 최신이면 바로 반환
@@ -124,7 +124,8 @@ export class PriceService {
 
   // D1 데이터가 요청 기간을 충분히 커버하는지 확인
   _coversRequestedPeriod(prices, period) {
-    if (!prices.length || period === 'max') return true;
+    if (!prices.length) return false;
+    if (period === 'max') return this._coversMaxPeriod(prices);
     const years = { '1Y': 1, '3Y': 3, '5Y': 5, '10Y': 10 }[period];
     if (!years) return true;
     const requestedStart = new Date();
@@ -132,6 +133,18 @@ export class PriceService {
     const dataStart = new Date(prices[0].date);
     const diffDays = (dataStart - requestedStart) / (24 * 60 * 60 * 1000);
     return diffDays < 90;
+  }
+
+  // D1 데이터가 max 기간에 충분한지 확인 — 이전 10Y 요청 잔재 구분
+  _coversMaxPeriod(prices) {
+    if (prices.length < 100) return false;
+    const firstDate = new Date(prices[0].date);
+    const tenYearsAgo = new Date();
+    tenYearsAgo.setFullYear(tenYearsAgo.getFullYear() - 10);
+    // D1 시작점이 10Y 기준보다 90일 이상 이전이면 진짜 max 데이터
+    // 10Y 기준 근처이면 이전 10Y 요청의 잔재일 수 있으므로 Yahoo에서 재조회
+    const diffDays = (firstDate - tenYearsAgo) / (24 * 60 * 60 * 1000);
+    return diffDays < -90;
   }
 
   // period → 시작 날짜 변환

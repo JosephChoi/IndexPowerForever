@@ -52,16 +52,20 @@ export class DailyUpdateService {
 
   // 종목 1개 업데이트: D1 마지막 날짜 이후 데이터만 Yahoo에서 가져와 저장
   async _updateTicker(ticker) {
-    // D1에서 마지막 저장 날짜 확인
-    const lastRow = await this.env.DB.prepare(
-      `SELECT MAX(date) as lastDate FROM price_cache WHERE ticker = ?`
+    // D1에서 최초/최신 저장 날짜 확인
+    const dateRow = await this.env.DB.prepare(
+      `SELECT MIN(date) as firstDate, MAX(date) as lastDate FROM price_cache WHERE ticker = ?`
     ).bind(ticker).first();
 
-    const lastDate = lastRow?.lastDate;
+    const firstDate = dateRow?.firstDate;
+    const lastDate = dateRow?.lastDate;
 
     let prices;
     if (!lastDate) {
       // D1에 데이터 없음 → 전체 기간 조회
+      prices = await this.yahoo.getChart(ticker, 'max');
+    } else if (this._needsFullHistory(firstDate)) {
+      // D1 데이터가 불완전 (10Y 이전 데이터 없음) → 전체 재조회
       prices = await this.yahoo.getChart(ticker, 'max');
     } else {
       // 최근 1년치 조회 후 마지막 날짜 이후만 필터
@@ -111,6 +115,17 @@ export class DailyUpdateService {
     for (const key of keys) {
       try { await this.env.KV.delete(key); } catch { /* noop */ }
     }
+  }
+
+  // D1 데이터가 전체 히스토리인지 확인 — 10Y 이전 데이터 없으면 불완전
+  _needsFullHistory(firstDate) {
+    if (!firstDate) return true;
+    const first = new Date(firstDate);
+    const tenYearsAgo = new Date();
+    tenYearsAgo.setFullYear(tenYearsAgo.getFullYear() - 10);
+    // 첫 데이터가 10Y 기준 근처이면 이전 10Y 요청의 잔재 → 전체 재조회 필요
+    const diffDays = (first - tenYearsAgo) / (24 * 60 * 60 * 1000);
+    return diffDays > -90;
   }
 
   _delay(ms) {

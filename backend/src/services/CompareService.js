@@ -166,7 +166,15 @@ export class CompareService {
 
   // KV 캐시 데이터가 요청 기간을 커버하는지 검증
   _cacheCoversperiod(data, period) {
-    if (period === 'max' || !data?.dataRange?.start) return true;
+    if (!data?.dataRange?.start) return true;
+    if (period === 'max') {
+      // max 캐시: 데이터 시작점이 10Y 기준보다 90일 이상 이전이어야 유효
+      const dataStart = new Date(data.dataRange.start);
+      const tenYearsAgo = new Date();
+      tenYearsAgo.setFullYear(tenYearsAgo.getFullYear() - 10);
+      const diffDays = (dataStart - tenYearsAgo) / (24 * 60 * 60 * 1000);
+      return diffDays < -90;
+    }
     const years = { '1Y': 1, '3Y': 3, '5Y': 5, '10Y': 10 }[period];
     if (!years) return true;
     const requestedStart = new Date();
