@@ -36,11 +36,12 @@ export class DailyUpdateService {
     return results;
   }
 
-  // D1 ranking_etf 테이블에서 종목 목록 조회 + 벤치마크 추가
+  // D1에 가격 데이터가 있는 모든 종목 조회 (상한 200종목)
   async _getTargetTickers() {
+    const MAX_TICKERS = 200;
     const { results } = await this.env.DB.prepare(
-      `SELECT ticker FROM ranking_etf ORDER BY ticker`
-    ).all();
+      `SELECT DISTINCT ticker FROM price_cache ORDER BY ticker LIMIT ?`
+    ).bind(MAX_TICKERS).all();
     const tickers = results.map(r => r.ticker);
 
     // 벤치마크 SPY, QQQ 보장
@@ -68,8 +69,8 @@ export class DailyUpdateService {
       // D1 데이터가 불완전 (10Y 이전 데이터 없음) → 전체 재조회
       prices = await this.yahoo.getChart(ticker, 'max');
     } else {
-      // 최근 1년치 조회 후 마지막 날짜 이후만 필터
-      prices = await this.yahoo.getChart(ticker, '1Y');
+      // lastDate 이후 데이터만 Yahoo에서 직접 조회
+      prices = await this.yahoo.getChartSince(ticker, lastDate);
       prices = prices.filter(p => p.date > lastDate);
     }
 

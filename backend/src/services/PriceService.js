@@ -83,8 +83,7 @@ export class PriceService {
   // Yahoo에서 최근 데이터만 가져오기 (D1 마지막 날짜 이후)
   async _fetchRecent(ticker, lastDate) {
     try {
-      // 마지막 날짜 이후 ~ 현재까지만 요청
-      const prices = await this.yahoo.getChart(ticker, '1Y');
+      const prices = await this.yahoo.getChartSince(ticker, lastDate);
       return prices.filter(p => p.date > lastDate);
     } catch {
       return [];

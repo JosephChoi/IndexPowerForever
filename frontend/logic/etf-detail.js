@@ -3,7 +3,7 @@ window.__view_etf_detail = {
   data() {
     return {
       ticker: '',
-      period: '5Y',
+      period: 'max',
       benchmark: 'SPY',
       activeTab: 'comparison',
       etfInfo: null,

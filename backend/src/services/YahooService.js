@@ -50,10 +50,16 @@ export class YahooService {
     return data;
   }
 
+  // 특정 날짜 이후 데이터만 조회 (크론잡/보충용)
+  async getChartSince(ticker, sinceDate) {
+    const period1 = Math.floor(new Date(sinceDate).getTime() / 1000);
+    const period2 = Math.floor(Date.now() / 1000);
+    return this._fetchChart(ticker, period1, period2);
+  }
+
   // 일별 가격 데이터 조회 (v8 chart API)
   // period1/period2 타임스탬프 방식 사용 (range= 파라미터는 데이터 제한 이슈)
   async getChart(ticker, period = '5Y') {
-    const { crumb, cookie } = await this.getCrumb();
     const period2 = Math.floor(Date.now() / 1000);
     let period1;
 
@@ -64,6 +70,13 @@ export class YahooService {
       const years = yearsMap[period] || 5;
       period1 = Math.floor((Date.now() - years * 365.25 * 24 * 60 * 60 * 1000) / 1000);
     }
+
+    return this._fetchChart(ticker, period1, period2);
+  }
+
+  // Yahoo v8 chart API 공통 fetch
+  async _fetchChart(ticker, period1, period2) {
+    const { crumb, cookie } = await this.getCrumb();
 
     const url = `https://query2.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ticker)}?interval=1d&period1=${period1}&period2=${period2}&crumb=${encodeURIComponent(crumb)}`;
 
