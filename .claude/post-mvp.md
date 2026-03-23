@@ -30,6 +30,8 @@
 **P-001**: `home.html` 프리셋 카드 `@click` → 개별 뱃지 `@click`, `style.css` 호버 스타일 추가
 **P-002**: `PriceService.js` KV/D1 캐시 기간 검증 추가, `CompareService.js` 동일 적용
 **P-003**: `style.css` 로딩 컴포넌트(CSS 애니메이션), 5개 뷰 + `app.js` 맞춤 메시지 적용
+**P-004**: `PriceService.js` 전면 개편 — 모든 기간에 최신성 검증 + 부족분만 Yahoo 보충
+**P-005**: `DailyUpdateService.js` 신규 + `wrangler.toml` Cron + `index.js` scheduled 핸들러
 
 ---
 

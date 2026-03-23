@@ -46,8 +46,22 @@
 - CompareService: `_cacheIsRecent` 검증 추가 (`dataRange.end` 기준 4일 체크)
 - D1 현황: 29개 종목, SPY 8342건(1993~), 전체 최신 날짜 3/20
 
+**P-005: 주요 종목 일일 자동 업데이트 (Cron Trigger)**
+- `DailyUpdateService.js` 신규 생성
+- wrangler.toml에 Cron 설정: `0 22 * * 1-5` (UTC 22:00 = KST 07:00, 월~금)
+- 실행 로직: ranking_etf 25종목 + SPY/QQQ → D1 마지막 날짜 이후만 Yahoo 보충
+- 종목 간 1.5초 딜레이 (Yahoo API 부하 방지)
+- 업데이트 후 관련 KV 캐시 자동 무효화 (price/compare/ranking 키)
+- 수동 트리거: `/api/admin/update-prices` 엔드포인트 추가
+- index.js `export default` 변경: Hono fetch 컨텍스트 바인딩 수정 (502 에러 해결)
+- 초기 실행 결과: 25종목 전부 skipped (3/23 일요일, 새 거래일 없음) ✅
+
+**인프라: Cloudflare Workers 유료 전환**
+- KV 쓰기 무료 한도(1,000/일) 50% 경고 수신
+- $5/월 유료 플랜 전환 (Workers 실행 시간 10ms → 30초, KV 쓰기 100만/월)
+
 ### 결과 파일 목록
-- `.claude/post-mvp.md` — 신규 생성 + P-004 추가
+- `.claude/post-mvp.md` — 신규 생성
 - `.claude/progress.md` — Post-MVP 참조 추가
 - `frontend/views/home.html` — 프리셋 뱃지 클릭 + 로딩 메시지
 - `frontend/views/etf-detail.html` — 로딩 메시지 3곳
@@ -57,6 +71,9 @@
 - `frontend/logic/app.js` — 라우터 로딩 컴포넌트
 - `backend/src/services/PriceService.js` — 캐시 기간 검증 + 최신성 검증 + 부족분 보충
 - `backend/src/services/CompareService.js` — 캐시 기간/최신성 검증
+- `backend/src/services/DailyUpdateService.js` — 신규 (일일 자동 업데이트)
+- `backend/src/index.js` — Cron 핸들러 + 수동 트리거 + fetch 바인딩 수정
+- `backend/wrangler.toml` — Cron Trigger 설정 추가
 
 ### 커밋 이력
 - `852f961` feat: preset card individual ticker navigation + post-MVP tracking
@@ -64,6 +81,9 @@
 - `654c08d` fix: validate KV cache coverage for requested period
 - `697080e` design: contextual loading messages with pulse animation
 - `0784f8a` design: spinning arrow icon for loading states
+- `bad0f41` fix: auto-refresh stale D1 price data from Yahoo
+- `4328d00` feat: daily cron job for price data auto-update
+- `24aab25` fix: bind Hono fetch context for Workers export
 
 ### 다음 세션 할 일
 1. ETF 상세 페이지 디자인 표준 적용 (세션 #7에서 미완)
@@ -71,6 +91,7 @@
 3. 책 구매 링크 URL 확정 시 교체
 4. 실제 책 표지 이미지 교체 (현재 SVG 더미)
 5. 10Y 데이터 실제 동작 확인 (배포 후)
+6. Cron 첫 실행 결과 확인 (3/24 월요일 KST 07:00)
 
 ### 참고사항
 - Post-MVP 작업은 `.claude/post-mvp.md`에서 별도 관리 (안정화 후 Phase 5+로 통합)
