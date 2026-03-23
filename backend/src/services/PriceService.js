@@ -11,10 +11,13 @@ export class PriceService {
   async get(ticker, period = '5Y') {
     const cacheKey = `price:${ticker}:${period}`;
 
-    // KV 캐시 확인 (1h)
+    // KV 캐시 확인 (1h) — 기간 커버리지 검증 포함
     const cached = await this.env.KV.get(cacheKey);
     if (cached) {
-      try { return JSON.parse(cached); } catch { /* 캐시 파싱 실패 시 재조회 */ }
+      try {
+        const parsed = JSON.parse(cached);
+        if (this._coversRequestedPeriod(parsed, period)) return parsed;
+      } catch { /* 캐시 파싱 실패 시 재조회 */ }
     }
 
     // max: D1에 충분한 데이터가 있으면 사용, 없으면 Yahoo 조회

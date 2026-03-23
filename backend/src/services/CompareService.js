@@ -14,7 +14,11 @@ export class CompareService {
 
     const cached = await this.env.KV.get(cacheKey);
     if (cached) {
-      try { return JSON.parse(cached); } catch { /* 캐시 파싱 실패 시 재계산 */ }
+      try {
+        const parsed = JSON.parse(cached);
+        // 캐시된 데이터가 요청 기간을 충분히 커버하는지 검증
+        if (this._cacheCoversperiod(parsed, period)) return parsed;
+      } catch { /* 캐시 파싱 실패 시 재계산 */ }
     }
 
     // 3개 티커 가격 병렬 조회
@@ -149,6 +153,18 @@ export class CompareService {
       sampled.push(data.at(-1));
     }
     return sampled;
+  }
+
+  // KV 캐시 데이터가 요청 기간을 커버하는지 검증
+  _cacheCoversperiod(data, period) {
+    if (period === 'max' || !data?.dataRange?.start) return true;
+    const years = { '1Y': 1, '3Y': 3, '5Y': 5, '10Y': 10 }[period];
+    if (!years) return true;
+    const requestedStart = new Date();
+    requestedStart.setFullYear(requestedStart.getFullYear() - years);
+    const dataStart = new Date(data.dataRange.start);
+    const diffDays = (dataStart - requestedStart) / (24 * 60 * 60 * 1000);
+    return diffDays < 90;
   }
 
   // 가격 배열에서 보유 기간(년) 계산
