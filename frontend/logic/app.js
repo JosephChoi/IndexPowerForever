@@ -64,7 +64,7 @@ const makeView = (name) => {
       return defineComponent({ name: `View_${name}`, mixins: [mixin], template });
     },
     loadingComponent: {
-      template: `<div class="d-flex justify-content-center align-items-center" style="min-height:60vh"><div class="spinner-border text-primary"></div></div>`,
+      template: `<div class="loading-context" style="min-height:60vh"><i class="bi bi-file-earmark-text loading-icon"></i><div class="loading-msg">페이지를 준비하는 중<span class="loading-dots"></span></div></div>`,
     },
   });
 };

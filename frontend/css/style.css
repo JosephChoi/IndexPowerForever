@@ -428,12 +428,68 @@ body { color: var(--text-primary); }
   background-color: #f8f9fa;
 }
 
-/* 로딩 스피너 */
+/* 로딩 컴포넌트 */
 .loading-overlay {
   display: flex;
   align-items: center;
   justify-content: center;
   min-height: 200px;
+}
+.loading-context {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1.5rem;
+  text-align: center;
+}
+.loading-context .loading-icon {
+  font-size: 2rem;
+  color: var(--color-etf);
+  margin-bottom: 1rem;
+  animation: loading-pulse 1.8s ease-in-out infinite;
+}
+.loading-context .loading-msg {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #212529;
+  margin-bottom: 0.25rem;
+}
+.loading-context .loading-sub {
+  font-size: 0.8rem;
+  color: #6c757d;
+}
+.loading-context .loading-dots::after {
+  content: '';
+  animation: loading-dots 1.5s steps(4, end) infinite;
+}
+@keyframes loading-dots {
+  0% { content: ''; }
+  25% { content: '.'; }
+  50% { content: '..'; }
+  75% { content: '...'; }
+}
+@keyframes loading-pulse {
+  0%, 100% { opacity: 0.4; transform: scale(0.95); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+/* 전체화면 로딩 오버레이 */
+.loading-fullscreen {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 1050;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.loading-fullscreen .loading-context {
+  background: #fff;
+  border-radius: 16px;
+  padding: 2.5rem 3rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
 }
 
 /* 차트 컨테이너 */

@@ -53,8 +53,10 @@
             </div>
           </div>
         </template>
-        <div class="loading-overlay" v-else-if="isLoading">
-          <div class="spinner-border text-primary"></div>
+        <div class="loading-context" v-else-if="isLoading">
+          <i class="bi bi-clock-history loading-icon"></i>
+          <div class="loading-msg">타이밍 시뮬레이션을 실행하는 중<span class="loading-dots"></span></div>
+          <div class="loading-sub">{{ startYear }}~{{ endYear }}년 상승일 데이터를 분석하고 있습니다</div>
         </div>
         <div class="text-center text-muted py-5" v-else>
           <i class="bi bi-play-circle display-3 d-block mb-2"></i>

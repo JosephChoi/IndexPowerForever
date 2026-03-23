@@ -1,14 +1,17 @@
 <div>
   <!-- 초기 로딩 -->
-  <div class="d-flex justify-content-center align-items-center" style="min-height:60vh" v-if="isLoading && !etfInfo && !compareData">
-    <div class="spinner-border text-primary"></div>
+  <div class="loading-context" style="min-height:60vh" v-if="isLoading && !etfInfo && !compareData">
+    <i class="bi bi-graph-up-arrow loading-icon"></i>
+    <div class="loading-msg">{{ ticker }} 성과 데이터를 수집하는 중<span class="loading-dots"></span></div>
+    <div class="loading-sub">Yahoo Finance에서 가격 데이터를 가져오고 있습니다</div>
   </div>
 
   <!-- 기간 변경 로딩 오버레이 -->
-  <div v-if="isLoading && (etfInfo || compareData)" class="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center" style="z-index:1050;background:rgba(255,255,255,0.7);">
-    <div class="text-center">
-      <div class="spinner-border text-primary mb-2"></div>
-      <div class="text-muted small">데이터 로딩 중...</div>
+  <div v-if="isLoading && (etfInfo || compareData)" class="loading-fullscreen">
+    <div class="loading-context">
+      <i class="bi bi-arrow-repeat loading-icon"></i>
+      <div class="loading-msg">{{ period }} 기간 성과를 분석하는 중<span class="loading-dots"></span></div>
+      <div class="loading-sub">{{ ticker }} vs {{ benchmarkName }} 수익률을 비교하고 있습니다</div>
     </div>
   </div>
 
@@ -198,9 +201,10 @@
         </div>
 
         <!-- 로딩 -->
-        <div class="text-center py-5" v-if="explorerLoading">
-          <div class="spinner-border text-primary mb-2"></div>
-          <div class="text-muted small">롤링 데이터 분석 중...</div>
+        <div class="loading-context" v-if="explorerLoading">
+          <i class="bi bi-search loading-icon"></i>
+          <div class="loading-msg">{{ explorerHolding }}년 보유 시 승률을 계산하는 중<span class="loading-dots"></span></div>
+          <div class="loading-sub">모든 투자 시작일에 대해 롤링 분석을 수행하고 있습니다</div>
         </div>
 
         <!-- 스토리텔링 3단계 -->

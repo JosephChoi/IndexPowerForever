@@ -22,8 +22,10 @@
       <button class="btn btn-sm btn-outline-danger ms-2" @click="loadRanking">재시도</button>
     </div>
 
-    <div class="loading-overlay" v-if="isLoading && !rankings.length">
-      <div class="spinner-border text-primary"></div>
+    <div class="loading-context" v-if="isLoading && !rankings.length">
+      <i class="bi bi-trophy loading-icon"></i>
+      <div class="loading-msg">ETF 성과 랭킹을 집계하는 중<span class="loading-dots"></span></div>
+      <div class="loading-sub">{{ period }} 기간 초과수익률 기준으로 순위를 매기고 있습니다</div>
     </div>
 
     <div class="text-center text-muted py-5" v-if="!isLoading && !error && rankings.length === 0">
