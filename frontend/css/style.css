@@ -447,7 +447,7 @@ body { color: var(--text-primary); }
   font-size: 2rem;
   color: var(--color-etf);
   margin-bottom: 1rem;
-  animation: loading-pulse 1.8s ease-in-out infinite;
+  animation: loading-spin 1.2s linear infinite;
 }
 .loading-context .loading-msg {
   font-size: 0.95rem;
@@ -469,9 +469,9 @@ body { color: var(--text-primary); }
   50% { content: '..'; }
   75% { content: '...'; }
 }
-@keyframes loading-pulse {
-  0%, 100% { opacity: 0.4; transform: scale(0.95); }
-  50% { opacity: 1; transform: scale(1.05); }
+@keyframes loading-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 /* 전체화면 로딩 오버레이 */
 .loading-fullscreen {

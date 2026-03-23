@@ -1,7 +1,7 @@
 <div>
   <!-- 초기 로딩 -->
   <div class="loading-context" style="min-height:60vh" v-if="isLoading && !etfInfo && !compareData">
-    <i class="bi bi-graph-up-arrow loading-icon"></i>
+    <i class="bi bi-arrow-repeat loading-icon"></i>
     <div class="loading-msg">{{ ticker }} 성과 데이터를 수집하는 중<span class="loading-dots"></span></div>
     <div class="loading-sub">Yahoo Finance에서 가격 데이터를 가져오고 있습니다</div>
   </div>
@@ -202,7 +202,7 @@
 
         <!-- 로딩 -->
         <div class="loading-context" v-if="explorerLoading">
-          <i class="bi bi-search loading-icon"></i>
+          <i class="bi bi-arrow-repeat loading-icon"></i>
           <div class="loading-msg">{{ explorerHolding }}년 보유 시 승률을 계산하는 중<span class="loading-dots"></span></div>
           <div class="loading-sub">모든 투자 시작일에 대해 롤링 분석을 수행하고 있습니다</div>
         </div>
