@@ -39,7 +39,7 @@ app.onError(errorHandler);
 app.notFound((c) => c.json({ error: 'NotFoundError', message: '요청한 경로를 찾을 수 없습니다.' }, 404));
 
 export default {
-  fetch: app.fetch,
+  fetch: (request, env, ctx) => app.fetch(request, env, ctx),
 
   // Cron Trigger: 매일 KST 07:00 (UTC 22:00) 주요 종목 가격 업데이트
   async scheduled(event, env, ctx) {
