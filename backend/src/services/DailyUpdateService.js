@@ -36,11 +36,15 @@ export class DailyUpdateService {
     return results;
   }
 
-  // D1에 가격 데이터가 있는 모든 종목 조회 (상한 200종목)
+  // ranking_etf + D1 price_cache에 있는 모든 종목 조회 (상한 200종목)
   async _getTargetTickers() {
     const MAX_TICKERS = 200;
     const { results } = await this.env.DB.prepare(
-      `SELECT DISTINCT ticker FROM price_cache ORDER BY ticker LIMIT ?`
+      `SELECT DISTINCT ticker FROM (
+        SELECT ticker FROM ranking_etf
+        UNION
+        SELECT DISTINCT ticker FROM price_cache
+      ) ORDER BY ticker LIMIT ?`
     ).bind(MAX_TICKERS).all();
     const tickers = results.map(r => r.ticker);
 
