@@ -134,14 +134,17 @@ export class PriceService {
     return diffDays < 90;
   }
 
-  // D1 데이터가 max 기간에 충분한지 확인 — 이전 10Y 요청 잔재 구분
+  // D1 데이터가 max 기간에 충분한지 확인 — 시작일 + 충전율 검증
   _coversMaxPeriod(prices) {
     if (prices.length < 100) return false;
     const firstDate = new Date(prices[0].date);
+    const lastDate = new Date(prices.at(-1).date);
+    // 충전율 검증: 날짜 범위 대비 실제 데이터 비율 (90% 미만이면 중간 구멍 있음)
+    const spanYears = (lastDate - firstDate) / (365.25 * 24 * 60 * 60 * 1000);
+    if (spanYears > 1 && prices.length / (spanYears * 252) < 0.9) return false;
+    // 시작일 검증: 10Y 이전 데이터 존재 확인
     const tenYearsAgo = new Date();
     tenYearsAgo.setFullYear(tenYearsAgo.getFullYear() - 10);
-    // D1 시작점이 10Y 기준보다 90일 이상 이전이면 진짜 max 데이터
-    // 10Y 기준 근처이면 이전 10Y 요청의 잔재일 수 있으므로 Yahoo에서 재조회
     const diffDays = (firstDate - tenYearsAgo) / (24 * 60 * 60 * 1000);
     return diffDays < -90;
   }
