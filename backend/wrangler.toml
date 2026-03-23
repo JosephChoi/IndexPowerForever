@@ -14,3 +14,7 @@ id = "d9325ab1fd164d17bb4065dbcbb4515e"
 
 [ai]
 binding = "AI"
+
+# 매일 KST 07:00 (UTC 22:00) 주요 종목 가격 자동 업데이트 (월~금)
+[triggers]
+crons = ["0 22 * * 1-5"]
