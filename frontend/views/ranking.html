@@ -57,7 +57,7 @@
             <td class="fw-bold text-primary">{{ r.ticker }}</td>
             <td class="small">{{ r.name }}</td>
             <td><span class="badge bg-light text-dark">{{ r.category || '-' }}</span></td>
-            <td class="text-end text-nowrap small">{{ r.aum ? ('$' + r.aum.toFixed(0) + 'B') : '-' }}</td>
+            <td class="text-end text-nowrap small">{{ r.aum ? ('$' + (r.aum / 1e9).toFixed(1) + 'B') : '-' }}</td>
             <td :class="r.totalReturn >= 0 ? 'text-success' : 'text-danger'">{{ r.totalReturn.toFixed(1) }}%</td>
             <td :class="r.excessReturn >= 0 ? 'text-outperform fw-bold' : 'text-underperform'">
               {{ r.excessReturn > 0 ? '+' : '' }}{{ r.excessReturn.toFixed(1) }}%
