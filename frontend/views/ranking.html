@@ -2,7 +2,7 @@
   <div class="container py-4">
     <div class="page-header">
       <h1 class="page-title"><i class="bi bi-bar-chart-line me-2 text-primary"></i>주요 ETF 성과비교</h1>
-      <p class="page-subtitle">2025년말 기준 AUM 상위 30개 ETF의 벤치마크 대비 성과 비교</p>
+      <p class="page-subtitle">미국 상장 AUM 상위 30개 ETF의 벤치마크 대비 성과 비교</p>
     </div>
 
     <!-- 필터 -->
@@ -37,7 +37,7 @@
       <table class="table table-standard table-hover align-middle w-100">
         <thead>
           <tr>
-            <th>순위</th><th>티커</th><th>종목명</th><th>카테고리</th>
+            <th>순위</th><th>티커</th><th>종목명</th><th>카테고리</th><th>AUM</th>
             <th>총수익률</th><th>초과수익률</th><th>CAGR</th><th>MDD</th><th>연승률</th>
           </tr>
         </thead>
@@ -49,6 +49,7 @@
             <td class="fw-bold text-primary">{{ r.ticker }}</td>
             <td class="small">{{ r.name }}</td>
             <td><span class="badge bg-light text-dark">{{ r.category || '-' }}</span></td>
+            <td class="text-end text-nowrap small">{{ r.aum ? ('$' + r.aum.toFixed(0) + 'B') : '-' }}</td>
             <td :class="r.totalReturn >= 0 ? 'text-success' : 'text-danger'">{{ r.totalReturn.toFixed(1) }}%</td>
             <td :class="r.excessReturn >= 0 ? 'text-outperform fw-bold' : 'text-underperform'">
               {{ r.excessReturn > 0 ? '+' : '' }}{{ r.excessReturn.toFixed(1) }}%

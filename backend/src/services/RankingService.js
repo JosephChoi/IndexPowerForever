@@ -18,7 +18,7 @@ export class RankingService {
 
     // 랭킹 대상 ETF 목록 조회
     const { results: etfList } = await this.env.DB.prepare(
-      `SELECT ticker, name, category FROM ranking_etf WHERE is_active = 1 ORDER BY sort_order ASC`
+      `SELECT ticker, name, category, aum FROM ranking_etf WHERE is_active = 1 ORDER BY sort_order ASC`
     ).all();
 
     if (etfList.length === 0) return [];
@@ -39,6 +39,7 @@ export class RankingService {
           ticker: etf.ticker,
           name: etf.name,
           category: etf.category,
+          aum: etf.aum,
           totalReturn: compare.stats.etf.totalReturn,
           excessReturn: parseFloat(
             (compare.stats.etf.totalReturn - compare.stats[benchmark.toLowerCase()]?.totalReturn || 0).toFixed(2)

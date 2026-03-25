@@ -7,7 +7,7 @@ INSERT OR IGNORE INTO preset (name, description, tickers, sort_order) VALUES
   ('채권혼합 ETF', '자산배분 ETF vs 지수 비교', '["AOM","AOR","AOA"]', 5),
   ('성장주 ETF', '성장주 ETF vs NASDAQ 100 비교', '["VUG","MGK","IWF"]', 6);
 
--- 성과비교 대상 ETF 목록 (CompaniesMarketCap.com 기준 US 상장 시가총액 상위 30개, 유럽 제외)
+-- 성과비교 대상 ETF 목록 (미국 상장 시가총액 상위 30개, 유럽 제외)
 INSERT OR IGNORE INTO ranking_etf (ticker, name, category, is_active, sort_order) VALUES
   ('VOO',  'Vanguard S&P 500 ETF', '대형 혼합', 1, 1),
   ('IVV',  'iShares Core S&P 500 ETF', '대형 혼합', 1, 2),
