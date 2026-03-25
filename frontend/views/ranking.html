@@ -14,7 +14,7 @@
         <button class="btn" :class="{ active: benchmark === 'SPY' }" @click="onFilterChange(period, 'SPY')">S&P 500</button>
         <button class="btn" :class="{ active: benchmark === 'QQQ' }" @click="onFilterChange(period, 'QQQ')">NASDAQ 100</button>
       </div>
-      <span class="text-secondary small" v-if="isLoading"><span class="spinner-border spinner-border-sm me-1"></span>데이터를 불러오는 중...</span>
+      <span class="text-secondary small" v-if="isLoading"><span class="spinner-border spinner-border-sm me-1"></span>성과를 비교하는 중...</span>
     </div>
 
     <div class="alert alert-danger" v-if="error">
