@@ -16,9 +16,13 @@ export class RankingService {
       try { return JSON.parse(cached); } catch { /* 캐시 파싱 실패 시 재계산 */ }
     }
 
-    // 랭킹 대상 ETF 목록 조회
+    // 랭킹 대상 ETF 목록 조회 (AUM은 etf_info에서 Yahoo 실시간 데이터 참조)
     const { results: etfList } = await this.env.DB.prepare(
-      `SELECT ticker, name, category, aum FROM ranking_etf WHERE is_active = 1 ORDER BY sort_order ASC`
+      `SELECT r.ticker, r.name, r.category, e.aum
+       FROM ranking_etf r
+       LEFT JOIN etf_info e ON r.ticker = e.ticker
+       WHERE r.is_active = 1
+       ORDER BY r.sort_order ASC`
     ).all();
 
     if (etfList.length === 0) return [];
@@ -39,7 +43,7 @@ export class RankingService {
           ticker: etf.ticker,
           name: etf.name,
           category: etf.category,
-          aum: etf.aum,
+          aum: etf.aum || null,
           totalReturn: compare.stats.etf.totalReturn,
           excessReturn: parseFloat(
             (compare.stats.etf.totalReturn - compare.stats[benchmark.toLowerCase()]?.totalReturn || 0).toFixed(2)
