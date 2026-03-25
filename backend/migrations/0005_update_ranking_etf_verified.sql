@@ -1,14 +1,8 @@
--- 인기 프리셋 초기 데이터 (벤치마크 ETF인 SPY/QQQ/VOO 제외 — 비교 대상만 포함)
-INSERT OR IGNORE INTO preset (name, description, tickers, sort_order) VALUES
-  ('레버리지 ETF 비교', 'S&P 500 레버리지 ETF vs 지수 비교', '["SSO","UPRO","SPXL"]', 1),
-  ('나스닥 레버리지', 'NASDAQ 100 레버리지 ETF vs 지수 비교', '["QLD","TQQQ"]', 2),
-  ('섹터 ETF 비교', '주요 섹터 ETF vs S&P 500 비교', '["XLK","XLV","XLF"]', 3),
-  ('배당 ETF 비교', '고배당 ETF vs S&P 500 비교', '["VYM","SCHD","DVY"]', 4),
-  ('채권혼합 ETF', '자산배분 ETF vs 지수 비교', '["AOM","AOR","AOA"]', 5),
-  ('성장주 ETF', '성장주 ETF vs NASDAQ 100 비교', '["VUG","MGK","IWF"]', 6);
+-- 성과비교 대상 ETF를 CompaniesMarketCap.com 기준 US 상장 시가총액 상위 30개로 교체 (유럽 제외)
+-- 출처: https://companiesmarketcap.com/etfs/largest-etfs-by-marketcap/
+DELETE FROM ranking_etf;
 
--- 성과비교 대상 ETF 목록 (CompaniesMarketCap.com 기준 US 상장 시가총액 상위 30개, 유럽 제외)
-INSERT OR IGNORE INTO ranking_etf (ticker, name, category, is_active, sort_order) VALUES
+INSERT INTO ranking_etf (ticker, name, category, is_active, sort_order) VALUES
   ('VOO',  'Vanguard S&P 500 ETF', '대형 혼합', 1, 1),
   ('IVV',  'iShares Core S&P 500 ETF', '대형 혼합', 1, 2),
   ('SPY',  'SPDR S&P 500 ETF Trust', '대형 혼합', 1, 3),
