@@ -1,8 +1,8 @@
 <div>
   <div class="container py-4">
     <div class="page-header">
-      <h1 class="page-title"><i class="bi bi-trophy me-2 text-warning"></i>ETF 성과 랭킹</h1>
-      <p class="page-subtitle">기간별 S&P 500 / NASDAQ 100 대비 초과수익률 순위</p>
+      <h1 class="page-title"><i class="bi bi-bar-chart-line me-2 text-primary"></i>주요 ETF 성과비교</h1>
+      <p class="page-subtitle">2025년말 기준 AUM 상위 30개 ETF의 벤치마크 대비 성과 비교</p>
     </div>
 
     <!-- 필터 -->
@@ -24,13 +24,13 @@
 
     <div class="loading-context" v-if="isLoading && !rankings.length">
       <i class="bi bi-arrow-repeat loading-icon"></i>
-      <div class="loading-msg">ETF 성과 랭킹을 집계하는 중<span class="loading-dots"></span></div>
-      <div class="loading-sub">{{ period }} 기간 초과수익률 기준으로 순위를 매기고 있습니다</div>
+      <div class="loading-msg">ETF 성과를 비교하는 중<span class="loading-dots"></span></div>
+      <div class="loading-sub">{{ period }} 기간 기준으로 주요 ETF 성과를 분석하고 있습니다</div>
     </div>
 
     <div class="text-center text-muted py-5" v-if="!isLoading && !error && rankings.length === 0">
       <i class="bi bi-inbox display-4 d-block mb-2"></i>
-      랭킹 데이터가 없습니다.
+      성과 비교 데이터가 없습니다.
     </div>
 
     <div class="table-responsive" v-if="rankings.length">

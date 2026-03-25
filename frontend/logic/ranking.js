@@ -11,7 +11,7 @@ window.__view_ranking = {
         const data = await this.$api.get(`/api/ranking?period=${this.period}&benchmark=${this.benchmark}`);
         this.rankings = Array.isArray(data) ? data : (data?.data || []);
       } catch (e) {
-        this.error = e.message || '랭킹을 불러오는 중 오류가 발생했습니다.';
+        this.error = e.message || '성과 비교를 불러오는 중 오류가 발생했습니다.';
       } finally {
         this.isLoading = false;
       }

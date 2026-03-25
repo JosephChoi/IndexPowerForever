@@ -36,15 +36,19 @@ export class PresetService {
        LIMIT 5`
     ).all();
 
+    // 벤치마크 ETF 제외 (SPY, QQQ, VOO는 비교 기준이므로 인기 검색에서 제외)
+    const BENCHMARK_TICKERS = ['SPY', 'QQQ', 'VOO', 'IVV'];
+    const filtered = results.filter(r => !BENCHMARK_TICKERS.includes(r.ticker));
+
     // 검색 기록 없으면 기본 인기 ETF 반환
-    const popular = results.length > 0
-      ? results.map(r => ({ ticker: r.ticker, count: r.count }))
+    const popular = filtered.length > 0
+      ? filtered.map(r => ({ ticker: r.ticker, count: r.count }))
       : [
-          { ticker: 'SPY', count: 0 },
-          { ticker: 'QQQ', count: 0 },
-          { ticker: 'SCHD', count: 0 },
-          { ticker: 'TQQQ', count: 0 },
           { ticker: 'ARKK', count: 0 },
+          { ticker: 'SCHD', count: 0 },
+          { ticker: 'VIG', count: 0 },
+          { ticker: 'TQQQ', count: 0 },
+          { ticker: 'VYM', count: 0 },
         ];
 
     await this.env.KV.put(cacheKey, JSON.stringify(popular), { expirationTtl: 3600 });
