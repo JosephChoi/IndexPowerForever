@@ -37,14 +37,22 @@
       <table class="table table-standard table-hover align-middle w-100">
         <thead>
           <tr>
-            <th>순위</th><th>티커</th><th>종목명</th><th>카테고리</th><th>AUM</th>
-            <th>총수익률</th><th>초과수익률</th><th>CAGR</th><th>MDD</th><th>연승률</th>
+            <th class="sortable-th" @click="onSort('excessReturn')">순위 <i class="bi" :class="sortIcon('excessReturn')"></i></th>
+            <th>티커</th>
+            <th>종목명</th>
+            <th>카테고리</th>
+            <th class="sortable-th" @click="onSort('aum')">AUM <i class="bi" :class="sortIcon('aum')"></i></th>
+            <th class="sortable-th" @click="onSort('totalReturn')">총수익률 <i class="bi" :class="sortIcon('totalReturn')"></i></th>
+            <th class="sortable-th" @click="onSort('excessReturn')">초과수익률 <i class="bi" :class="sortIcon('excessReturn')"></i></th>
+            <th class="sortable-th" @click="onSort('cagr')">CAGR <i class="bi" :class="sortIcon('cagr')"></i></th>
+            <th class="sortable-th" @click="onSort('mdd')">MDD <i class="bi" :class="sortIcon('mdd')"></i></th>
+            <th class="sortable-th" @click="onSort('winRate')">연승률 <i class="bi" :class="sortIcon('winRate')"></i></th>
           </tr>
         </thead>
         <tbody>
-          <tr class="ranking-row" v-for="r in rankings" :key="r.ticker" @click="navigateTo('/etf/' + r.ticker)">
+          <tr class="ranking-row" v-for="r in sortedRankings" :key="r.ticker" @click="navigateTo('/etf/' + r.ticker)">
             <td class="fw-bold">
-              <span class="badge" :class="r.rank <= 3 ? 'bg-warning text-dark' : 'bg-secondary'">{{ r.rank }}</span>
+              <span class="badge" :class="r.displayRank <= 3 ? 'bg-warning text-dark' : 'bg-secondary'">{{ r.displayRank }}</span>
             </td>
             <td class="fw-bold text-primary">{{ r.ticker }}</td>
             <td class="small">{{ r.name }}</td>

@@ -418,7 +418,7 @@ body { color: var(--text-primary); }
   box-shadow: 0 3px 8px rgba(13, 110, 253, 0.35);
 }
 
-/* 랭킹 테이블 */
+/* 성과비교 테이블 */
 .ranking-row {
   cursor: pointer;
   transition: background-color 0.15s;
@@ -426,6 +426,27 @@ body { color: var(--text-primary); }
 
 .ranking-row:hover {
   background-color: #f8f9fa;
+}
+
+.sortable-th {
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.sortable-th:hover {
+  color: var(--color-etf);
+}
+
+.sortable-th .bi {
+  font-size: 0.7rem;
+  opacity: 0.5;
+}
+
+.sortable-th:hover .bi,
+.sortable-th .bi-caret-up-fill,
+.sortable-th .bi-caret-down-fill {
+  opacity: 1;
 }
 
 /* 로딩 컴포넌트 */
