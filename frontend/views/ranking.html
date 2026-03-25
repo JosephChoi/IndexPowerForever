@@ -46,7 +46,6 @@
             <th class="sortable-th" @click="onSort('excessReturn')">초과수익률 <i class="bi" :class="sortIcon('excessReturn')"></i></th>
             <th class="sortable-th" @click="onSort('cagr')">CAGR <i class="bi" :class="sortIcon('cagr')"></i></th>
             <th class="sortable-th" @click="onSort('mdd')">MDD <i class="bi" :class="sortIcon('mdd')"></i></th>
-            <th class="sortable-th" @click="onSort('winRate')">연승률 <i class="bi" :class="sortIcon('winRate')"></i></th>
           </tr>
         </thead>
         <tbody>
@@ -64,7 +63,6 @@
             </td>
             <td>{{ r.cagr.toFixed(1) }}%</td>
             <td class="text-danger">{{ r.mdd.toFixed(1) }}%</td>
-            <td>{{ r.winRate.toFixed(0) }}%</td>
           </tr>
         </tbody>
       </table>
