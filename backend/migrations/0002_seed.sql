@@ -23,7 +23,7 @@ INSERT OR IGNORE INTO ranking_etf (ticker, name, category, is_active, sort_order
   ('AGG',  'iShares Core US Aggregate Bond ETF', '채권', 1, 12),
   ('IEMG', 'iShares Core MSCI Emerging Markets ETF', '신흥국', 1, 13),
   ('VXUS', 'Vanguard Total Intl Stock ETF', '국제주식', 1, 14),
-  ('SPYM', 'SPDR Portfolio S&P 500 ETF', '대형 혼합', 1, 15),
+  ('SPLG', 'SPDR Portfolio S&P 500 ETF', '대형 혼합', 1, 15),
   ('IWF',  'iShares Russell 1000 Growth ETF', '대형 성장', 1, 16),
   ('VWO',  'Vanguard FTSE Emerging Markets ETF', '신흥국', 1, 17),
   ('VGT',  'Vanguard Information Technology ETF', '기술', 1, 18),
