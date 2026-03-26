@@ -1,18 +1,9 @@
 <div>
-  <!-- 초기 로딩 -->
+  <!-- 초기 로딩 (콘텐츠 없을 때만) -->
   <div class="loading-context" style="min-height:60vh" v-if="isLoading && !etfInfo && !compareData">
     <i class="bi bi-arrow-repeat loading-icon"></i>
     <div class="loading-msg">{{ ticker }} 성과 데이터를 수집하는 중<span class="loading-dots"></span></div>
     <div class="loading-sub">Yahoo Finance에서 가격 데이터를 가져오고 있습니다</div>
-  </div>
-
-  <!-- 기간 변경 로딩 오버레이 -->
-  <div v-if="isLoading && (etfInfo || compareData)" class="loading-fullscreen">
-    <div class="loading-context">
-      <i class="bi bi-arrow-repeat loading-icon"></i>
-      <div class="loading-msg">{{ period }} 기간 성과를 분석하는 중<span class="loading-dots"></span></div>
-      <div class="loading-sub">{{ ticker }} vs {{ benchmarkName }} 수익률을 비교하고 있습니다</div>
-    </div>
   </div>
 
   <!-- 에러 -->
@@ -23,7 +14,16 @@
     </div>
   </div>
 
-  <template v-if="etfInfo || compareData">
+  <div class="loading-section-wrap" v-if="etfInfo || compareData">
+
+    <!-- 기간 변경 로딩 오버레이 (반투명, 뒤 콘텐츠 보임) -->
+    <div v-if="isLoading" class="loading-section-overlay">
+      <div class="loading-context">
+        <i class="bi bi-arrow-repeat loading-icon"></i>
+        <div class="loading-msg">{{ period }} 기간 성과를 분석하는 중<span class="loading-dots"></span></div>
+        <div class="loading-sub">{{ ticker }} vs {{ benchmarkName }} 수익률을 비교하고 있습니다</div>
+      </div>
+    </div>
 
     <!-- ── ETF 헤더 배너 ── -->
     <div class="etf-header-banner">
@@ -200,15 +200,18 @@
           >{{ h }}년</button>
         </div>
 
-        <!-- 로딩 -->
-        <div class="loading-context" v-if="explorerLoading">
-          <i class="bi bi-arrow-repeat loading-icon"></i>
-          <div class="loading-msg">{{ explorerHolding }}년 보유 시 승률을 계산하는 중<span class="loading-dots"></span></div>
-          <div class="loading-sub">모든 투자 시작일에 대해 롤링 분석을 수행하고 있습니다</div>
-        </div>
-
         <!-- 스토리텔링 3단계 -->
-        <div v-if="explorerData && !explorerLoading">
+        <div class="loading-section-wrap">
+          <!-- 로딩 오버레이 -->
+          <div v-if="explorerLoading" class="loading-section-overlay">
+            <div class="loading-context">
+              <i class="bi bi-arrow-repeat loading-icon"></i>
+              <div class="loading-msg">{{ explorerHolding }}년 보유 시 승률을 계산하는 중<span class="loading-dots"></span></div>
+              <div class="loading-sub">모든 투자 시작일에 대해 롤링 분석을 수행하고 있습니다</div>
+            </div>
+          </div>
+
+        <div v-if="explorerData">
 
           <!-- Step 1 -->
           <div class="explorer-step mb-4">
@@ -326,6 +329,7 @@
             </div>
           </div>
 
+        </div>
         </div>
       </div>
 
@@ -465,5 +469,5 @@
       </div>
 
     </div>
-  </template>
+  </div>
 </div>

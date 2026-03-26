@@ -22,50 +22,55 @@
       <button class="btn btn-sm btn-outline-danger ms-2" @click="loadRanking">재시도</button>
     </div>
 
-    <div class="loading-context" v-if="isLoading && !rankings.length">
-      <i class="bi bi-arrow-repeat loading-icon"></i>
-      <div class="loading-msg">ETF 성과를 비교하는 중<span class="loading-dots"></span></div>
-      <div class="loading-sub">{{ period }} 기간 기준으로 주요 ETF 성과를 분석하고 있습니다</div>
-    </div>
-
     <div class="text-center text-muted py-5" v-if="!isLoading && !error && rankings.length === 0">
       <i class="bi bi-inbox display-4 d-block mb-2"></i>
       성과 비교 데이터가 없습니다.
     </div>
 
-    <div class="table-responsive" v-if="rankings.length">
-      <table class="table table-standard table-hover align-middle w-100">
-        <thead>
-          <tr>
-            <th class="sortable-th" @click="onSort('excessReturn')">순위 <i class="bi" :class="sortIcon('excessReturn')"></i></th>
-            <th>티커</th>
-            <th>종목명</th>
-            <th>카테고리</th>
-            <th class="sortable-th" @click="onSort('aum')">AUM <i class="bi" :class="sortIcon('aum')"></i></th>
-            <th class="sortable-th" @click="onSort('totalReturn')">총수익률 <i class="bi" :class="sortIcon('totalReturn')"></i></th>
-            <th class="sortable-th" @click="onSort('excessReturn')">초과수익률 <i class="bi" :class="sortIcon('excessReturn')"></i></th>
-            <th class="sortable-th" @click="onSort('cagr')">CAGR <i class="bi" :class="sortIcon('cagr')"></i></th>
-            <th class="sortable-th" @click="onSort('mdd')">MDD <i class="bi" :class="sortIcon('mdd')"></i></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr class="ranking-row" v-for="r in sortedRankings" :key="r.ticker" @click="navigateTo('/etf/' + r.ticker)">
-            <td class="fw-bold">
-              <span class="badge" :class="r.displayRank <= 3 ? 'bg-warning text-dark' : 'bg-secondary'">{{ r.displayRank }}</span>
-            </td>
-            <td class="fw-bold text-primary">{{ r.ticker }}</td>
-            <td class="small">{{ r.name }}</td>
-            <td><span class="badge bg-light text-dark">{{ r.category || '-' }}</span></td>
-            <td class="text-end text-nowrap small">{{ r.aum ? ('$' + (r.aum / 1e9).toFixed(1) + 'B') : '-' }}</td>
-            <td :class="r.totalReturn >= 0 ? 'text-success' : 'text-danger'">{{ r.totalReturn.toFixed(1) }}%</td>
-            <td :class="r.excessReturn >= 0 ? 'text-outperform fw-bold' : 'text-underperform'">
-              {{ r.excessReturn > 0 ? '+' : '' }}{{ r.excessReturn.toFixed(1) }}%
-            </td>
-            <td>{{ r.cagr.toFixed(1) }}%</td>
-            <td class="text-danger">{{ r.mdd.toFixed(1) }}%</td>
-          </tr>
-        </tbody>
-      </table>
+    <div class="loading-section-wrap">
+      <!-- 로딩 오버레이 -->
+      <div v-if="isLoading" class="loading-section-overlay">
+        <div class="loading-context">
+          <i class="bi bi-arrow-repeat loading-icon"></i>
+          <div class="loading-msg">ETF 성과를 비교하는 중<span class="loading-dots"></span></div>
+          <div class="loading-sub">{{ period }} 기간 기준으로 주요 ETF 성과를 분석하고 있습니다</div>
+        </div>
+      </div>
+
+      <div class="table-responsive" v-if="rankings.length">
+        <table class="table table-standard table-hover align-middle w-100">
+          <thead>
+            <tr>
+              <th class="sortable-th" @click="onSort('excessReturn')">순위 <i class="bi" :class="sortIcon('excessReturn')"></i></th>
+              <th>티커</th>
+              <th>종목명</th>
+              <th>카테고리</th>
+              <th class="sortable-th" @click="onSort('aum')">AUM <i class="bi" :class="sortIcon('aum')"></i></th>
+              <th class="sortable-th" @click="onSort('totalReturn')">총수익률 <i class="bi" :class="sortIcon('totalReturn')"></i></th>
+              <th class="sortable-th" @click="onSort('excessReturn')">초과수익률 <i class="bi" :class="sortIcon('excessReturn')"></i></th>
+              <th class="sortable-th" @click="onSort('cagr')">CAGR <i class="bi" :class="sortIcon('cagr')"></i></th>
+              <th class="sortable-th" @click="onSort('mdd')">MDD <i class="bi" :class="sortIcon('mdd')"></i></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="ranking-row" v-for="r in sortedRankings" :key="r.ticker" @click="navigateTo('/etf/' + r.ticker)">
+              <td class="fw-bold">
+                <span class="badge" :class="r.displayRank <= 3 ? 'bg-warning text-dark' : 'bg-secondary'">{{ r.displayRank }}</span>
+              </td>
+              <td class="fw-bold text-primary">{{ r.ticker }}</td>
+              <td class="small">{{ r.name }}</td>
+              <td><span class="badge bg-light text-dark">{{ r.category || '-' }}</span></td>
+              <td class="text-end text-nowrap small">{{ r.aum ? ('$' + (r.aum / 1e9).toFixed(1) + 'B') : '-' }}</td>
+              <td :class="r.totalReturn >= 0 ? 'text-success' : 'text-danger'">{{ r.totalReturn.toFixed(1) }}%</td>
+              <td :class="r.excessReturn >= 0 ? 'text-outperform fw-bold' : 'text-underperform'">
+                {{ r.excessReturn > 0 ? '+' : '' }}{{ r.excessReturn.toFixed(1) }}%
+              </td>
+              <td>{{ r.cagr.toFixed(1) }}%</td>
+              <td class="text-danger">{{ r.mdd.toFixed(1) }}%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </div>

@@ -140,7 +140,16 @@
     </div>
 
     <!-- 인기 프리셋 -->
-    <section v-if="!isLoading">
+    <section class="loading-section-wrap">
+      <!-- 로딩 오버레이 -->
+      <div v-if="isLoading" class="loading-section-overlay">
+        <div class="loading-context">
+          <i class="bi bi-arrow-repeat loading-icon"></i>
+          <div class="loading-msg">인기 프리셋을 불러오는 중<span class="loading-dots"></span></div>
+          <div class="loading-sub">추천 ETF 비교 조합을 준비하고 있습니다</div>
+        </div>
+      </div>
+
       <h2 class="h5 fw-bold mb-3">
         <i class="bi bi-stars text-warning me-2"></i>인기 비교 프리셋
       </h2>
@@ -167,13 +176,6 @@
         </div>
       </div>
     </section>
-
-    <!-- 로딩 -->
-    <div class="loading-context" v-if="isLoading">
-      <i class="bi bi-arrow-repeat loading-icon"></i>
-      <div class="loading-msg">인기 프리셋을 불러오는 중<span class="loading-dots"></span></div>
-      <div class="loading-sub">추천 ETF 비교 조합을 준비하고 있습니다</div>
-    </div>
 
     <!-- 서비스 소개 -->
     <section class="mt-5 py-5 rounded-3 px-4" style="background:var(--bg-light)">

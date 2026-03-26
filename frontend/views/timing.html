@@ -30,37 +30,43 @@
           <button class="btn btn-sm btn-outline-danger ms-2" @click="simulate">재시도</button>
         </div>
 
-        <template v-if="result">
-          <div class="text-muted small mb-3">
-            <i class="bi bi-calendar3 me-1"></i>
-            {{ result.startYear }}년 ~ {{ result.endYear }}년 S&P 500(SPY) 기준 · 총 {{ result.tradingDays.toLocaleString() }}거래일
+        <div class="loading-section-wrap">
+          <!-- 로딩 오버레이 -->
+          <div v-if="isLoading" class="loading-section-overlay">
+            <div class="loading-context">
+              <i class="bi bi-arrow-repeat loading-icon"></i>
+              <div class="loading-msg">타이밍 시뮬레이션을 실행하는 중<span class="loading-dots"></span></div>
+              <div class="loading-sub">{{ startYear }}~{{ endYear }}년 상승일 데이터를 분석하고 있습니다</div>
+            </div>
           </div>
-          <div class="row g-3">
-            <div class="col-12 col-sm-6" v-for="s in result.scenarios" :key="s.missingDays">
-              <div class="card-base" :class="s.missingDays === 0 ? 'card-highlight' : ''">
-                <div class="text-muted small fw-semibold mb-1">
-                  <span v-if="s.missingDays === 0"><i class="bi bi-check-circle text-success me-1"></i>전체 투자 시</span>
-                  <span v-else><i class="bi bi-x-circle text-danger me-1"></i>상위 <strong>{{ s.missingDays }}일</strong> 놓쳤을 때</span>
-                </div>
-                <div class="fw-bold" style="font-size:1.5rem" :class="s.finalReturn >= 0 ? 'text-success' : 'text-danger'">
-                  {{ s.finalReturn.toFixed(1) }}%
-                </div>
-                <div class="text-muted small">CAGR {{ s.cagr.toFixed(1) }}%</div>
-                <div class="text-danger small fw-semibold" v-if="s.missingDays > 0 && result.scenarios[0]">
-                  {{ (s.finalReturn - result.scenarios[0].finalReturn).toFixed(1) }}%p 손실
+
+          <template v-if="result">
+            <div class="text-muted small mb-3">
+              <i class="bi bi-calendar3 me-1"></i>
+              {{ result.startYear }}년 ~ {{ result.endYear }}년 S&P 500(SPY) 기준 · 총 {{ result.tradingDays.toLocaleString() }}거래일
+            </div>
+            <div class="row g-3">
+              <div class="col-12 col-sm-6" v-for="s in result.scenarios" :key="s.missingDays">
+                <div class="card-base" :class="s.missingDays === 0 ? 'card-highlight' : ''">
+                  <div class="text-muted small fw-semibold mb-1">
+                    <span v-if="s.missingDays === 0"><i class="bi bi-check-circle text-success me-1"></i>전체 투자 시</span>
+                    <span v-else><i class="bi bi-x-circle text-danger me-1"></i>상위 <strong>{{ s.missingDays }}일</strong> 놓쳤을 때</span>
+                  </div>
+                  <div class="fw-bold" style="font-size:1.5rem" :class="s.finalReturn >= 0 ? 'text-success' : 'text-danger'">
+                    {{ s.finalReturn.toFixed(1) }}%
+                  </div>
+                  <div class="text-muted small">CAGR {{ s.cagr.toFixed(1) }}%</div>
+                  <div class="text-danger small fw-semibold" v-if="s.missingDays > 0 && result.scenarios[0]">
+                    {{ (s.finalReturn - result.scenarios[0].finalReturn).toFixed(1) }}%p 손실
+                  </div>
                 </div>
               </div>
             </div>
+          </template>
+          <div class="text-center text-muted py-5" v-else-if="!isLoading">
+            <i class="bi bi-play-circle display-3 d-block mb-2"></i>
+            기간을 설정하면 자동으로 시뮬레이션됩니다
           </div>
-        </template>
-        <div class="loading-context" v-else-if="isLoading">
-          <i class="bi bi-arrow-repeat loading-icon"></i>
-          <div class="loading-msg">타이밍 시뮬레이션을 실행하는 중<span class="loading-dots"></span></div>
-          <div class="loading-sub">{{ startYear }}~{{ endYear }}년 상승일 데이터를 분석하고 있습니다</div>
-        </div>
-        <div class="text-center text-muted py-5" v-else>
-          <i class="bi bi-play-circle display-3 d-block mb-2"></i>
-          기간을 설정하면 자동으로 시뮬레이션됩니다
         </div>
       </div>
     </div>
