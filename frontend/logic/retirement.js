@@ -12,11 +12,14 @@ window.__view_retirement = {
         { label: 'NASDAQ 100', annualRate: 13 },
       ],
       results: [],
-      chart: null,
     };
   },
+  created() {
+    // Chart.js 인스턴스를 Vue 반응성 시스템 밖에 저장 (Proxy 래핑 방지)
+    this._chart = null;
+  },
   mounted() { this.calculate(); },
-  beforeUnmount() { if (this.chart) this.chart.destroy(); },
+  beforeUnmount() { if (this._chart) this._chart.destroy(); },
   methods: {
     calculate() {
       const totalContrib = this.currentBalance + this.monthlyContrib * 12 * this.years;
@@ -53,17 +56,17 @@ window.__view_retirement = {
       }));
 
       // 기존 차트가 있으면 데이터만 업데이트
-      if (this.chart) {
-        this.chart.data.labels = labels;
-        this.chart.data.datasets.forEach((ds, i) => {
+      if (this._chart) {
+        this._chart.data.labels = labels;
+        this._chart.data.datasets.forEach((ds, i) => {
           ds.label = datasets[i].label;
           ds.data = datasets[i].data;
         });
-        this.chart.update();
+        this._chart.update();
         return;
       }
 
-      this.chart = new Chart(ctx, {
+      this._chart = new Chart(ctx, {
         type: 'line',
         data: { labels, datasets },
         options: {

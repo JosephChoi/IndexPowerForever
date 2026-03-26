@@ -12,8 +12,12 @@ window.__view_fee_simulator = {
         { label: '액티브 펀드', fee: 1.5 },
       ],
       results: [],
-      chart: null,
     };
+  },
+
+  created() {
+    // Chart.js 인스턴스를 Vue 반응성 시스템 밖에 저장 (Proxy 래핑 방지)
+    this._chart = null;
   },
 
   mounted() {
@@ -21,7 +25,7 @@ window.__view_fee_simulator = {
   },
 
   beforeUnmount() {
-    if (this.chart) this.chart.destroy();
+    if (this._chart) this._chart.destroy();
   },
 
   methods: {
@@ -55,17 +59,17 @@ window.__view_fee_simulator = {
       }));
 
       // 기존 차트가 있으면 데이터만 업데이트
-      if (this.chart) {
-        this.chart.data.labels = yearLabels;
-        this.chart.data.datasets.forEach((ds, i) => {
+      if (this._chart) {
+        this._chart.data.labels = yearLabels;
+        this._chart.data.datasets.forEach((ds, i) => {
           ds.label = datasets[i].label;
           ds.data = datasets[i].data;
         });
-        this.chart.update();
+        this._chart.update();
         return;
       }
 
-      this.chart = new Chart(ctx, {
+      this._chart = new Chart(ctx, {
         type: 'line',
         data: { labels: yearLabels, datasets },
         options: {
