@@ -40,23 +40,32 @@ window.__view_retirement = {
     renderChart() {
       const ctx = this.$refs.retirementChart;
       if (!ctx) return;
-      if (this.chart) this.chart.destroy();
       const labels = Array.from({ length: this.years + 1 }, (_, i) => i);
       const colors = ['#6c757d', '#198754', '#fd7e14'];
+      const datasets = this.scenarios.map((s, i) => ({
+        label: s.label,
+        data: labels.map(y => {
+          const r = s.annualRate / 100 / 12; const n = y * 12;
+          if (r === 0) return Math.round(this.currentBalance + this.monthlyContrib * n);
+          return Math.round(this.currentBalance * Math.pow(1 + r, n) + this.monthlyContrib * (Math.pow(1 + r, n) - 1) / r);
+        }),
+        borderColor: colors[i], borderWidth: 2, fill: false, pointRadius: 0,
+      }));
+
+      // 기존 차트가 있으면 데이터만 업데이트
+      if (this.chart) {
+        this.chart.data.labels = labels;
+        this.chart.data.datasets.forEach((ds, i) => {
+          ds.label = datasets[i].label;
+          ds.data = datasets[i].data;
+        });
+        this.chart.update();
+        return;
+      }
+
       this.chart = new Chart(ctx, {
         type: 'line',
-        data: {
-          labels,
-          datasets: this.scenarios.map((s, i) => ({
-            label: s.label,
-            data: labels.map(y => {
-              const r = s.annualRate / 100 / 12; const n = y * 12;
-              if (r === 0) return Math.round(this.currentBalance + this.monthlyContrib * n);
-              return Math.round(this.currentBalance * Math.pow(1 + r, n) + this.monthlyContrib * (Math.pow(1 + r, n) - 1) / r);
-            }),
-            borderColor: colors[i], borderWidth: 2, fill: false, pointRadius: 0,
-          })),
-        },
+        data: { labels, datasets },
         options: {
           responsive: true, maintainAspectRatio: false,
           plugins: { legend: { position: 'top' } },

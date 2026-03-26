@@ -40,26 +40,34 @@ window.__view_fee_simulator = {
     renderChart() {
       const ctx = this.$refs.feeChart;
       if (!ctx) return;
-      if (this.chart) this.chart.destroy();
 
       const yearLabels = Array.from({ length: this.years + 1 }, (_, i) => i);
       const colors = ['#0d6efd', '#fd7e14', '#dc3545'];
+      const datasets = this.scenarios.map((s, i) => ({
+        label: `${s.label} (${s.fee}%)`,
+        data: yearLabels.map(y =>
+          Math.round(this.initialAmount * Math.pow(1 + (this.annualReturn - s.fee) / 100, y))
+        ),
+        borderColor: colors[i],
+        borderWidth: 2,
+        fill: false,
+        pointRadius: 0,
+      }));
+
+      // 기존 차트가 있으면 데이터만 업데이트
+      if (this.chart) {
+        this.chart.data.labels = yearLabels;
+        this.chart.data.datasets.forEach((ds, i) => {
+          ds.label = datasets[i].label;
+          ds.data = datasets[i].data;
+        });
+        this.chart.update();
+        return;
+      }
 
       this.chart = new Chart(ctx, {
         type: 'line',
-        data: {
-          labels: yearLabels,
-          datasets: this.scenarios.map((s, i) => ({
-            label: `${s.label} (${s.fee}%)`,
-            data: yearLabels.map(y =>
-              Math.round(this.initialAmount * Math.pow(1 + (this.annualReturn - s.fee) / 100, y))
-            ),
-            borderColor: colors[i],
-            borderWidth: 2,
-            fill: false,
-            pointRadius: 0,
-          })),
-        },
+        data: { labels: yearLabels, datasets },
         options: {
           responsive: true,
           maintainAspectRatio: false,
