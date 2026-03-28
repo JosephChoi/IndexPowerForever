@@ -167,8 +167,43 @@
                 <span class="legend-dot ms-3" style="background:#fd7e14"></span>NASDAQ 100
               </div>
             </div>
-            <div class="chart-container" style="height:320px">
+            <div class="chart-container" style="height:320px;cursor:crosshair">
               <canvas ref="comparisonChart"></canvas>
+            </div>
+
+            <!-- 드래그 구간 선택 안내 / 결과 -->
+            <div class="drag-select-bar" v-if="!dragSelection">
+              <i class="bi bi-hand-index me-1"></i>
+              차트를 드래그하여 원하는 구간의 수익률을 확인하세요
+            </div>
+            <div class="drag-select-result" v-if="dragSelection">
+              <div class="drag-select-period">
+                <i class="bi bi-calendar-range me-1"></i>
+                {{ dragSelection.startDate }} ~ {{ dragSelection.endDate }}
+                <button class="btn btn-sm btn-link p-0 ms-2 text-muted" @click="clearDragSelection" title="선택 해제">
+                  <i class="bi bi-x-circle"></i>
+                </button>
+              </div>
+              <div class="drag-select-returns">
+                <div class="drag-return-item">
+                  <span class="drag-return-label" style="color:#0d6efd">{{ ticker }}</span>
+                  <span class="drag-return-value" :class="dragSelection.etfReturn >= 0 ? 'positive' : 'negative'">
+                    {{ dragSelection.etfReturn > 0 ? '+' : '' }}{{ dragSelection.etfReturn.toFixed(1) }}%
+                  </span>
+                </div>
+                <div class="drag-return-item">
+                  <span class="drag-return-label" style="color:#198754">S&P 500</span>
+                  <span class="drag-return-value" :class="dragSelection.spyReturn >= 0 ? 'positive' : 'negative'">
+                    {{ dragSelection.spyReturn > 0 ? '+' : '' }}{{ dragSelection.spyReturn.toFixed(1) }}%
+                  </span>
+                </div>
+                <div class="drag-return-item">
+                  <span class="drag-return-label" style="color:#fd7e14">NASDAQ 100</span>
+                  <span class="drag-return-value" :class="dragSelection.qqqReturn >= 0 ? 'positive' : 'negative'">
+                    {{ dragSelection.qqqReturn > 0 ? '+' : '' }}{{ dragSelection.qqqReturn.toFixed(1) }}%
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
 

@@ -22,6 +22,8 @@ window.__view_etf_detail = {
       explorerHolding: 1,
       explorerStep: 1,
       selectedDot: null,
+      // 드래그 구간 선택
+      dragSelection: null,
     };
   },
 
@@ -146,11 +148,150 @@ window.__view_etf_detail = {
       this.renderAnnualChart();
     },
 
+    // 드래그 선택 해제
+    clearDragSelection() {
+      this.dragSelection = null;
+    },
+
+    // 드래그 구간 수익률 계산 (누적수익률 기반)
+    calcRangeReturn(cumReturns, startIdx, endIdx) {
+      const rA = cumReturns[startIdx];
+      const rB = cumReturns[endIdx];
+      return ((1 + rB / 100) / (1 + rA / 100) - 1) * 100;
+    },
+
+    // Chart.js 드래그 선택 플러그인 생성
+    createDragSelectPlugin() {
+      const vm = this;
+      return {
+        id: 'dragSelect',
+        _state: { dragging: false, startX: null, endX: null },
+
+        // 드래그 영역 그리기
+        afterDraw(chart) {
+          const state = chart.options.plugins.dragSelect?._state;
+          if (!state || !state.dragging || state.startX === null || state.endX === null) return;
+
+          const { ctx, chartArea } = chart;
+          const left = Math.min(state.startX, state.endX);
+          const right = Math.max(state.startX, state.endX);
+          const clampL = Math.max(left, chartArea.left);
+          const clampR = Math.min(right, chartArea.right);
+          if (clampR <= clampL) return;
+
+          ctx.save();
+          ctx.fillStyle = 'rgba(13, 110, 253, 0.1)';
+          ctx.fillRect(clampL, chartArea.top, clampR - clampL, chartArea.bottom - chartArea.top);
+          ctx.strokeStyle = 'rgba(13, 110, 253, 0.4)';
+          ctx.lineWidth = 1;
+          ctx.setLineDash([4, 4]);
+          ctx.strokeRect(clampL, chartArea.top, clampR - clampL, chartArea.bottom - chartArea.top);
+          ctx.restore();
+        },
+
+        // 이벤트 핸들러
+        afterInit(chart) {
+          const canvas = chart.canvas;
+          const state = { dragging: false, startX: null, endX: null };
+          chart.options.plugins.dragSelect = { _state: state };
+
+          const getX = (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const touch = e.touches ? e.touches[0] : e;
+            return touch.clientX - rect.left;
+          };
+
+          const getDataIndex = (chart, x) => {
+            const xScale = chart.scales.x;
+            if (!xScale) return -1;
+            const val = xScale.getValueForPixel(x);
+            return Math.round(Math.max(0, Math.min(val, chart.data.labels.length - 1)));
+          };
+
+          const updateSelection = (chart, state) => {
+            if (state.startX === null || state.endX === null) return;
+            let startIdx = getDataIndex(chart, state.startX);
+            let endIdx = getDataIndex(chart, state.endX);
+            if (startIdx === endIdx) return;
+            if (startIdx > endIdx) [startIdx, endIdx] = [endIdx, startIdx];
+
+            const chartData = vm.compareData.chart;
+            const labels = chartData.etf.map(d => d.date);
+            const etfReturns = chartData.etf.map(d => d.return);
+            const spyReturns = chartData.spy.map(d => d.return);
+            const qqqReturns = chartData.qqq.map(d => d.return);
+
+            vm.dragSelection = {
+              startDate: labels[startIdx],
+              endDate: labels[endIdx],
+              startIdx,
+              endIdx,
+              etfReturn: vm.calcRangeReturn(etfReturns, startIdx, endIdx),
+              spyReturn: vm.calcRangeReturn(spyReturns, startIdx, endIdx),
+              qqqReturn: vm.calcRangeReturn(qqqReturns, startIdx, endIdx),
+            };
+          };
+
+          const onStart = (e) => {
+            if (e.type === 'touchstart' && e.touches.length > 1) return;
+            const x = getX(e);
+            const { chartArea } = chart;
+            if (x < chartArea.left || x > chartArea.right) return;
+            state.dragging = true;
+            state.startX = x;
+            state.endX = x;
+            if (e.type === 'touchstart') e.preventDefault();
+          };
+
+          const onMove = (e) => {
+            if (!state.dragging) return;
+            state.endX = getX(e);
+            chart.draw();
+            updateSelection(chart, state);
+            if (e.type === 'touchmove') e.preventDefault();
+          };
+
+          const onEnd = () => {
+            if (!state.dragging) return;
+            state.dragging = false;
+            chart.draw();
+          };
+
+          canvas.addEventListener('mousedown', onStart);
+          canvas.addEventListener('mousemove', onMove);
+          canvas.addEventListener('mouseup', onEnd);
+          canvas.addEventListener('mouseleave', onEnd);
+          canvas.addEventListener('touchstart', onStart, { passive: false });
+          canvas.addEventListener('touchmove', onMove, { passive: false });
+          canvas.addEventListener('touchend', onEnd);
+
+          // 정리용 참조 저장
+          chart._dragCleanup = () => {
+            canvas.removeEventListener('mousedown', onStart);
+            canvas.removeEventListener('mousemove', onMove);
+            canvas.removeEventListener('mouseup', onEnd);
+            canvas.removeEventListener('mouseleave', onEnd);
+            canvas.removeEventListener('touchstart', onStart);
+            canvas.removeEventListener('touchmove', onMove);
+            canvas.removeEventListener('touchend', onEnd);
+          };
+        },
+
+        beforeDestroy(chart) {
+          if (chart._dragCleanup) chart._dragCleanup();
+        },
+      };
+    },
+
     // ① 누적 수익률 비교 라인 차트
     renderComparisonChart() {
       const ctx = this.$refs.comparisonChart;
       if (!ctx) return;
-      if (this.comparisonChart) this.comparisonChart.destroy();
+      if (this.comparisonChart) {
+        if (this.comparisonChart._dragCleanup) this.comparisonChart._dragCleanup();
+        this.comparisonChart.destroy();
+      }
+      this.dragSelection = null;
 
       const chart = this.compareData.chart;
       const labels = chart.etf.map(d => d.date);
@@ -198,6 +339,7 @@ window.__view_etf_detail = {
             y: { ticks: { callback: v => v.toFixed(0) + '%' } },
           },
         },
+        plugins: [this.createDragSelectPlugin()],
       });
     },
 
