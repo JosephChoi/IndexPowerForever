@@ -341,15 +341,15 @@
                 </span>
               </div>
               <div class="row g-2 text-center">
-                <div class="col-4">
+                <div class="col-12 col-sm-4">
                   <div class="text-muted small">보유 기간</div>
                   <div class="fw-semibold">{{ selectedDot.date }} ~ {{ selectedDot.endDate }}</div>
                 </div>
-                <div class="col-4">
+                <div class="col-6 col-sm-4">
                   <div class="text-muted small">{{ benchmarkName }} 수익률</div>
                   <div class="fw-bold text-outperform">{{ selectedDot.benchReturn > 0 ? '+' : '' }}{{ selectedDot.benchReturn }}%</div>
                 </div>
-                <div class="col-4">
+                <div class="col-6 col-sm-4">
                   <div class="text-muted small">{{ ticker }} 수익률</div>
                   <div class="fw-bold" :class="selectedDot.etfReturn >= 0 ? 'text-primary' : 'text-underperform'">{{ selectedDot.etfReturn > 0 ? '+' : '' }}{{ selectedDot.etfReturn }}%</div>
                 </div>
@@ -413,7 +413,8 @@
             <div class="chart-card-header">
               <span class="chart-card-title">연도별 수익률 상세</span>
             </div>
-            <div class="table-responsive">
+            <!-- 데스크톱: 테이블 -->
+            <div class="table-responsive yearly-table-desktop">
               <table class="table detail-table mb-0">
                 <thead>
                   <tr>
@@ -440,6 +441,33 @@
                   </tr>
                 </tbody>
               </table>
+            </div>
+            <!-- 모바일: 카드 리스트 -->
+            <div class="yearly-cards-mobile p-2">
+              <div
+                class="yearly-mobile-card"
+                v-for="row in compareData.winAnalysis.yearlyReturns"
+                :key="'m-' + row.year"
+              >
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                  <span class="fw-bold">{{ row.year }}</span>
+                  <span class="result-badge" :class="!row.win ? 'win' : 'lose'">{{ !row.win ? '인덱스 승' : '인덱스 패' }}</span>
+                </div>
+                <div class="d-flex gap-3 small">
+                  <div>
+                    <span class="text-muted">{{ benchmarkName }}</span>
+                    <span class="ms-1 fw-semibold">{{ row.benchReturn > 0 ? '+' : '' }}{{ row.benchReturn.toFixed(1) }}%</span>
+                  </div>
+                  <div>
+                    <span class="text-muted">{{ ticker }}</span>
+                    <span class="ms-1 fw-semibold" :class="row.etfReturn >= 0 ? 'text-outperform' : 'text-underperform'">{{ row.etfReturn > 0 ? '+' : '' }}{{ row.etfReturn.toFixed(1) }}%</span>
+                  </div>
+                  <div>
+                    <span class="text-muted">초과</span>
+                    <span class="ms-1 fw-bold" :class="row.diff <= 0 ? 'text-outperform' : 'text-underperform'">{{ (-row.diff) > 0 ? '+' : '' }}{{ (-row.diff).toFixed(1) }}%</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 

@@ -37,7 +37,8 @@
         </div>
       </div>
 
-      <div class="table-responsive" v-if="rankings.length">
+      <!-- 데스크톱: 테이블 -->
+      <div class="table-responsive ranking-table-desktop" v-if="rankings.length">
         <table class="table table-standard table-hover align-middle w-100">
           <thead>
             <tr>
@@ -70,6 +71,54 @@
             </tr>
           </tbody>
         </table>
+      </div>
+
+      <!-- 모바일: 카드 리스트 -->
+      <div class="ranking-cards-mobile" v-if="rankings.length">
+        <div class="d-flex justify-content-end mb-2">
+          <select class="form-select form-select-sm" style="width:auto;font-size:0.78rem;" :value="sortBy" @change="onSort($event.target.value)">
+            <option value="excessReturn">초과수익률순</option>
+            <option value="totalReturn">총수익률순</option>
+            <option value="cagr">CAGR순</option>
+            <option value="mdd">MDD순</option>
+            <option value="aum">AUM순</option>
+          </select>
+        </div>
+        <div
+          class="ranking-mobile-card"
+          v-for="r in sortedRankings"
+          :key="'m-' + r.ticker"
+          @click="navigateTo('/etf/' + r.ticker)"
+        >
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <div class="rank-badge" :class="r.displayRank <= 3 ? 'rank-top' : 'rank-normal'">{{ r.displayRank }}</div>
+            <div class="flex-grow-1">
+              <span class="fw-bold text-primary me-1">{{ r.ticker }}</span>
+              <span class="text-muted small">{{ r.name }}</span>
+            </div>
+            <span :class="r.excessReturn >= 0 ? 'text-outperform fw-bold' : 'text-underperform fw-bold'" style="font-size:0.95rem">
+              {{ r.excessReturn > 0 ? '+' : '' }}{{ r.excessReturn.toFixed(1) }}%
+            </span>
+          </div>
+          <div class="metric-row">
+            <div class="metric-item">
+              <span class="metric-label">총수익률</span>
+              <span :class="r.totalReturn >= 0 ? 'text-success' : 'text-danger'">{{ r.totalReturn.toFixed(1) }}%</span>
+            </div>
+            <div class="metric-item">
+              <span class="metric-label">CAGR</span>
+              <span>{{ r.cagr.toFixed(1) }}%</span>
+            </div>
+            <div class="metric-item">
+              <span class="metric-label">MDD</span>
+              <span class="text-danger">{{ r.mdd.toFixed(1) }}%</span>
+            </div>
+            <div class="metric-item" v-if="r.aum">
+              <span class="metric-label">AUM</span>
+              <span>{{ '$' + (r.aum / 1e9).toFixed(1) + 'B' }}</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>

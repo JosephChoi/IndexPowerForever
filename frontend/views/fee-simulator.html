@@ -29,7 +29,8 @@
           <h6 class="fw-bold mb-3">연도별 자산 추이</h6>
           <div class="chart-container" style="height:320px"><canvas ref="feeChart"></canvas></div>
         </div>
-        <div class="table-responsive">
+        <!-- 데스크톱: 테이블 -->
+        <div class="table-responsive fee-table-desktop">
           <table class="table table-standard w-100 text-center">
             <thead>
               <tr>
@@ -46,6 +47,31 @@
               </tr>
             </tbody>
           </table>
+        </div>
+        <!-- 모바일: 카드 리스트 -->
+        <div class="fee-cards-mobile">
+          <div
+            class="fee-mobile-card"
+            :class="i === 0 ? 'fee-baseline' : ''"
+            v-for="(r, i) in results"
+            :key="'m-' + i"
+          >
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <span class="fw-bold">{{ r.label }}</span>
+              <span class="badge bg-light text-dark">{{ r.fee }}%</span>
+            </div>
+            <div class="d-flex justify-content-between align-items-baseline">
+              <div>
+                <div class="fw-bold" style="font-size:1.15rem">{{ r.finalAmount.toLocaleString() }}<small class="fw-normal text-muted">만원</small></div>
+                <div class="small" :class="r.profit >= 0 ? 'text-success' : 'text-danger'">수익 {{ r.profit.toLocaleString() }}만원</div>
+              </div>
+              <div class="text-end" v-if="i > 0">
+                <div class="text-danger fw-semibold small">-{{ r.loss.toLocaleString() }}만원</div>
+                <div class="text-muted" style="font-size:0.68rem">비용 차이 손실</div>
+              </div>
+              <span class="badge bg-primary bg-opacity-10 text-primary small" v-else>기준</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
