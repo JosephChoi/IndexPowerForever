@@ -38,7 +38,7 @@
           <div>
             <div class="etf-ticker-badge">{{ ticker }}</div>
             <h1 class="etf-fullname mt-1 mb-2">{{ etfInfo?.name || '' }}</h1>
-            <div class="d-flex flex-wrap gap-2 align-items-center etf-meta-row">
+            <div class="d-flex gap-2 align-items-center etf-meta-row">
               <span class="etf-meta-chip" v-if="etfInfo?.expenseRatio">
                 <i class="bi bi-percent me-1"></i>{{ (etfInfo.expenseRatio * 100).toFixed(2) }}%
               </span>

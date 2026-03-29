@@ -1163,7 +1163,7 @@ body { color: var(--text-primary); }
   .etf-ticker-badge { font-size: 1.8rem; }
   .etf-fullname { font-size: 0.9rem; }
   .etf-meta-chip { font-size: 0.68rem; padding: 0.15rem 0.5rem; }
-  .etf-meta-row { flex-wrap: nowrap; gap: 0.35rem; }
+  .etf-meta-row { flex-wrap: nowrap !important; gap: 0.35rem; overflow-x: auto; }
   .kpi-value { font-size: 1.3rem; }
   .kpi-card { padding: 0.9rem; }
   .kpi-vs { font-size: 0.65rem; }
