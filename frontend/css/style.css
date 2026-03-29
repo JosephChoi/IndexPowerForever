@@ -681,6 +681,7 @@ body { color: var(--text-primary); }
   font-weight: 600;
   color: rgba(255,255,255,0.4);
   letter-spacing: 0.03em;
+  white-space: nowrap;
 }
 
 /* 벤치마크 선택 */
