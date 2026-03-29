@@ -626,6 +626,13 @@ body { color: var(--text-primary); }
   margin: 0;
 }
 
+/* 검색으로 버튼 — 오른쪽 상단 고정 */
+.etf-back-btn {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
 .etf-meta-chip {
   display: inline-flex;
   align-items: center;

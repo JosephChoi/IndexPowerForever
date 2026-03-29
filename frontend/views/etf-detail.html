@@ -28,7 +28,11 @@
     <!-- ── ETF 헤더 배너 ── -->
     <div class="etf-header-banner">
       <div class="container py-4">
-        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+        <div class="position-relative">
+          <!-- 검색으로 버튼 — 오른쪽 상단 고정 -->
+          <button class="btn btn-outline-light btn-sm px-3 etf-back-btn" @click="navigateTo('/')">
+            <i class="bi bi-arrow-left me-1"></i>검색으로
+          </button>
 
           <!-- 티커 + 풀네임 + 메타 -->
           <div>
@@ -46,10 +50,6 @@
               </span>
             </div>
           </div>
-
-          <button class="btn btn-outline-light btn-sm px-3" @click="navigateTo('/')">
-            <i class="bi bi-arrow-left me-1"></i>검색으로
-          </button>
         </div>
 
         <!-- 기간 + 벤치마크 선택 -->
