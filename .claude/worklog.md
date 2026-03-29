@@ -2,6 +2,218 @@
 
 ---
 
+## 세션 #12 — 2026-03-30 (KST)
+
+### 시작 시 상태
+- Phase 0~4 완료 (42/42) + Post-MVP P-001~P-019 완료
+- 모바일 레이아웃 개선 요청
+
+### 목표
+- 전체 페이지 모바일 최적화
+- 모바일 햄버거 메뉴 아이콘 수정
+- ETF 상세 헤더 모바일 레이아웃 개선
+- 네비게이션/탭바/스피너 정리
+- 중복 배포 워크플로우 제거
+
+### 결과
+- **P-020**: 전체 페이지 모바일 최적화
+  - 랭킹 9컬럼 테이블 → 모바일 카드 리스트 자동 전환 (정렬 드롭다운 포함)
+  - ETF 상세 연도별 수익률 테이블 → 모바일 카드 전환, 탭바 가로 스크롤
+  - 비용 시뮬레이터 테이블 → 모바일 카드 전환 (기준 시나리오 강조)
+  - 슬라이더 터치 타겟 24px 확대, 차트 높이 반응형, 버튼/배지/폰트 축소
+  - 인사이트 필터 모바일 가로 스크롤, 차트 카드 헤더 세로 정렬
+- **P-021**: 모바일 햄버거 메뉴 아이콘 SVG 색상 흰색으로 변경
+- **P-022**: ETF 상세 모바일 헤더 레이아웃 개선
+  - 메타칩(AUM/설정일) 같은 행 배치, 검색 버튼 우상단 고정
+  - flex-wrap nowrap으로 줄바꿈 방지, 헤더 간격 조정(mt-4→mt-3, gap-2→gap-3)
+- **P-023**: 네비게이션/탭바/스피너 정리
+  - 네비게이션 메뉴 "성과비교" → "랭킹"으로 복원
+  - ETF 상세 탭바 모바일 디자인 강화
+  - 벤치마크 버튼 앞 "비교지수" 라벨 추가 후 제거
+  - 랭킹 페이지 인라인 스피너 제거, 초기 로딩 뷰포트 중앙 배치
+- **P-024**: 프론트엔드 중복 배포 워크플로우 제거
+  - `deploy-frontend.yml` 삭제 (Cloudflare Pages Git 연동과 중복)
+  - `CLAUDE.md` 배포 섹션 업데이트
+
+### 변경 파일
+- `frontend/views/ranking.html` — 모바일 카드 레이아웃 + 정렬 드롭다운
+- `frontend/views/etf-detail.html` — 모바일 헤더 + 연도별 테이블 카드 전환
+- `frontend/views/fee-simulator.html` — 테이블 모바일 카드 전환
+- `frontend/views/insights.html` — 필터 가로 스크롤
+- `frontend/css/style.css` — 반응형 공통 스타일
+- `frontend/logic/ranking.js` — 정렬 드롭다운 로직
+- `frontend/components/navbar.html` — 햄버거 아이콘 흰색, 메뉴 복원
+- `CLAUDE.md` — 배포 섹션 업데이트
+- `.github/workflows/deploy-frontend.yml` — 삭제
+
+### 커밋
+- `09be64a` — 전체 페이지 모바일 최적화
+- `61ff77a` — 햄버거 메뉴 아이콘 흰색
+- `dd9ac85`, `ff87cd3`, `e244f6c` — ETF 상세 모바일 헤더 개선
+- `431f91c` — 네비게이션/탭바/스피너 정리
+- `1b67acb` — 중복 배포 워크플로우 제거
+- `b8cf773`, `8c46adf` — 비교지수 라벨 줄바꿈 방지 후 제거
+- `4b46e88` — ETF 헤더 간격 조정
+
+### 다음 세션 할 일
+- 디자인 가이드 체크리스트 잔여 항목 검토 (book.html, 홈 프리셋 카드 등)
+- 모바일 실사용 QA
+
+### 참고사항
+- deploy-frontend.yml 삭제 후 Cloudflare Pages는 Git 연동 자동 배포만 사용
+- CLAUDE.md 배포 섹션에서 Frontend 트리거를 "GitHub 연동 자동 배포"로 수정
+
+---
+
+## 세션 #11 — 2026-03-29 (KST)
+
+### 시작 시 상태
+- Phase 0~4 완료 (42/42) + Post-MVP P-001~P-018 완료
+- ETF 상세 페이지 수익률 비교 차트 기능 강화 요청
+
+### 목표
+- 차트에서 드래그로 원하는 구간의 수익률을 비교하는 기능 추가
+
+### 결과
+- **P-019**: Chart.js 커스텀 플러그인으로 드래그 구간 선택 구현
+  - 마우스 + 터치 이벤트 모두 지원
+  - 드래그 중 실시간 수익률 계산 (ETF, S&P 500, NASDAQ 100)
+  - 선택 구간 반투명 오버레이 UI 표시
+  - 구간 해제 기능 (차트 클릭 또는 닫기 버튼)
+
+### 변경 파일
+- `frontend/logic/etf-detail.js` — 드래그 플러그인 + 구간 수익률 계산 로직
+- `frontend/views/etf-detail.html` — 구간 선택 결과 UI
+- `frontend/css/style.css` — 드래그 선택 UI 스타일
+
+### 커밋
+- `6aa24fd` — 푸시 완료
+
+### 다음 세션 할 일
+- 디자인 가이드 체크리스트 미완료 항목 진행
+- 모바일 레이아웃 추가 검토
+
+### 참고사항
+- 드래그 플러그인은 Chart.js 플러그인 배열에 인라인으로 등록 (별도 파일 불필요)
+
+---
+
+## 세션 #10 — 2026-03-25 (15:00 ~ KST)
+
+### 시작 시 상태
+- Phase 0~4 완료 (42/42) + Post-MVP P-001~P-012 완료
+- 프리셋에 벤치마크 ETF(SPY/QQQ) 포함 문제
+- 랭킹이 임의 선정 25개 ETF로 구성되어 신뢰성 부족
+
+### 목표
+- 프리셋/인기검색에서 벤치마크 ETF 제거
+- 랭킹 → 성과비교로 리브랜딩
+- ETF 목록을 공신력 있는 AUM 기준 30개로 교체
+- AUM 컬럼 추가 + 테이블 정렬 기능
+
+### 결과
+- **P-013**: 프리셋에서 SPY/QQQ 제거, 인기 검색에서 벤치마크(SPY/QQQ/VOO/IVV) 필터링
+- **P-014**: "ETF 성과 랭킹" → "주요 ETF 성과비교", 네비바 "랭킹" → "성과비교", 아이콘/로딩문구 변경
+- **P-015**: CompaniesMarketCap 기준 US 상장 시가총액 상위 30개로 교체 (유럽 ETF 제외)
+- **P-016**: AUM 컬럼 추가 (etf_info JOIN으로 Yahoo 실시간 데이터 사용), 6개 컬럼 클릭 정렬 기능
+- **P-017**: SPYM → SPLG 티커 교체 (2025.11 티커 변경으로 Yahoo 미지원)
+- **P-018**: 연승률 컬럼 제거
+- 로딩 UX: "성과를 비교하는 중..." 텍스트 표시
+- 30개 ETF etf_info 데이터 수동 호출로 채움
+
+### 변경 파일
+- `backend/migrations/0002_seed.sql` — 프리셋 + ETF 목록 교체
+- `backend/migrations/0003~0006.sql` — D1 마이그레이션 (프리셋 수정, ETF 교체, AUM 컬럼)
+- `backend/src/services/PresetService.js` — 벤치마크 필터링
+- `backend/src/services/RankingService.js` — etf_info JOIN, AUM 조회
+- `frontend/views/ranking.html` — 제목/컬럼/정렬/로딩 UX
+- `frontend/logic/ranking.js` — 정렬 로직 (sortedRankings computed)
+- `frontend/components/navbar.html` — 메뉴명 변경
+- `frontend/css/style.css` — sortable-th 스타일
+
+### 다음 세션 할 일
+- 배포 규칙 준수 확인 (수동 wrangler deploy 금지 — 이번 세션 초반 위반 1회)
+- 성과비교 페이지 모바일 레이아웃 검토
+- 디자인 가이드 체크리스트 미완료 항목 진행
+
+### 참고사항
+- 수동 배포 금지 피드백 메모리 저장 완료 (`feedback_no_manual_deploy.md`)
+- ranking_etf 테이블에 aum 컬럼 추가했으나, 실제 표시는 etf_info(Yahoo)에서 JOIN
+- SPLG는 구 티커로, Yahoo에서 SPYM 지원 시 교체 가능
+
+---
+
+## 세션 #9 — 2026-03-24 (02:00 ~ 03:30 KST)
+
+### 시작 시 상태
+- Phase 0~4 완료 (42/42) + Post-MVP P-001~P-005 완료
+- 일부 종목에서 10Y↔max 기간 전환 시 잘못된 데이터 반환
+
+### 작업 내용
+
+**P-006: 10Y/max 기간 전환 버그 수정**
+- 원인 분석: D1에 불완전한 기간 데이터(3Y/10Y)가 max로 잘못 반환
+- PriceService: `_coversMaxPeriod()` 추가 (D1 시작일이 10Y+90일 이전인지 검증)
+- CompareService: `_cacheCoversperiod()` max 무조건 true 반환 → 동일 기준 검증
+- DailyUpdateService: `_needsFullHistory()` 추가 (D1 데이터 불완전 시 전체 재조회)
+
+**P-007: 디폴트 기간 5Y → max 변경**
+- `etf-detail.js`: `period: '5Y'` → `period: 'max'`
+- 신규 종목 검색 시 처음부터 전체 데이터를 D1에 확보 → 기간 전환 시 Yahoo 재조회 불필요
+
+**P-008: 크론잡 대상 확장**
+- `ranking_etf`만 → `ranking_etf UNION price_cache` 전체 종목 (상한 200)
+- 사용자가 검색한 종목도 매일 자동 업데이트 대상에 포함
+
+**P-009: Yahoo fetch 최적화 — getChartSince**
+- `YahooService.getChartSince(ticker, sinceDate)` 신규 메서드
+- `_fetchChart()` 공통 추출, `getChart`와 `getChartSince` 공유
+- DailyUpdateService + PriceService._fetchRecent: `getChart('1Y')` → `getChartSince(lastDate)`
+- 1Y(250일) 전체 대신 필요한 기간만 요청
+
+**P-010: D1 충전율 검증 로직 추가**
+- SCHD 등 7개 종목에서 D1 데이터에 중간 구멍 발견 (25~67% 충전율)
+- `_coversMaxPeriod()`, `_needsFullHistory()`: 충전율 90% 미만이면 불완전 판정
+- `rows / (spanYears * 252) < 0.9` → Yahoo 전체 재조회
+
+**P-011: D1 불완전 데이터 7종목 복구**
+- AGG, SCHD, DVY, SSO, AOM, QLD, AOR의 D1 데이터 삭제
+- 수동 트리거로 Yahoo max 전체 재조회
+- 크론잡 대상에서 D1 삭제 종목이 누락되는 버그 발견 → P-008 보완 (ranking_etf UNION)
+
+**P-012: 벤치마크 차트 선 스타일 변경**
+- S&P 500 / NASDAQ 100 차트 선: 점선(borderDash) → 실선
+- ETF(2px) > 벤치마크(1.2px) 두께 차이로 비교군 구분 유지
+
+### 결과 파일 목록
+- `frontend/logic/etf-detail.js` — 디폴트 기간 max + 차트 선 스타일
+- `backend/src/services/YahooService.js` — getChartSince + _fetchChart 추출
+- `backend/src/services/PriceService.js` — _coversMaxPeriod 충전율 검증
+- `backend/src/services/CompareService.js` — _cacheCoversperiod max 검증
+- `backend/src/services/DailyUpdateService.js` — 크론 대상 확장 + 충전율 검증 + getChartSince
+
+### 커밋 이력
+- `6d728bb` fix: validate max period data coverage and backfill incomplete D1 history
+- `b831173` feat: default to max period, cron all D1 tickers, fetch only since lastDate
+- `465cd35` chore: retry frontend deployment
+- `057d0f0` design: change benchmark chart lines from dashed to solid thin lines
+- `7a0e3ab` fix: detect sparse D1 data with fill rate check (90% threshold)
+- `115e359` fix: cron target includes ranking_etf + price_cache (not just price_cache)
+
+### 다음 세션 할 일
+1. ETF 상세 페이지 디자인 표준 적용 (세션 #7에서 미완)
+2. book.html 디자인 개선
+3. 인사이트 페이지 개선
+4. 크론 첫 정상 실행 결과 확인 (3/25 KST 07:00)
+
+### 참고사항
+- 디폴트 기간이 max로 변경됨 — 신규 검색 시 항상 전체 히스토리 로드
+- 크론잡 대상: ranking_etf + price_cache 전체 (상한 200종목)
+- D1 충전율 90% 미만이면 전체 재조회 트리거
+- Yahoo fetch: getChartSince로 필요 기간만 요청 (1Y 전체 대신)
+
+---
+
 ## 세션 #8 — 2026-03-23 (20:00 ~ 22:00 KST)
 
 ### 시작 시 상태
@@ -97,6 +309,62 @@
 - Post-MVP 작업은 `.claude/post-mvp.md`에서 별도 관리 (안정화 후 Phase 5+로 통합)
 - 캐시 기간 검증: 데이터 시작일이 요청 시작일보다 90일 이상 늦으면 Yahoo 재조회
 - Workers epoch 문제: 모듈 스코프 `new Date()` 사용 금지 (세션 #7 참고)
+
+---
+
+## 세션 #9 — 2026-03-24 (KST)
+
+### 시작 시 상태
+- Phase 0~4 전체 완료 (42/42 + Phase 4 10건)
+- Post-MVP P-001~P-005 완료 (세션 #8)
+- 10Y/max 기간 데이터 신뢰성 추가 강화 필요
+
+### 목표
+- 10Y/max 기간 전환 버그 추가 수정
+- 디폴트 기간 max 변경
+- 크론잡 + Yahoo fetch 최적화
+- 벤치마크 차트 선 스타일 개선
+
+### 결과
+**P-006: 10Y/max 기간 전환 버그 수정**
+- PriceService, CompareService 기간 검증 로직 강화
+
+**P-007: 디폴트 기간 5Y → max 변경**
+- 프론트엔드 ETF 상세 페이지 초기 기간값 변경
+
+**P-008: 크론잡 대상 확장**
+- ranking_etf UNION price_cache 전체 종목으로 확대
+
+**P-009: Yahoo fetch 최적화**
+- `getChartSince(lastDate)` 도입 — 1Y 전체 대신 lastDate 이후만 조회
+
+**P-010: D1 충전율 검증**
+- 90% 미만이면 Yahoo 전체 재조회로 보완
+
+**P-011: D1 불완전 데이터 7종목 복구**
+- 해당 종목 D1 데이터 삭제 후 Yahoo 전체 재조회로 복구
+
+**P-012: 벤치마크 차트 선 스타일 변경**
+- SPY/QQQ 점선 → 얇은 실선으로 변경
+
+### 커밋 이력
+- `6d728bb` fix: validate max period data coverage and backfill incomplete D1 history
+- `b831173` feat: default to max period, cron all D1 tickers, fetch only since lastDate
+- `465cd35` chore: retry frontend deployment
+- `057d0f0` design: change benchmark chart lines from dashed to solid thin lines
+- `7a0e3ab` fix: detect sparse D1 data with fill rate check (90% threshold)
+- `115e359` fix: cron target includes ranking_etf + price_cache (not just price_cache)
+
+### 다음 세션 할 일
+1. ETF 상세 페이지 디자인 표준 적용 (Phase 4 디자인 가이드 기준)
+2. book.html 디자인 개선
+3. 책 구매 링크 URL 확정 시 교체
+4. 실제 책 표지 이미지 교체 (현재 SVG 더미)
+
+### 참고사항
+- D1 충전율 검증: 영업일 기준 기대 데이터 건수 대비 실제 건수 90% 미만이면 재조회
+- getChartSince: YahooService에 추가된 메서드, 특정 날짜 이후 데이터만 fetch
+- 크론잡은 매일 KST 07:00 (UTC 22:00) 실행, 전체 D1 보유 종목 + ranking_etf 커버
 
 ---
 

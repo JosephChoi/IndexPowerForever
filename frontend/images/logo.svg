@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" fill="none">
+  <defs>
+    <linearGradient id="logoBg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0a58ca"/>
+      <stop offset="100%" stop-color="#198754"/>
+    </linearGradient>
+    <linearGradient id="chartFill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fff" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#fff" stop-opacity="0.03"/>
+    </linearGradient>
+  </defs>
+  <!-- 배경 -->
+  <rect width="40" height="40" rx="9" fill="url(#logoBg)"/>
+  <!-- 차트 영역 채우기 -->
+  <path d="M6,30 L10,26 L15,28 L20,20 L25,22 L29,14 L34,8 L34,32 L6,32 Z" fill="url(#chartFill)"/>
+  <!-- 메인 차트 라인 -->
+  <polyline points="6,30 10,26 15,28 20,20 25,22 29,14 34,8" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <!-- 끝점 강조 -->
+  <circle cx="34" cy="8" r="2.5" fill="#fff" opacity="0.9"/>
+  <circle cx="34" cy="8" r="4.5" fill="#fff" opacity="0.2"/>
+</svg>
