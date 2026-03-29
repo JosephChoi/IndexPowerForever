@@ -11,16 +11,23 @@
 
 ## 배포
 
-> **수동 배포 금지. 모든 배포는 `git commit` + `git push`로만.**
+> **수동 배포 금지. `wrangler deploy` / `wrangler pages deploy` 직접 실행 절대 금지.**
+> **모든 배포는 `git commit` + `git push`로만.**
 
-| 대상 | 트리거 | 워크플로우 |
+| 대상 | 배포 방식 | 트리거 |
 |---|---|---|
-| Frontend | `frontend/**` push | `deploy-frontend.yml` → Cloudflare Pages |
-| Backend | `backend/**` push | `deploy-backend.yml` → Cloudflare Workers |
+| Frontend | **Cloudflare Pages Git 연동** (대시보드 설정) | `main` push 자동 감지 |
+| Backend | **GitHub Actions** (`deploy-backend.yml`) | `backend/**` push |
 
 - Frontend: `https://indexpowerforever.pages.dev`
 - Backend: `https://index-power-forever.sixman-joseph.workers.dev`
 - `.claude/`, 루트 파일 변경은 배포 트리거 안 됨
+
+### 배포 주의사항
+
+- **Frontend는 GitHub Actions 워크플로우 없음** — Cloudflare Pages가 Git 연동으로 직접 배포. GitHub Actions로 중복 배포 워크플로우(`deploy-frontend.yml`)를 만들면 **같은 커밋이 2번 배포**되므로 절대 만들지 말 것
+- **Backend(Workers)는 Git 연동 불가** — Cloudflare Workers는 Git 연동을 지원하지 않으므로 GitHub Actions가 유일한 자동 배포 수단
+- 배포 워크플로우 신규 생성/수정 시 위 구조를 반드시 확인하여 중복 배포 방지
 
 ## 구조
 

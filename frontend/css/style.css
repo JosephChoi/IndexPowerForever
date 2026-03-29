@@ -749,33 +749,24 @@ body { color: var(--text-primary); }
 /* 탭 바 모바일 강화 */
 @media (max-width: 576px) {
   .etf-tab-bar {
-    background: linear-gradient(180deg, #f0f4ff 0%, #fff 100%);
+    background: #f0f4ff;
     border-bottom: 2px solid #dee2e6;
-    padding: 0.35rem 0;
   }
   .etf-tabs {
-    gap: 0.25rem;
-    padding: 0 0.5rem;
+    gap: 0;
   }
   .etf-tab {
     flex: 1;
     text-align: center;
     font-size: 0.78rem;
     font-weight: 600;
-    padding: 0.6rem 0.4rem;
-    border-bottom: none;
-    border-radius: 8px;
+    padding: 0.7rem 0.4rem;
     color: #495057;
-    background: transparent;
+    border-bottom: 3px solid transparent;
   }
   .etf-tab.active {
-    background: var(--color-etf);
-    color: #fff;
-    border-bottom: none;
-    box-shadow: 0 2px 8px rgba(13, 110, 253, 0.3);
-  }
-  .etf-tab:hover:not(.active) {
-    background: rgba(13, 110, 253, 0.08);
+    color: var(--color-etf);
+    border-bottom-color: var(--color-etf);
   }
 }
 
