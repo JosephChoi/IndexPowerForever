@@ -63,17 +63,20 @@
               @click="onPeriodChange(p)"
             >{{ p === 'max' ? '전체' : p }}</button>
           </div>
-          <div class="etf-bench-group">
-            <button
-              class="etf-bench-btn spy"
-              :class="{ active: benchmark === 'SPY' }"
-              @click="onBenchmarkChange('SPY')"
-            >S&P 500</button>
-            <button
-              class="etf-bench-btn qqq"
-              :class="{ active: benchmark === 'QQQ' }"
-              @click="onBenchmarkChange('QQQ')"
-            >NASDAQ 100</button>
+          <div class="d-flex align-items-center gap-2">
+            <span class="etf-section-label">비교지수</span>
+            <div class="etf-bench-group">
+              <button
+                class="etf-bench-btn spy"
+                :class="{ active: benchmark === 'SPY' }"
+                @click="onBenchmarkChange('SPY')"
+              >S&P 500</button>
+              <button
+                class="etf-bench-btn qqq"
+                :class="{ active: benchmark === 'QQQ' }"
+                @click="onBenchmarkChange('QQQ')"
+              >NASDAQ 100</button>
+            </div>
           </div>
           <span class="spinner-border spinner-border-sm text-white-50 ms-1" v-if="isLoading"></span>
         </div>

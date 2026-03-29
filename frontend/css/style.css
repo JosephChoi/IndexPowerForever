@@ -675,6 +675,14 @@ body { color: var(--text-primary); }
   color: rgba(255,255,255,0.8);
 }
 
+/* 섹션 라벨 (기간/비교지수) */
+.etf-section-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.4);
+  letter-spacing: 0.03em;
+}
+
 /* 벤치마크 선택 */
 .etf-bench-group {
   display: flex;
@@ -737,6 +745,39 @@ body { color: var(--text-primary); }
 }
 
 .etf-tab:hover { color: #0d6efd; }
+
+/* 탭 바 모바일 강화 */
+@media (max-width: 576px) {
+  .etf-tab-bar {
+    background: linear-gradient(180deg, #f0f4ff 0%, #fff 100%);
+    border-bottom: 2px solid #dee2e6;
+    padding: 0.35rem 0;
+  }
+  .etf-tabs {
+    gap: 0.25rem;
+    padding: 0 0.5rem;
+  }
+  .etf-tab {
+    flex: 1;
+    text-align: center;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 0.6rem 0.4rem;
+    border-bottom: none;
+    border-radius: 8px;
+    color: #495057;
+    background: transparent;
+  }
+  .etf-tab.active {
+    background: var(--color-etf);
+    color: #fff;
+    border-bottom: none;
+    box-shadow: 0 2px 8px rgba(13, 110, 253, 0.3);
+  }
+  .etf-tab:hover:not(.active) {
+    background: rgba(13, 110, 253, 0.08);
+  }
+}
 
 .etf-tab.active {
   color: #0d6efd;
@@ -1175,7 +1216,7 @@ body { color: var(--text-primary); }
     scrollbar-width: none;
   }
   .etf-tabs::-webkit-scrollbar { display: none; }
-  .etf-tab { font-size: 0.8rem; padding: 0.7rem 0.75rem; white-space: nowrap; flex-shrink: 0; }
+  /* etf-tab 모바일 스타일은 별도 미디어 쿼리에서 관리 */
 
   /* 롤링 승률 */
   .rolling-rate { font-size: 2.2rem; }
