@@ -195,15 +195,17 @@
                 </div>
                 <div class="drag-return-item">
                   <span class="drag-return-label" style="color:#198754">S&P 500</span>
-                  <span class="drag-return-value" :class="dragSelection.spyReturn >= 0 ? 'positive' : 'negative'">
+                  <span v-if="dragSelection.spyReturn != null" class="drag-return-value" :class="dragSelection.spyReturn >= 0 ? 'positive' : 'negative'">
                     {{ dragSelection.spyReturn > 0 ? '+' : '' }}{{ dragSelection.spyReturn.toFixed(1) }}%
                   </span>
+                  <span v-else class="drag-return-value text-muted">N/A</span>
                 </div>
                 <div class="drag-return-item">
                   <span class="drag-return-label" style="color:#fd7e14">NASDAQ 100</span>
-                  <span class="drag-return-value" :class="dragSelection.qqqReturn >= 0 ? 'positive' : 'negative'">
+                  <span v-if="dragSelection.qqqReturn != null" class="drag-return-value" :class="dragSelection.qqqReturn >= 0 ? 'positive' : 'negative'">
                     {{ dragSelection.qqqReturn > 0 ? '+' : '' }}{{ dragSelection.qqqReturn.toFixed(1) }}%
                   </span>
+                  <span v-else class="drag-return-value text-muted">N/A</span>
                 </div>
               </div>
             </div>

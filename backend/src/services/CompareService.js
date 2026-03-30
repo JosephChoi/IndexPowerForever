@@ -37,8 +37,10 @@ export class CompareService {
 
     const benchPrices = benchmark === 'QQQ' ? qqqPrices : spyPrices;
 
-    // 기간 계산 (년수)
+    // 기간 계산 (년수) — 각 티커별 실제 데이터 기간 사용
     const years = this._calcYears(etfPrices);
+    const spyYears = this._calcYears(spyPrices);
+    const qqqYears = this._calcYears(qqqPrices);
 
     // 누적 수익률
     const etfCumReturns = CalculationService.calcCumulativeReturns(etfPrices);
@@ -49,10 +51,10 @@ export class CompareService {
     // 초과수익률
     const excessReturns = CalculationService.calcExcessReturns(etfCumReturns, benchCumReturns);
 
-    // 통계 지표
+    // 통계 지표 — 각 티커의 실제 기간으로 CAGR 산출
     const etfCAGR = CalculationService.calcCAGR(etfPrices[0]?.close, etfPrices.at(-1)?.close, years);
-    const spyCAGR = CalculationService.calcCAGR(spyPrices[0]?.close, spyPrices.at(-1)?.close, years);
-    const qqqCAGR = CalculationService.calcCAGR(qqqPrices[0]?.close, qqqPrices.at(-1)?.close, years);
+    const spyCAGR = CalculationService.calcCAGR(spyPrices[0]?.close, spyPrices.at(-1)?.close, spyYears);
+    const qqqCAGR = CalculationService.calcCAGR(qqqPrices[0]?.close, qqqPrices.at(-1)?.close, qqqYears);
 
     const etfVol = CalculationService.calcAnnualVolatility(etfPrices);
     const spyVol = CalculationService.calcAnnualVolatility(spyPrices);

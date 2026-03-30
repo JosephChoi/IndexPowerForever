@@ -157,6 +157,7 @@ window.__view_etf_detail = {
     calcRangeReturn(cumReturns, startIdx, endIdx) {
       const rA = cumReturns[startIdx];
       const rB = cumReturns[endIdx];
+      if (rA == null || rB == null) return null;
       return ((1 + rB / 100) / (1 + rA / 100) - 1) * 100;
     },
 
@@ -216,10 +217,20 @@ window.__view_etf_detail = {
             if (startIdx > endIdx) [startIdx, endIdx] = [endIdx, startIdx];
 
             const chartData = vm.compareData.chart;
-            const labels = chartData.etf.map(d => d.date);
-            const etfReturns = chartData.etf.map(d => d.return);
-            const spyReturns = chartData.spy.map(d => d.return);
-            const qqqReturns = chartData.qqq.map(d => d.return);
+            // 차트의 통합 라벨 사용 (모든 데이터셋의 날짜 합집합)
+            const allDates = new Set([
+              ...chartData.etf.map(d => d.date),
+              ...chartData.spy.map(d => d.date),
+              ...chartData.qqq.map(d => d.date),
+            ]);
+            const labels = [...allDates].sort();
+            const toMap = (arr) => { const m = new Map(); for (const d of arr) m.set(d.date, d.return); return m; };
+            const etfMap = toMap(chartData.etf);
+            const spyMap = toMap(chartData.spy);
+            const qqqMap = toMap(chartData.qqq);
+            const etfReturns = labels.map(d => etfMap.get(d) ?? null);
+            const spyReturns = labels.map(d => spyMap.get(d) ?? null);
+            const qqqReturns = labels.map(d => qqqMap.get(d) ?? null);
 
             vm.dragSelection = {
               startDate: labels[startIdx],
@@ -294,7 +305,23 @@ window.__view_etf_detail = {
       this.dragSelection = null;
 
       const chart = this.compareData.chart;
-      const labels = chart.etf.map(d => d.date);
+      // 모든 데이터셋의 날짜를 합쳐 정렬된 유니크 라벨 생성
+      const allDates = new Set([
+        ...chart.etf.map(d => d.date),
+        ...chart.spy.map(d => d.date),
+        ...chart.qqq.map(d => d.date),
+      ]);
+      const labels = [...allDates].sort();
+
+      // 날짜→값 맵 생성 (데이터 길이가 다를 때 정확한 날짜 매핑)
+      const toMap = (arr, key = 'return') => {
+        const m = new Map();
+        for (const d of arr) m.set(d.date, d[key]);
+        return m;
+      };
+      const etfMap = toMap(chart.etf);
+      const spyMap = toMap(chart.spy);
+      const qqqMap = toMap(chart.qqq);
 
       this.comparisonChart = new Chart(ctx, {
         type: 'line',
@@ -303,30 +330,33 @@ window.__view_etf_detail = {
           datasets: [
             {
               label: this.ticker,
-              data: chart.etf.map(d => d.return),
+              data: labels.map(d => etfMap.get(d) ?? null),
               borderColor: '#0d6efd',
               borderWidth: 2,
               fill: false,
               pointRadius: 0,
               tension: 0.1,
+              spanGaps: true,
             },
             {
               label: 'S&P 500',
-              data: chart.spy.map(d => d.return),
+              data: labels.map(d => spyMap.get(d) ?? null),
               borderColor: '#198754',
               borderWidth: 1.2,
               fill: false,
               pointRadius: 0,
               tension: 0.1,
+              spanGaps: true,
             },
             {
               label: 'NASDAQ 100',
-              data: chart.qqq.map(d => d.return),
+              data: labels.map(d => qqqMap.get(d) ?? null),
               borderColor: '#fd7e14',
               borderWidth: 1.2,
               fill: false,
               pointRadius: 0,
               tension: 0.1,
+              spanGaps: true,
             },
           ],
         },
