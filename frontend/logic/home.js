@@ -6,7 +6,15 @@ window.__view_home = {
       searchResults: [],
       isSearching: false,
       recentTickers: [],
-      presets: [],
+      // 프리셋은 고정 데이터 — API 호출 없이 즉시 렌더링
+      presets: [
+        { id: 1, name: '레버리지 ETF 비교', description: 'S&P 500 레버리지 ETF vs 지수 비교', tickers: ['SSO', 'UPRO', 'SPXL'] },
+        { id: 2, name: '나스닥 레버리지', description: 'NASDAQ 100 레버리지 ETF vs 지수 비교', tickers: ['QLD', 'TQQQ'] },
+        { id: 3, name: '섹터 ETF 비교', description: '주요 섹터 ETF vs S&P 500 비교', tickers: ['XLK', 'XLV', 'XLF'] },
+        { id: 4, name: '배당 ETF 비교', description: '고배당 ETF vs S&P 500 비교', tickers: ['VYM', 'SCHD', 'DVY'] },
+        { id: 5, name: '채권혼합 ETF', description: '자산배분 ETF vs 지수 비교', tickers: ['AOM', 'AOR', 'AOA'] },
+        { id: 6, name: '성장주 ETF', description: '성장주 ETF vs NASDAQ 100 비교', tickers: ['VUG', 'MGK', 'IWF'] },
+      ],
       popularEtfs: [],
       isLoading: false,
       error: null,
@@ -16,7 +24,6 @@ window.__view_home = {
 
   mounted() {
     this.loadRecent();
-    this.loadPresets();
     this.loadPopular();
   },
 
@@ -64,19 +71,6 @@ window.__view_home = {
     onPresetClick(preset) {
       if (preset.tickers?.length > 0) {
         this.navigateTo(`/etf/${preset.tickers[0]}`);
-      }
-    },
-
-    // 인기 프리셋 로드
-    async loadPresets() {
-      try {
-        this.isLoading = true;
-        const data = await this.$api.get('/api/presets');
-        this.presets = Array.isArray(data) ? data : (data?.data || []);
-      } catch (e) {
-        this.error = '프리셋을 불러오는 중 오류가 발생했습니다.';
-      } finally {
-        this.isLoading = false;
       }
     },
 

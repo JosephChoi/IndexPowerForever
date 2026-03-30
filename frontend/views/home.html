@@ -111,7 +111,7 @@
     <!-- 에러 -->
     <div class="alert alert-danger" v-if="error">
       <i class="bi bi-exclamation-triangle me-2"></i>{{ error }}
-      <button class="btn btn-sm btn-outline-danger ms-2" @click="loadPresets(); loadPopular()">재시도</button>
+      <button class="btn btn-sm btn-outline-danger ms-2" @click="loadPopular()">재시도</button>
     </div>
 
     <!-- 인기 검색 TOP 5 -->
@@ -133,23 +133,14 @@
     </section>
 
     <!-- 데이터 없음 -->
-    <div class="text-center text-muted py-4" v-if="!isLoading && !error && presets.length === 0 && popularEtfs.length === 0">
+    <div class="text-center text-muted py-4" v-if="!isLoading && !error && popularEtfs.length === 0 && presets.length === 0">
       <i class="bi bi-inbox display-4 d-block mb-2"></i>
       데이터를 불러올 수 없습니다.
-      <button class="btn btn-sm btn-outline-secondary ms-2" @click="loadPresets(); loadPopular()">다시 시도</button>
+      <button class="btn btn-sm btn-outline-secondary ms-2" @click="loadPopular()">다시 시도</button>
     </div>
 
-    <!-- 인기 프리셋 -->
-    <section class="loading-section-wrap">
-      <!-- 로딩 오버레이 -->
-      <div v-if="isLoading" class="loading-section-overlay">
-        <div class="loading-context">
-          <i class="bi bi-arrow-repeat loading-icon"></i>
-          <div class="loading-msg">인기 프리셋을 불러오는 중<span class="loading-dots"></span></div>
-          <div class="loading-sub">추천 ETF 비교 조합을 준비하고 있습니다</div>
-        </div>
-      </div>
-
+    <!-- 인기 프리셋 (하드코딩 — 로딩 없이 즉시 표시) -->
+    <section>
       <h2 class="h5 fw-bold mb-3">
         <i class="bi bi-stars text-warning me-2"></i>인기 비교 프리셋
       </h2>
