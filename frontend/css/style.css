@@ -555,7 +555,14 @@ body { color: var(--text-primary); }
   border-radius: 8px;
 }
 .navbar-brand-text {
-  background: linear-gradient(90deg, #fff 0%, rgba(255,255,255,0.8) 100%);
+  font-size: 1.25rem;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  color: rgba(255,255,255,0.85);
+}
+.navbar-brand-accent {
+  font-weight: 800;
+  background: linear-gradient(135deg, #4ade80 0%, #22d3ee 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
