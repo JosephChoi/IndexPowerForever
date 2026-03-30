@@ -10,9 +10,6 @@ window.__view_etf_detail = {
       compareData: null,
       isLoading: false,
       error: null,
-      comparisonChart: null,
-      excessChart: null,
-      annualChart: null,
       descExpanded: false,
       showTranslated: false,
       translatedDesc: null,
@@ -27,6 +24,13 @@ window.__view_etf_detail = {
     };
   },
 
+  created() {
+    // Chart.js 인스턴스를 Vue 반응성 시스템 밖에 저장 (Proxy 래핑 방지)
+    this._comparisonChart = null;
+    this._excessChart = null;
+    this._annualChart = null;
+  },
+
   mounted() {
     const ticker = this.getParam('ticker');
     if (!ticker) { this.navigateTo('/'); return; }
@@ -36,9 +40,9 @@ window.__view_etf_detail = {
   },
 
   beforeUnmount() {
-    if (this.comparisonChart) this.comparisonChart.destroy();
-    if (this.excessChart) this.excessChart.destroy();
-    if (this.annualChart) this.annualChart.destroy();
+    if (this._comparisonChart) this._comparisonChart.destroy();
+    if (this._excessChart) this._excessChart.destroy();
+    if (this._annualChart) this._annualChart.destroy();
   },
 
   computed: {
@@ -294,26 +298,15 @@ window.__view_etf_detail = {
       };
     },
 
-    // ① 누적 수익률 비교 라인 차트
-    renderComparisonChart() {
-      const ctx = this.$refs.comparisonChart;
-      if (!ctx) return;
-      if (this.comparisonChart) {
-        if (this.comparisonChart._dragCleanup) this.comparisonChart._dragCleanup();
-        this.comparisonChart.destroy();
-      }
-      this.dragSelection = null;
-
+    // 비교 차트용 데이터 준비 헬퍼
+    _prepareComparisonData() {
       const chart = this.compareData.chart;
-      // 모든 데이터셋의 날짜를 합쳐 정렬된 유니크 라벨 생성
       const allDates = new Set([
         ...chart.etf.map(d => d.date),
         ...chart.spy.map(d => d.date),
         ...chart.qqq.map(d => d.date),
       ]);
       const labels = [...allDates].sort();
-
-      // 날짜→값 맵 생성 (데이터 길이가 다를 때 정확한 날짜 매핑)
       const toMap = (arr, key = 'return') => {
         const m = new Map();
         for (const d of arr) m.set(d.date, d[key]);
@@ -322,15 +315,42 @@ window.__view_etf_detail = {
       const etfMap = toMap(chart.etf);
       const spyMap = toMap(chart.spy);
       const qqqMap = toMap(chart.qqq);
+      return {
+        labels,
+        etfData: labels.map(d => etfMap.get(d) ?? null),
+        spyData: labels.map(d => spyMap.get(d) ?? null),
+        qqqData: labels.map(d => qqqMap.get(d) ?? null),
+      };
+    },
 
-      this.comparisonChart = new Chart(ctx, {
+    // ① 누적 수익률 비교 라인 차트
+    renderComparisonChart() {
+      const ctx = this.$refs.comparisonChart;
+      if (!ctx) return;
+      this.dragSelection = null;
+
+      const { labels, etfData, spyData, qqqData } = this._prepareComparisonData();
+
+      // 기존 차트가 있으면 데이터만 업데이트
+      if (this._comparisonChart) {
+        this._comparisonChart.stop();
+        this._comparisonChart.data.labels = labels;
+        this._comparisonChart.data.datasets[0].label = this.ticker;
+        this._comparisonChart.data.datasets[0].data = etfData;
+        this._comparisonChart.data.datasets[1].data = spyData;
+        this._comparisonChart.data.datasets[2].data = qqqData;
+        this._comparisonChart.update();
+        return;
+      }
+
+      this._comparisonChart = new Chart(ctx, {
         type: 'line',
         data: {
           labels,
           datasets: [
             {
               label: this.ticker,
-              data: labels.map(d => etfMap.get(d) ?? null),
+              data: etfData,
               borderColor: '#0d6efd',
               borderWidth: 2,
               fill: false,
@@ -340,7 +360,7 @@ window.__view_etf_detail = {
             },
             {
               label: 'S&P 500',
-              data: labels.map(d => spyMap.get(d) ?? null),
+              data: spyData,
               borderColor: '#198754',
               borderWidth: 1.2,
               fill: false,
@@ -350,7 +370,7 @@ window.__view_etf_detail = {
             },
             {
               label: 'NASDAQ 100',
-              data: labels.map(d => qqqMap.get(d) ?? null),
+              data: qqqData,
               borderColor: '#fd7e14',
               borderWidth: 1.2,
               fill: false,
@@ -377,17 +397,30 @@ window.__view_etf_detail = {
     renderExcessChart() {
       const ctx = this.$refs.excessChart;
       if (!ctx) return;
-      if (this.excessChart) this.excessChart.destroy();
 
       const excess = this.compareData.chart.excess;
-      this.excessChart = new Chart(ctx, {
+      const labels = excess.map(d => d.date);
+      const data = excess.map(d => d.excess);
+      const bgColors = excess.map(d => d.excess >= 0 ? 'rgba(40,167,69,0.5)' : 'rgba(220,53,69,0.5)');
+
+      // 기존 차트가 있으면 데이터만 업데이트
+      if (this._excessChart) {
+        this._excessChart.stop();
+        this._excessChart.data.labels = labels;
+        this._excessChart.data.datasets[0].data = data;
+        this._excessChart.data.datasets[0].backgroundColor = bgColors;
+        this._excessChart.update();
+        return;
+      }
+
+      this._excessChart = new Chart(ctx, {
         type: 'bar',
         data: {
-          labels: excess.map(d => d.date),
+          labels,
           datasets: [{
             label: '초과수익률',
-            data: excess.map(d => d.excess),
-            backgroundColor: excess.map(d => d.excess >= 0 ? 'rgba(40,167,69,0.5)' : 'rgba(220,53,69,0.5)'),
+            data,
+            backgroundColor: bgColors,
             borderWidth: 0,
           }],
         },
@@ -407,17 +440,30 @@ window.__view_etf_detail = {
     renderAnnualChart() {
       const ctx = this.$refs.annualChart;
       if (!ctx) return;
-      if (this.annualChart) this.annualChart.destroy();
 
       const yearly = this.compareData.winAnalysis.yearlyReturns;
-      this.annualChart = new Chart(ctx, {
+      const labels = yearly.map(d => d.year);
+      const data = yearly.map(d => d.diff);
+      const bgColors = yearly.map(d => d.win ? '#28a745' : '#dc3545');
+
+      // 기존 차트가 있으면 데이터만 업데이트
+      if (this._annualChart) {
+        this._annualChart.stop();
+        this._annualChart.data.labels = labels;
+        this._annualChart.data.datasets[0].data = data;
+        this._annualChart.data.datasets[0].backgroundColor = bgColors;
+        this._annualChart.update();
+        return;
+      }
+
+      this._annualChart = new Chart(ctx, {
         type: 'bar',
         data: {
-          labels: yearly.map(d => d.year),
+          labels,
           datasets: [{
             label: '초과수익률',
-            data: yearly.map(d => d.diff),
-            backgroundColor: yearly.map(d => d.win ? '#28a745' : '#dc3545'),
+            data,
+            backgroundColor: bgColors,
             borderRadius: 3,
           }],
         },

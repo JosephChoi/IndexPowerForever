@@ -11,6 +11,7 @@ window.__view_retirement = {
         { label: 'S&P 500', annualRate: 10 },
         { label: 'NASDAQ 100', annualRate: 13 },
       ],
+      totalContrib: 0,
       results: [],
     };
   },
@@ -22,13 +23,27 @@ window.__view_retirement = {
   beforeUnmount() { if (this._chart) this._chart.destroy(); },
   methods: {
     calculate() {
-      const totalContrib = this.currentBalance + this.monthlyContrib * 12 * this.years;
+      this.totalContrib = this.currentBalance + this.monthlyContrib * 12 * this.years;
       const base = this._calcFinal(this.scenarios[0].annualRate);
       this.results = this.scenarios.map(s => {
         const finalAmount = this._calcFinal(s.annualRate);
-        return { ...s, finalAmount, profit: finalAmount - totalContrib, extra: finalAmount - base };
+        return { ...s, finalAmount, profit: finalAmount - this.totalContrib, extra: finalAmount - base };
       });
       this.$nextTick(() => this.renderChart());
+    },
+
+    // 만원 단위 → 억/만원 포맷
+    formatAmount(val) {
+      const abs = Math.abs(val);
+      const sign = val < 0 ? '-' : '';
+      if (abs >= 10000) {
+        const eok = Math.floor(abs / 10000);
+        const man = abs % 10000;
+        return man > 0
+          ? `${sign}${eok}억 ${man.toLocaleString()}만원`
+          : `${sign}${eok}억원`;
+      }
+      return `${sign}${abs.toLocaleString()}만원`;
     },
 
     _calcFinal(annualRate) {

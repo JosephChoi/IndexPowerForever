@@ -74,6 +74,20 @@ body { color: var(--text-primary); }
 .table-standard tbody tr:hover { background: rgba(13,110,253,0.04); }
 .table-standard tbody tr.row-highlight { background: rgba(25,135,84,0.06); }
 
+/* 비용 시뮬레이터 — 운용보수 열 강조 박스 */
+.fee-table-desktop .table-standard th:nth-child(2),
+.fee-table-desktop .table-standard td:nth-child(2) {
+  border-left: 3px solid var(--color-underperform);
+  border-right: 3px solid var(--color-underperform);
+}
+.fee-table-desktop .table-standard thead th:nth-child(2) {
+  border-top: 3px solid var(--color-underperform);
+  background: var(--color-underperform);
+}
+.fee-table-desktop .table-standard tbody tr:last-child td:nth-child(2) {
+  border-bottom: 3px solid var(--color-underperform);
+}
+
 /* ── 표준 배지 ── */
 .badge-standard {
   font-size: 0.8rem; padding: 0.3rem 0.6rem;
@@ -136,6 +150,96 @@ body { color: var(--text-primary); }
   box-shadow: var(--shadow-sm);
 }
 .sim-panel-title { font-size: 1rem; font-weight: 700; margin-bottom: var(--space-lg); }
+
+/* 퇴직연금 결과 카드 */
+.retirement-result-card {
+  background: #ffffff;
+  border: 1px solid #e9ecef;
+  border-radius: 16px;
+  padding: 1.5rem 1.25rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.retirement-result-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+.retirement-result-card--safe {
+  border-top: 4px solid #6c757d;
+  background: #f8f9fa;
+}
+.retirement-result-card--sp500 {
+  border-top: 4px solid var(--color-spy);
+  background: #ffffff;
+}
+.retirement-result-card--nasdaq {
+  border-top: 4px solid var(--color-ndx);
+  background: #ffffff;
+}
+.retirement-result-card--nasdaq .retirement-result-card__amount {
+  color: var(--color-ndx);
+}
+.retirement-result-card--nasdaq .retirement-result-card__detail .text-success {
+  color: var(--color-ndx) !important;
+}
+.retirement-result-card__badge {
+  display: inline-block;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  margin-bottom: 0.5rem;
+}
+.retirement-result-card__rate {
+  font-size: 0.85rem;
+  color: #495057;
+  margin-bottom: 0.75rem;
+}
+.retirement-result-card__amount {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+  line-height: 1.2;
+}
+.retirement-result-card__detail {
+  background: #f8f9fa;
+  border-radius: 10px;
+  padding: 0.75rem;
+  font-size: 0.85rem;
+  color: #495057;
+}
+.retirement-result-card--safe .retirement-result-card__detail {
+  background: #ffffff;
+}
+.retirement-extra-card {
+  background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+  border: 1px solid #bbf7d0;
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  text-align: center;
+}
+.retirement-extra-card--nasdaq {
+  background: linear-gradient(135deg, #fff7ed 0%, #fffbeb 100%);
+  border-color: #fed7aa;
+}
+.retirement-extra-card__label {
+  font-size: 0.78rem;
+  color: #495057;
+  margin-bottom: 0.2rem;
+}
+.retirement-extra-card__value {
+  font-size: 1rem;
+  font-weight: 800;
+}
+.retirement-extra-card__value--sp500 {
+  color: var(--color-spy);
+}
+.retirement-extra-card__value--nasdaq {
+  color: var(--color-ndx);
+}
 
 /* 히어로 섹션 */
 .hero-section {

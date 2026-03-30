@@ -15,11 +15,16 @@
           </div>
           <div class="mb-3">
             <div class="sim-slider-label"><span class="label">월 납입액</span><span class="value">{{ monthlyContrib.toLocaleString() }}만원</span></div>
-            <input type="range" class="sim-slider" min="10" max="500" step="10" v-model.number="monthlyContrib" @input="calculate" />
+            <input type="range" class="sim-slider" min="0" max="500" step="10" v-model.number="monthlyContrib" @input="calculate" />
           </div>
           <div class="mb-3">
             <div class="sim-slider-label"><span class="label">운용 기간</span><span class="value">{{ years }}년</span></div>
             <input type="range" class="sim-slider" min="5" max="40" v-model.number="years" @input="calculate" />
+          </div>
+        </div>
+        <div class="mt-3" style="background:#f8f9fa; border-radius:10px; padding:0.75rem 1rem; border-left:3px solid #adb5bd;">
+          <div style="font-size:0.78rem; color:#6c757d; line-height:1.5;">
+            <i class="bi bi-info-circle me-1"></i>본 시뮬레이션은 각 시나리오의 연수익률이 매년 동일하게 유지된다는 가정 하에 계산된 결과입니다. 실제 투자 수익률은 시장 상황에 따라 매년 달라지므로, 결과는 참고 목적으로만 활용하시기 바랍니다.
           </div>
         </div>
       </div>
@@ -31,13 +36,32 @@
         </div>
         <div class="row g-3">
           <div class="col-12 col-sm-4" v-for="(r, i) in results" :key="i">
-            <div class="card-base text-center" :class="i > 0 ? 'card-highlight' : ''" :style="i > 0 ? 'background:rgba(40,167,69,0.04)' : ''">
-              <div class="fw-bold mb-2">{{ r.label }}</div>
-              <div class="fw-bold" :class="i === 0 ? '' : 'text-outperform'" style="font-size:1.5rem">
-                {{ r.finalAmount.toLocaleString() }}<small class="fs-6 fw-normal">만</small>
+            <div class="retirement-result-card" :class="i === 0 ? 'retirement-result-card--safe' : i === 1 ? 'retirement-result-card--sp500' : 'retirement-result-card--nasdaq'">
+              <div class="retirement-result-card__badge" :style="{ background: i === 0 ? '#6c757d' : i === 1 ? '#198754' : '#fd7e14' }">
+                {{ r.label }}
               </div>
-              <div class="text-muted small mt-1">수익금 {{ r.profit.toLocaleString() }}만원</div>
-              <div class="text-success small fw-bold" v-if="i > 0">+{{ r.extra.toLocaleString() }}만원 더</div>
+              <div class="retirement-result-card__rate">연 {{ r.annualRate }}%</div>
+              <div class="retirement-result-card__amount">
+                {{ formatAmount(r.finalAmount) }}
+              </div>
+              <div class="retirement-result-card__detail">
+                <div class="d-flex justify-content-between mb-1">
+                  <span>원금</span>
+                  <span class="fw-semibold">{{ formatAmount(totalContrib) }}</span>
+                </div>
+                <div class="d-flex justify-content-between">
+                  <span>수익금</span>
+                  <span class="fw-bold" :class="r.profit >= 0 ? 'text-success' : 'text-danger'">+{{ formatAmount(r.profit) }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="retirement-extra-card mt-2" :class="i === 2 ? 'retirement-extra-card--nasdaq' : ''" v-if="i > 0">
+              <div class="retirement-extra-card__label">
+                <i class="bi bi-arrow-up-circle-fill"></i>원리금보장 대비
+              </div>
+              <div class="retirement-extra-card__value" :class="i === 1 ? 'retirement-extra-card__value--sp500' : 'retirement-extra-card__value--nasdaq'">
+                +{{ formatAmount(r.extra) }}
+              </div>
             </div>
           </div>
         </div>

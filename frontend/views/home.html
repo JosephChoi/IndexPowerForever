@@ -115,11 +115,11 @@
     </div>
 
     <!-- 인기 검색 TOP 5 -->
-    <section class="mb-5" v-if="popularEtfs.length > 0">
+    <section class="mb-5 text-center" v-if="popularEtfs.length > 0">
       <h2 class="h5 fw-bold mb-3">
         <i class="bi bi-fire text-danger me-2"></i>인기 검색 ETF
       </h2>
-      <div class="btn-group-selector">
+      <div class="btn-group-selector d-inline-flex flex-wrap justify-content-center">
         <button
           class="btn"
           v-for="(etf, idx) in popularEtfs"

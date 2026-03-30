@@ -22,6 +22,11 @@
             슬라이더를 조절하면 자동으로 시뮬레이션이 실행됩니다.
           </div>
         </div>
+        <div class="mt-3" style="background:#f8f9fa; border-radius:10px; padding:0.75rem 1rem; border-left:3px solid #adb5bd;">
+          <div style="font-size:0.78rem; color:#6c757d; line-height:1.5;">
+            <i class="bi bi-info-circle me-1"></i>본 시뮬레이션은 과거 실제 데이터를 기반으로 한 결과이며, 미래 수익률을 보장하지 않습니다. 시장 타이밍 전략의 위험성을 이해하기 위한 참고 자료로 활용하시기 바랍니다.
+          </div>
+        </div>
       </div>
 
       <div class="col-12 col-md-8">
@@ -30,7 +35,7 @@
           <button class="btn btn-sm btn-outline-danger ms-2" @click="simulate">재시도</button>
         </div>
 
-        <div class="loading-section-wrap">
+        <div class="loading-section-wrap d-flex flex-column h-100">
           <!-- 로딩 오버레이 -->
           <div v-if="isLoading" class="loading-section-overlay">
             <div class="loading-context">
@@ -45,18 +50,35 @@
               <i class="bi bi-calendar3 me-1"></i>
               {{ result.startYear }}년 ~ {{ result.endYear }}년 S&P 500(SPY) 기준 · 총 {{ result.tradingDays.toLocaleString() }}거래일
             </div>
-            <div class="row g-3">
-              <div class="col-12 col-sm-6" v-for="s in result.scenarios" :key="s.missingDays">
-                <div class="card-base" :class="s.missingDays === 0 ? 'card-highlight' : ''">
-                  <div class="text-muted small fw-semibold mb-1">
-                    <span v-if="s.missingDays === 0"><i class="bi bi-check-circle text-success me-1"></i>전체 투자 시</span>
-                    <span v-else><i class="bi bi-x-circle text-danger me-1"></i>상위 <strong>{{ s.missingDays }}일</strong> 놓쳤을 때</span>
+            <!-- 전체 투자 시 (상단 강조) -->
+            <div class="mb-3" v-if="result.scenarios.length > 0">
+              <div class="card-base text-center" style="border-left:4px solid var(--color-outperform); background:rgba(40,167,69,0.04); padding:1.25rem 1rem;">
+                <div class="d-flex align-items-center justify-content-center gap-3">
+                  <div class="text-muted small fw-semibold">
+                    <i class="bi bi-check-circle text-success me-1"></i>전체 투자 시
+                  </div>
+                  <div class="fw-bold" style="font-size:1.6rem" :class="result.scenarios[0].finalReturn >= 0 ? 'text-success' : 'text-danger'">
+                    {{ result.scenarios[0].finalReturn.toFixed(1) }}%
+                  </div>
+                  <div class="text-muted small">CAGR {{ result.scenarios[0].cagr.toFixed(1) }}%</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 놓쳤을 때 시나리오 (하단 그리드) -->
+            <div class="row g-3" style="flex:1;">
+              <div class="col-6 col-lg-3 d-flex" v-for="s in result.scenarios.slice(1)" :key="s.missingDays">
+                <div class="card-base text-center d-flex flex-column justify-content-center w-100" style="border-top:3px solid var(--color-underperform);">
+                  <div class="mb-3" style="color:#495057;">
+                    <div style="font-size:0.8rem;">상위</div>
+                    <div class="fw-bold" style="font-size:1.5rem; line-height:1.2; color:var(--color-ndx);">{{ s.missingDays }}일</div>
+                    <div style="font-size:0.8rem;">제외되었을 때</div>
                   </div>
                   <div class="fw-bold" style="font-size:1.5rem" :class="s.finalReturn >= 0 ? 'text-success' : 'text-danger'">
                     {{ s.finalReturn.toFixed(1) }}%
                   </div>
-                  <div class="text-muted small">CAGR {{ s.cagr.toFixed(1) }}%</div>
-                  <div class="text-danger small fw-semibold" v-if="s.missingDays > 0 && result.scenarios[0]">
+                  <div class="text-muted small mt-2">CAGR {{ s.cagr.toFixed(1) }}%</div>
+                  <div class="text-danger small fw-semibold mt-1">
                     {{ (s.finalReturn - result.scenarios[0].finalReturn).toFixed(1) }}%p 손실
                   </div>
                 </div>

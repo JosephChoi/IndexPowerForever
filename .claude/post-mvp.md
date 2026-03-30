@@ -1,7 +1,7 @@
 # Index Power Forever — Post-MVP 추가 기능
 
 > MVP(Phase 0~4) 완료 후 추가되는 기능/변경 사항을 별도 관리합니다.
-> 마지막 업데이트: 2026-03-30
+> 마지막 업데이트: 2026-03-31 (세션 #15)
 
 ## 관리 원칙
 
@@ -39,10 +39,68 @@
 | P-022 | ETF 상세 모바일 헤더 레이아웃 개선 | [x] | 2026-03-30 | 2026-03-30 | 메타칩 같은 행 배치, 검색 버튼 우상단 고정, flex-wrap nowrap |
 | P-023 | 네비게이션/탭바/스피너 정리 | [x] | 2026-03-30 | 2026-03-30 | 메뉴 "성과비교"→"랭킹" 복원, 벤치마크 라벨, 랭킹 스피너 중앙 배치 |
 | P-024 | 프론트엔드 중복 배포 워크플로우 제거 | [x] | 2026-03-30 | 2026-03-30 | deploy-frontend.yml 삭제, Cloudflare Pages Git 연동 단일화 |
+| P-025 | 프론트엔드/백엔드 전체 검증 + 미정의 CSS 3건 수정 | [x] | 2026-03-30 | 2026-03-30 | book-cover-shadow, book-author, desc-toggle-wrap CSS 추가 |
+| P-026 | 서비스 로고 SVG + 파비콘 생성 및 적용 | [x] | 2026-03-30 | 2026-03-30 | 우상향 차트 디자인 SVG, 네비게이션 Bootstrap Icons → SVG 로고 교체 |
+| P-027 | 탭바 밑줄 스타일 복원 + 연한 블루 배경 | [x] | 2026-03-30 | 2026-03-30 | ETF 상세 모바일 탭바 디자인 강화 |
+| P-028 | SPY 전체기간 NASDAQ 100 차트/수치 잘림 버그 수정 | [x] | 2026-03-30 | 2026-03-30 | CompareService 벤치마크별 실제 기간 CAGR 산출, 차트 날짜 합집합 매핑 |
+| P-029 | 홈 인기 프리셋 즉시 표시 (API 호출 제거) | [x] | 2026-03-30 | 2026-03-30 | 프리셋 6개 하드코딩, 로딩 오버레이 제거 |
+| P-030 | 서비스명 indexwins로 변경 | [x] | 2026-03-30 | 2026-03-30 | 네비게이션 바 타이포그래피 로고, 페이지 타이틀 변경 |
+| P-031 | 커스텀 도메인 indexwins.com 설정 | [x] | 2026-03-30 | 2026-03-30 | 가비아→Cloudflare 네임서버, Pages/Workers 커스텀 도메인, API URL 변경 |
+| P-032 | ETF 상세 차트 기간/벤치마크 전환 애니메이션 | [x] | 2026-03-31 | 2026-03-31 | destroy→재생성 대신 데이터 업데이트 방식, Chart.js 인스턴스 반응성 밖 관리로 stack overflow 해결 |
+| P-033 | 퇴직연금 시뮬레이터 UX 개선 | [x] | 2026-03-31 | 2026-03-31 | 연수익률 표시, 억/만원 포맷, 카드 디자인 개선, 초과수익 분리, 0원 허용, 디스클레이머 |
+| P-034 | 비용 시뮬레이터 운용보수 강조 + 디스클레이머 | [x] | 2026-03-31 | 2026-03-31 | 운용보수 열 빨간 볼드+테두리, 하단 디스클레이머 추가 |
+| P-035 | 타이밍 시뮬레이터 카드 레이아웃 + 디스클레이머 | [x] | 2026-03-31 | 2026-03-31 | 전체 투자 강조 카드 상단, 4열 그리드, 문구 개선, 디스클레이머 추가 |
+| P-036 | 로컬 개발 서버 생성 | [x] | 2026-03-31 | 2026-03-31 | dev-server.js — SPA fallback 지원 |
 
 ---
 
 ## 📝 Post-MVP 작업 로그
+
+### 세션 #15 — 2026-03-31 KST
+
+**P-032**: ETF 상세 차트 기간/벤치마크 전환 시 부드러운 애니메이션 적용. 기존 destroy→재생성 방식을 Chart.js `data.labels`, `data.datasets` 직접 업데이트 방식으로 변경. Chart.js 인스턴스를 `this._chart`로 Vue 반응성 시스템 밖에 저장하고 `created()` 훅에서 초기화하여 반응성 추적으로 인한 stack overflow 해결.
+
+**P-033**: 퇴직연금 시뮬레이터 전반적인 UX 개선. 각 시나리오 카드에 연수익률(연 2.5%, 연 10%, 연 13%) 표시. 금액 포맷을 만원 단위에서 억/만원 단위로 변환(예: 7억 4,690만원). 원금과 수익금을 카드 하단에 분리 표시. 결과 카드 디자인 강화(컬러 배지, 상단 보더, 호버 효과). NASDAQ 카드에 주황색 테마 적용. 원리금보장 대비 초과 수익을 각 카드 하단에 별도 카드로 분리. 월 납입액 최소값 0원 허용. 하단 디스클레이머 추가.
+
+**P-034**: 비용 시뮬레이터 개선. 운용보수 테이블 열에 빨간색 볼드 강조 및 빨간 테두리 박스 적용. 하단 디스클레이머 추가.
+
+**P-035**: 타이밍 시뮬레이터 카드 레이아웃 및 문구 개선. 전체 투자 시 결과를 상단 강조 카드로 분리하고, 일부 기간 제외 시나리오를 하단 4열 그리드로 배치. "상위 N일 제외되었을 때" 문구로 개선하고 일수를 주황색으로 강조. 마이너스 수익률 빨간색 표시 유지. 하단 디스클레이머 추가.
+
+**P-036**: SPA fallback을 지원하는 로컬 개발 서버 `dev-server.js` 생성.
+
+변경 파일: `frontend/logic/etf-detail.js`, `frontend/views/retirement.html`, `frontend/logic/retirement.js`, `frontend/views/fee-simulator.html`, `frontend/views/timing.html`, `frontend/logic/timing.js`, `dev-server.js`
+
+---
+
+### 세션 #14 — 2026-03-30 KST
+
+**P-028**: SPY 전체기간에서 NASDAQ 100 차트/수치가 잘리는 버그 수정. 백엔드 CompareService에서 SPY/QQQ 각각의 실제 데이터 시작일 기준으로 CAGR을 독립 계산하도록 수정. 프론트엔드 Chart.js에서 날짜 합집합 기반 인덱스 매핑으로 각 데이터셋이 정확한 위치에 그려지도록 변경. 드래그 선택 기능 동일하게 수정, null 안전 처리 추가.
+
+**P-029**: 홈 인기 프리셋을 로딩 없이 즉시 표시. /api/presets API 호출 제거, 프리셋 6개 home.js에 하드코딩. 로딩 오버레이 제거, 페이지 진입 즉시 카드 표시.
+
+**P-030**: 서비스명을 indexwins로 변경. 네비게이션 바에 "index"(light 400) + "wins"(bold 800 녹색→시안 그라데이션) 타이포그래피 로고 적용. 페이지 타이틀 "indexwins — 지수 투자의 과학"으로 변경.
+
+**P-031**: 커스텀 도메인 indexwins.com 설정. 가비아 네임서버를 Cloudflare로 변경(chris.ns.cloudflare.com, wally.ns.cloudflare.com). Cloudflare DNS CNAME 레코드 추가. Pages 커스텀 도메인 indexwins.com, Workers 커스텀 도메인 api.indexwins.com 설정. 프론트엔드 API URL을 api.indexwins.com으로 변경.
+
+변경 파일: `backend/src/services/CompareService.js`, `frontend/logic/etf-detail.js`, `frontend/views/etf-detail.html`, `frontend/logic/home.js`, `frontend/views/home.html`, `frontend/components/navbar.html`, `frontend/css/style.css`, `frontend/index.html`, `frontend/logic/app.js`
+
+커밋: `12c105b`, `34d75bf`, `6945607`, `6efad00`
+
+---
+
+### 세션 #13 — 2026-03-30 17:00 KST
+
+**P-025**: 프론트엔드/백엔드 전체 검증 수행. 미정의 CSS 클래스 3건(book-cover-shadow, book-author, desc-toggle-wrap) 발견 및 수정.
+
+**P-026**: 서비스 로고 SVG 생성(우상향 차트 디자인). 파비콘 SVG 생성 및 index.html 적용. 네비게이션 바 Bootstrap Icons → SVG 로고 교체.
+
+**P-027**: ETF 상세 모바일 탭바 밑줄 스타일 복원 + 연한 블루 배경 디자인 강화.
+
+변경 파일: `frontend/css/style.css`, `frontend/components/navbar.html`, `frontend/index.html`, `frontend/assets/logo.svg`, `frontend/assets/favicon.svg`
+
+커밋: `d11b07c`
+
+---
 
 ### 세션 #12 — 2026-03-30 (KST)
 
