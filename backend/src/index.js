@@ -62,12 +62,13 @@ export default {
   // Cron Trigger: 매일 KST 07:00 (UTC 22:00) 주요 종목 가격 업데이트
   async scheduled(event, env, ctx) {
     const service = new DailyUpdateService(env);
-    const results = await service.run();
-    console.log('[DailyUpdate]', JSON.stringify({
-      success: results.success.length,
-      failed: results.failed.length,
-      skipped: results.skipped.length,
-      details: results,
+    ctx.waitUntil(service.run().then(results => {
+      console.log('[DailyUpdate]', JSON.stringify({
+        success: results.success.length,
+        failed: results.failed.length,
+        skipped: results.skipped.length,
+        details: results,
+      }));
     }));
   },
 };
