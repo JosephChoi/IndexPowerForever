@@ -25,11 +25,29 @@ app.route('/api/translate', translateRoute);
 // 헬스체크
 app.get('/health', (c) => c.json({ status: 'ok', service: 'index-power-forever' }));
 
-// 수동 데이터 업데이트 트리거 (초기 세팅 + 디버그용)
+// 수동 데이터 업데이트 트리거 (초기 세팅 + 디버그용) — waitUntil로 타임아웃 방지
 app.get('/api/admin/update-prices', async (c) => {
   const service = new DailyUpdateService(c.env);
-  const results = await service.run();
-  return c.json({ data: results });
+  c.executionCtx.waitUntil(service.run().then(results => {
+    console.log('[ManualUpdate]', JSON.stringify({
+      success: results.success.length,
+      failed: results.failed.length,
+      skipped: results.skipped.length,
+      details: results,
+    }));
+  }));
+  return c.json({ data: { message: '업데이트가 백그라운드에서 시작되었습니다. 완료까지 약 5~10분 소요됩니다.' } });
+});
+
+// Yahoo API 연결 테스트 — SPY 1개만 업데이트하여 즉시 결과 확인
+app.get('/api/admin/test-update', async (c) => {
+  const service = new DailyUpdateService(c.env);
+  try {
+    const updated = await service._updateTicker('SPY');
+    return c.json({ data: { ticker: 'SPY', newRows: updated, status: 'ok' } });
+  } catch (e) {
+    return c.json({ data: { ticker: 'SPY', error: e.message, status: 'failed' } });
+  }
 });
 
 // 에러 핸들러
