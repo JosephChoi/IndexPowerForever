@@ -2,6 +2,67 @@
 
 ---
 
+## 세션 #17 — 2026-04-01 19:54 KST
+
+### 시작 시 상태
+- Phase 0~4 완료 (42/42) + Post-MVP P-001~P-038 완료
+
+### 목표
+- 차트 드래그 선택 시 선택 영역 시각화 (음영+경계선)
+
+### 결과
+- **P-039**: 차트 드래그 선택 영역 시각화
+  - 드래그 중 + 선택 완료 후 모두 선택 영역 하이라이트 유지
+  - 반투명 파란색 배경(opacity 0.12) + 점선 테두리 + 양쪽 수직 경계선
+  - 새 드래그 시작 시 이전 선택 자동 초기화
+  - X 버튼(clearDragSelection)으로 해제 시 차트 하이라이트도 동시 제거
+  - **핵심 수정**: state를 `chart.options.plugins`가 아닌 `chart._dragState`에 직접 저장 — Chart.js의 options 프록시/복제로 인한 참조 끊김 문제 해결
+
+### 변경 파일
+- `frontend/logic/etf-detail.js` — dragSelect 플러그인 state 저장 위치 변경 + 선택 영역 시각화
+
+### 다음 세션 할 일
+- 드래그 선택 영역 시각화 정상 동작 확인 후 커밋
+
+---
+
+## 세션 #16 — 2026-03-31 20:22 KST
+
+### 시작 시 상태
+- Phase 0~4 완료 (42/42) + Post-MVP P-001~P-036 완료
+- 일일 가격 업데이트 cron이 3/26 이후 멈춤 발견
+
+### 목표
+- 일일 가격 업데이트 cron 타임아웃 문제 진단 및 수정
+- PM 스킬 복구 (commands → skills 마이그레이션)
+
+### 결과
+- **P-037**: 일일 가격 업데이트 타임아웃 수정
+  - 원인: 200개 종목 × 1.5초 = 5분+ 소요 → Workers 실행 시간 초과
+  - `scheduled()` handler에 `ctx.waitUntil()` 적용하여 백그라운드 실행
+  - `/api/admin/update-prices`도 `c.executionCtx.waitUntil()`로 타임아웃 방지
+  - `/api/admin/test-update` 엔드포인트 추가 (SPY 1개만 빠른 진단용)
+  - 수동 테스트 결과: Yahoo API 정상 작동 확인 (status: ok)
+- **P-038**: PM 스킬 복구
+  - `.claude/commands/pm.md` → `.claude/skills/pm/skill.md`로 마이그레이션
+- 에이전트 규칙 업데이트: worklog 시간 기록 규칙 명확화 (실제 시각 기입)
+
+### 변경 파일
+- `backend/src/index.js` — waitUntil() 적용, test-update 엔드포인트 추가
+- `.claude/skills/pm/skill.md` — PM 스킬 신규 생성 (commands에서 이전)
+- `.claude/agents/project-manager.md` — 시간 기록 규칙 명확화
+
+### 다음 세션 할 일
+- Cloudflare 대시보드에서 cron 실행 로그 확인 (다음 날 KST 07:00 이후)
+- 책 구매 링크 URL 확정 후 book.html 수정 (수동 작업)
+
+### 참고사항
+- Post-MVP 누적: P-001~P-038 완료
+- cron이 정상 작동하는지 내일(4/1) KST 07:00 이후 데이터 업데이트 여부 확인 필요
+- PriceService에 4일 이상 stale 시 실시간 Yahoo fetch 로직 있음 → cron 실패해도 사용자 조회 시 자동 갱신
+
+---
+
 ## 세션 #15 — 2026-03-31 KST
 
 ### 시작 시 상태

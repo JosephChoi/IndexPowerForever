@@ -155,6 +155,15 @@ window.__view_etf_detail = {
     // 드래그 선택 해제
     clearDragSelection() {
       this.dragSelection = null;
+      // 차트의 선택 영역 하이라이트도 제거
+      if (this._comparisonChart) {
+        const state = this._comparisonChart._dragState;
+        if (state) {
+          state.selectedStartX = null;
+          state.selectedEndX = null;
+        }
+        this._comparisonChart.draw();
+      }
     },
 
     // 드래그 구간 수익률 계산 (누적수익률 기반)
@@ -170,35 +179,52 @@ window.__view_etf_detail = {
       const vm = this;
       return {
         id: 'dragSelect',
-        _state: { dragging: false, startX: null, endX: null },
 
-        // 드래그 영역 그리기
+        // 드래그 영역 그리기 (드래그 중 + 선택 완료 후 모두)
         afterDraw(chart) {
-          const state = chart.options.plugins.dragSelect?._state;
-          if (!state || !state.dragging || state.startX === null || state.endX === null) return;
+          const state = chart._dragState;
+          if (!state) return;
+
+          // 드래그 중이면 현재 좌표로, 선택 완료 후에는 저장된 좌표로
+          const drawStartX = state.dragging ? state.startX : state.selectedStartX;
+          const drawEndX = state.dragging ? state.endX : state.selectedEndX;
+          if (drawStartX === null || drawEndX === null) return;
 
           const { ctx, chartArea } = chart;
-          const left = Math.min(state.startX, state.endX);
-          const right = Math.max(state.startX, state.endX);
+          const left = Math.min(drawStartX, drawEndX);
+          const right = Math.max(drawStartX, drawEndX);
           const clampL = Math.max(left, chartArea.left);
           const clampR = Math.min(right, chartArea.right);
           if (clampR <= clampL) return;
 
           ctx.save();
-          ctx.fillStyle = 'rgba(13, 110, 253, 0.1)';
+          // 선택 영역 배경
+          ctx.fillStyle = 'rgba(13, 110, 253, 0.12)';
           ctx.fillRect(clampL, chartArea.top, clampR - clampL, chartArea.bottom - chartArea.top);
-          ctx.strokeStyle = 'rgba(13, 110, 253, 0.4)';
-          ctx.lineWidth = 1;
-          ctx.setLineDash([4, 4]);
+          // 선택 영역 테두리
+          ctx.strokeStyle = 'rgba(13, 110, 253, 0.5)';
+          ctx.lineWidth = 1.5;
+          ctx.setLineDash([6, 3]);
           ctx.strokeRect(clampL, chartArea.top, clampR - clampL, chartArea.bottom - chartArea.top);
+          // 양쪽 수직 경계선
+          ctx.setLineDash([]);
+          ctx.strokeStyle = 'rgba(13, 110, 253, 0.7)';
+          ctx.lineWidth = 2;
+          [clampL, clampR].forEach(x => {
+            ctx.beginPath();
+            ctx.moveTo(x, chartArea.top);
+            ctx.lineTo(x, chartArea.bottom);
+            ctx.stroke();
+          });
           ctx.restore();
         },
 
         // 이벤트 핸들러
         afterInit(chart) {
           const canvas = chart.canvas;
-          const state = { dragging: false, startX: null, endX: null };
-          chart.options.plugins.dragSelect = { _state: state };
+          // chart 인스턴스에 직접 state 저장 (options 프록시 문제 방지)
+          const state = { dragging: false, startX: null, endX: null, selectedStartX: null, selectedEndX: null };
+          chart._dragState = state;
 
           const getX = (e) => {
             const rect = canvas.getBoundingClientRect();
@@ -255,6 +281,10 @@ window.__view_etf_detail = {
             state.dragging = true;
             state.startX = x;
             state.endX = x;
+            // 이전 선택 영역 클리어
+            state.selectedStartX = null;
+            state.selectedEndX = null;
+            vm.dragSelection = null;
             if (e.type === 'touchstart') e.preventDefault();
           };
 
@@ -269,6 +299,15 @@ window.__view_etf_detail = {
           const onEnd = () => {
             if (!state.dragging) return;
             state.dragging = false;
+            // 유효한 선택이면 좌표 저장하여 영역 유지
+            if (state.startX !== null && state.endX !== null) {
+              const startIdx = getDataIndex(chart, state.startX);
+              const endIdx = getDataIndex(chart, state.endX);
+              if (startIdx !== endIdx) {
+                state.selectedStartX = state.startX;
+                state.selectedEndX = state.endX;
+              }
+            }
             chart.draw();
           };
 
