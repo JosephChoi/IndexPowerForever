@@ -2,6 +2,47 @@
 
 ---
 
+## 세션 #18 — 2026-04-06 19:16 KST
+
+### 시작 시 상태
+- Phase 0~4 완료 (42/42) + Post-MVP P-001~P-039 진행
+
+### 목표
+- P-040: 서비스 이용 매뉴얼 작성 (책자 삽입용)
+- P-041: OG 이미지 + 웹앱 아이콘 + PWA manifest 생성
+
+### 결과
+
+**P-040**: 서비스 이용 매뉴얼 작성 완료. Puppeteer로 전체 8개 페이지 + 모바일 3개 = 14장 스크린샷 자동 캡처. 매뉴얼 8개 섹션(홈/랭킹/ETF상세/비용시뮬레이터/타이밍시뮬레이터/퇴직연금시뮬레이터/인사이트/메뉴요약) 작성. 각 섹션에 책 파트 연계 포인트 포함. Markdown → Word(.docx) 변환 (pandoc).
+
+**P-041**: OG 이미지 + 웹앱 아이콘 생성 및 적용.
+- `og-image.png` (1200x630): SNS 공유 미리보기 — 다크 히어로 배경 + 서비스명 + 차트 아이콘
+- `apple-touch-icon-180.png` (180x180): iOS 홈 화면 아이콘
+- `favicon-192.png` / `favicon-512.png`: Android PWA 아이콘
+- `favicon-32.png`: 브라우저 탭 PNG 파비콘
+- `manifest.json`: 웹앱 매니페스트 생성 (standalone 모드)
+- `index.html`: OG 메타태그, Twitter Card, apple-touch-icon, manifest 링크, theme-color 추가
+
+### 변경/생성 파일
+- `manual/서비스_이용_매뉴얼.md` (신규)
+- `manual/서비스_이용_매뉴얼.docx` (신규)
+- `manual/screenshots/*.png` — 14장 (신규)
+- `manual/capture-screenshots.js` (신규 — 도구)
+- `manual/generate-icons.js` (신규 — 도구)
+- `frontend/images/og-image.png` (신규)
+- `frontend/images/apple-touch-icon-180.png` (신규)
+- `frontend/images/favicon-192.png` (신규)
+- `frontend/images/favicon-512.png` (신규)
+- `frontend/images/favicon-32.png` (신규)
+- `frontend/manifest.json` (신규)
+- `frontend/index.html` (수정 — OG/Twitter/PWA 메타태그 추가)
+
+### 다음 세션 할 일
+- P-039 (차트 드래그 선택 영역 시각화) 마무리
+- 책 구매 링크 URL 확정 후 book.html 반영
+
+---
+
 ## 세션 #17 — 2026-04-01 19:54 KST
 
 ### 시작 시 상태
