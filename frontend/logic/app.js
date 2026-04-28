@@ -2,10 +2,10 @@
 const { createApp, defineComponent, ref } = Vue;
 const { createRouter, createWebHistory } = VueRouter;
 
-// API Base URL — 개발/운영 환경 자동 감지
-const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+// API Base URL — 운영은 same-origin(상대경로), 로컬 dev(프론트 8080)는 백엔드(8787)로 분기
+const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
   ? 'http://localhost:8787'
-  : 'https://api.indexwins.com';
+  : '';
 
 // $api 플러그인 — JWT 없는 단순 fetch wrapper
 const apiPlugin = {

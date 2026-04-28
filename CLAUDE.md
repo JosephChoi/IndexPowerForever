@@ -11,23 +11,28 @@
 
 ## 배포
 
-> **수동 배포 금지. `wrangler deploy` / `wrangler pages deploy` 직접 실행 절대 금지.**
+> **수동 배포 금지. `wrangler deploy` 직접 실행 절대 금지.**
 > **모든 배포는 `git commit` + `git push`로만.**
 
-| 대상 | 배포 방식 | 트리거 |
-|---|---|---|
-| Frontend | **Cloudflare Pages Git 연동** (대시보드 설정) | `main` push 자동 감지 |
-| Backend | **GitHub Actions** (`deploy-backend.yml`) | `backend/**` push |
+**Workers 단일 배포 (Static Assets 통합)** — 정적(frontend)과 API(backend)가 같은 Worker에서 서빙.
 
-- Frontend: `https://indexpowerforever.pages.dev`
-- Backend: `https://index-power-forever.sixman-joseph.workers.dev`
-- `.claude/`, 루트 파일 변경은 배포 트리거 안 됨
+| 항목 | 설정 |
+|---|---|
+| 배포 방식 | **Cloudflare Workers Builds** (대시보드에서 GitHub repo 직접 연결) |
+| Git 연동 설정 | repo `IndexPowerForever`, branch `main`, **Root directory `backend`**, deploy `npx wrangler deploy` |
+| 트리거 | `main` push 자동 감지 (전체 watch) |
+| Worker 이름 | `index-power-forever` |
+| 정적 자산 | `wrangler.toml [assets]` → `directory = "../frontend"`, SPA fallback |
+| 운영 도메인 | `indexwins.com` (Worker Custom Domain) |
+| API 호출 | same-origin (`/api/*` 상대경로) — CORS 불필요 |
 
 ### 배포 주의사항
 
-- **Frontend는 GitHub Actions 워크플로우 없음** — Cloudflare Pages가 Git 연동으로 직접 배포. GitHub Actions로 중복 배포 워크플로우(`deploy-frontend.yml`)를 만들면 **같은 커밋이 2번 배포**되므로 절대 만들지 말 것
-- **Backend(Workers)는 Git 연동 불가** — Cloudflare Workers는 Git 연동을 지원하지 않으므로 GitHub Actions가 유일한 자동 배포 수단
-- 배포 워크플로우 신규 생성/수정 시 위 구조를 반드시 확인하여 중복 배포 방지
+- `[assets]` directory 경로는 wrangler.toml(=`backend/`) 기준 → **`../frontend`** (절대 `./frontend` 아님)
+- Vue Router가 history 모드라 `not_found_handling = "single-page-application"` 필수
+- CORS는 로컬 dev(프론트 8080 → 백엔드 8787) 전용으로만 동작 (`backend/src/middleware/cors.js`)
+- 프론트 `API_BASE`는 운영 시 `''`(상대경로). `https://api.indexwins.com` 등 절대 URL 하드코딩 금지
+- **GitHub Actions 워크플로우 신규 생성 금지** — Workers Builds가 유일한 자동 배포 수단. `.github/workflows/`에 deploy 워크플로우를 다시 만들면 같은 커밋이 2번 배포됨
 
 ## 구조
 

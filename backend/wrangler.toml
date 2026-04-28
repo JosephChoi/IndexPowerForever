@@ -3,6 +3,17 @@ main = "src/index.js"
 compatibility_date = "2024-11-01"
 compatibility_flags = ["nodejs_compat"]
 
+# 정적 자산을 같은 Worker에서 서빙 (Pages 분리 운영 → 단일 Worker로 통합)
+# /api/* 는 Worker 라우트, 그 외 경로는 frontend 정적 파일
+# 매칭되는 파일이 없으면 SPA 라우팅으로 index.html 폴백
+[assets]
+directory = "../frontend"
+not_found_handling = "single-page-application"
+binding = "ASSETS"
+
+[dev]
+port = 8787
+
 [[d1_databases]]
 binding = "DB"
 database_name = "index-power-forever"

@@ -2,6 +2,36 @@
 
 ---
 
+## 세션 #20 — 2026-04-28 22:28 KST
+
+### 목표
+- Cloudflare Pages + Workers 분리 배포 → **Workers 단일 배포(Static Assets 통합)** 마이그레이션
+- 가이드: `/Users/joseph/AICording/SP500Simulator/.claude/docs/migration-guide-workers-unified.md`
+
+### 변경 사항 (코드)
+- `backend/wrangler.toml` — `[assets]` 블록 추가 (`directory = "../frontend"`, `not_found_handling = "single-page-application"`, `binding = "ASSETS"`), `[dev] port = 8787`
+- `backend/src/middleware/cors.js` — Hono cors() 제거, 로컬 dev(8080) 전용 핸드롤 미들웨어로 교체 (운영은 same-origin)
+- `frontend/logic/app.js` — `API_BASE`를 운영에선 `''`(상대경로)로 단순화 (기존 `https://api.indexwins.com` 제거)
+- `.github/workflows/deploy-backend.yml` — **삭제** (Cloudflare Workers Builds Git 연동으로 대체, 중복 배포 방지)
+- `CLAUDE.md` — 배포 섹션을 Workers 단일 구조로 재작성
+
+### 대시보드 작업 (완료/진행중)
+- Worker에 Custom Domain `indexwins.com`, `www.indexwins.com`, `api.indexwins.com` 등록 완료
+- Cloudflare Workers Builds Git 연동 설정 완료 (repo `IndexPowerForever`, branch `main`, root `backend`, deploy `npx wrangler deploy`)
+
+### 다음 세션 할 일
+1. push 후 Workers Builds 자동 배포 확인 (대시보드 Deployments)
+2. 운영 도메인 검증 — `https://indexwins.com/`, `https://indexwins.com/api/health`, SPA 라우팅, OPTIONS preflight 사라짐
+3. Pages 프로젝트 삭제
+4. (선택) `api.indexwins.com` 호환용 유지 또는 제거
+
+### 참고사항
+- Vue Router history 모드 → `not_found_handling = "single-page-application"` 필수
+- 프론트 dev 서버 포트 8080, 백엔드 wrangler dev 8787
+- D1/KV/AI 바인딩 그대로 유지, Cron trigger 그대로 유지
+
+---
+
 ## 세션 #18 — 2026-04-06 19:16 KST
 
 ### 시작 시 상태
