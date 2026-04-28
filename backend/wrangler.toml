@@ -29,3 +29,6 @@ binding = "AI"
 # 매일 KST 07:00 (UTC 22:00) 주요 종목 가격 자동 업데이트 (월~금)
 [triggers]
 crons = ["0 22 * * 1-5"]
+
+# Workers Builds 트리거 검증용 (빈 주석)
+
