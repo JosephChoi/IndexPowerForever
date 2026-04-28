@@ -18,6 +18,7 @@
 ### 대시보드 작업 (완료/진행중)
 - Worker에 Custom Domain `indexwins.com`, `www.indexwins.com`, `api.indexwins.com` 등록 완료
 - Cloudflare Workers Builds Git 연동 설정 완료 (repo `IndexPowerForever`, branch `main`, root `backend`, deploy `npx wrangler deploy`)
+- Pages 프로젝트 Git 자동 배포 비활성화 (분기 제어 → 자동 배포 off) — 중복 배포 차단 검증용 push 진행
 
 ### 다음 세션 할 일
 1. push 후 Workers Builds 자동 배포 확인 (대시보드 Deployments)
