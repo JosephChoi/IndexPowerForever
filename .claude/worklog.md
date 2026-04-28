@@ -15,21 +15,36 @@
 - `.github/workflows/deploy-backend.yml` — **삭제** (Cloudflare Workers Builds Git 연동으로 대체, 중복 배포 방지)
 - `CLAUDE.md` — 배포 섹션을 Workers 단일 구조로 재작성
 
-### 대시보드 작업 (완료/진행중)
-- Worker에 Custom Domain `indexwins.com`, `www.indexwins.com`, `api.indexwins.com` 등록 완료
-- Cloudflare Workers Builds Git 연동 설정 완료 (repo `IndexPowerForever`, branch `main`, root `backend`, deploy `npx wrangler deploy`)
-- Pages 프로젝트 Git 자동 배포 비활성화 (분기 제어 → 자동 배포 off) — 중복 배포 차단 검증용 push 진행
+### 대시보드 작업 (모두 완료)
+- Worker에 Custom Domain `indexwins.com`, `www.indexwins.com`, `api.indexwins.com` 등록
+- Cloudflare Workers Builds Git 연동 (repo `IndexPowerForever`, branch `main`, **root `backend`**, deploy `npx wrangler deploy`)
+- Pages 프로젝트 Git 자동 배포 비활성화 후 push 검증 → Pages는 "건너뜀", Worker만 빌드되는 것 확인
+- Pages 프로젝트 누적 deployment 정리 후 프로젝트 삭제 완료
+  - 138개 deployment가 임계치(약 100개) 초과로 UI 삭제 차단됨 → Cloudflare REST API로 일괄 삭제(`DELETE /accounts/:acc/pages/projects/:proj/deployments/:id?force=true`)
+  - 임계치 이하로 줄인 뒤 UI에서 프로젝트 삭제 성공
+  - 작업용 API 토큰은 작업 후 즉시 폐기
 
-### 다음 세션 할 일
-1. push 후 Workers Builds 자동 배포 확인 (대시보드 Deployments)
-2. 운영 도메인 검증 — `https://indexwins.com/`, `https://indexwins.com/api/health`, SPA 라우팅, OPTIONS preflight 사라짐
-3. Pages 프로젝트 삭제
-4. (선택) `api.indexwins.com` 호환용 유지 또는 제거
+### 운영 검증 결과
+- `https://indexwins.com/` → 200 (Worker가 정적 파일 서빙)
+- `https://indexwins.com/health` → `{"status":"ok","service":"index-power-forever"}` 정상
+- 브라우저 DevTools Network에 OPTIONS preflight 사라짐 (same-origin)
+- SPA 라우팅(history mode) 정상
 
-### 참고사항
+### 효과
+- 도메인 1개로 일원화 (Pages 정적 + Workers API → Worker 1개)
+- CORS preflight 제거 → API 첫 응답 수십~수백 ms 단축
+- 정적 파일 요청은 Workers 요청 카운트 미포함 → 비용 영향 0
+- 배포 채널 단일화 (GitHub push → Workers Builds 1회)
+
+### 참고사항 / 함정 정리
+- `[assets] directory`는 wrangler.toml(=`backend/`) 기준 → **`../frontend`** (절대 `./frontend` 아님)
 - Vue Router history 모드 → `not_found_handling = "single-page-application"` 필수
+- Workers Builds Root directory를 **`backend`**로 지정해야 wrangler.toml 발견됨 (가장 빠뜨리기 쉬움)
+- GitHub Actions 워크플로우와 Workers Builds 동시 활성화 시 중복 배포 → Actions 삭제 필수
+- Pages 프로젝트 자체에도 별도 Git auto-deploy가 살아있어 함께 끊어야 중복 배포 완전 차단
+- Pages deployment 누적이 임계치(약 100개) 넘으면 UI 삭제 차단 → API 일괄 삭제 후 가능
 - 프론트 dev 서버 포트 8080, 백엔드 wrangler dev 8787
-- D1/KV/AI 바인딩 그대로 유지, Cron trigger 그대로 유지
+- D1/KV/AI 바인딩 + Cron trigger 그대로 유지, 영향 없음
 
 ---
 
