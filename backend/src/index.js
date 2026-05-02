@@ -53,8 +53,14 @@ app.get('/api/admin/test-update', async (c) => {
 // 에러 핸들러
 app.onError(errorHandler);
 
-// 404 핸들러
-app.notFound((c) => c.json({ error: 'NotFoundError', message: '요청한 경로를 찾을 수 없습니다.' }, 404));
+// 404 핸들러 — /api/* 만 JSON 404, 나머지는 SPA 폴백(index.html)
+app.notFound((c) => {
+  const { pathname } = new URL(c.req.url);
+  if (pathname.startsWith('/api/')) {
+    return c.json({ error: 'NotFoundError', message: '요청한 경로를 찾을 수 없습니다.' }, 404);
+  }
+  return c.env.ASSETS.fetch(c.req.raw);
+});
 
 export default {
   fetch: (request, env, ctx) => app.fetch(request, env, ctx),
