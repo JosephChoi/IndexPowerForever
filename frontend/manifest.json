@@ -4,8 +4,8 @@
   "description": "ETF vs S&P 500 / NASDAQ 100 지수 성과 비교 분석",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#060b18",
-  "theme_color": "#0a58ca",
+  "background_color": "#070d24",
+  "theme_color": "#070d24",
   "icons": [
     {
       "src": "/images/favicon-192.png",

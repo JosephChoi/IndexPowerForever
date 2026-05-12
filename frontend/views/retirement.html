@@ -37,7 +37,7 @@
         <div class="row g-3">
           <div class="col-12 col-sm-4" v-for="(r, i) in results" :key="i">
             <div class="retirement-result-card" :class="i === 0 ? 'retirement-result-card--safe' : i === 1 ? 'retirement-result-card--sp500' : 'retirement-result-card--nasdaq'">
-              <div class="retirement-result-card__badge" :style="{ background: i === 0 ? '#6c757d' : i === 1 ? '#198754' : '#fd7e14' }">
+              <div class="retirement-result-card__badge" :style="{ background: i === 0 ? '#6c757d' : i === 1 ? '#16a34a' : '#dc2626' }">
                 {{ r.label }}
               </div>
               <div class="retirement-result-card__rate">연 {{ r.annualRate }}%</div>

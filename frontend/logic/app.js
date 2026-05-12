@@ -115,7 +115,6 @@ const loadNavbar = async () => {
     document.querySelectorAll('.nav-link').forEach(el => {
       const href = el.getAttribute('href');
       if (href === '#') {
-        // 드롭다운 토글: 하위 경로 중 하나가 현재 경로이면 active
         el.classList.toggle('active', simulatorPaths.includes(to.path));
       } else {
         el.classList.toggle('active', href === to.path);
@@ -124,6 +123,116 @@ const loadNavbar = async () => {
     document.querySelectorAll('.dropdown-item').forEach(el => {
       el.classList.toggle('active', el.getAttribute('href') === to.path);
     });
+  });
+
+  initNavbarSearch();
+};
+
+// ── 글로벌 ETF 검색 모달 (Vue 외부 — vanilla) ──
+const initNavbarSearch = () => {
+  const btn = document.getElementById('navbarSearchBtn');
+  const modal = document.getElementById('navbarSearchModal');
+  const input = document.getElementById('navbarSearchInput');
+  const results = document.getElementById('navbarSearchResults');
+  if (!btn || !modal || !input || !results) return;
+
+  let debounceTimer = null;
+  let currentResults = [];
+
+  const open = () => {
+    modal.hidden = false;
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => input.focus(), 30);
+  };
+  const close = () => {
+    modal.hidden = true;
+    document.body.style.overflow = '';
+    input.value = '';
+    currentResults = [];
+    renderEmpty();
+    if (debounceTimer) { clearTimeout(debounceTimer); debounceTimer = null; }
+  };
+
+  const escapeHtml = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+  const renderEmpty = () => {
+    results.innerHTML = '<div class="navbar-search-modal-empty"><i class="bi bi-search me-2"></i>티커 또는 ETF명을 입력하세요</div>';
+  };
+  const renderLoading = () => {
+    results.innerHTML = '<div class="navbar-search-modal-empty"><span class="spinner-border spinner-border-sm me-2"></span>검색 중...</div>';
+  };
+  const renderNoResults = () => {
+    results.innerHTML = '<div class="navbar-search-modal-empty"><i class="bi bi-exclamation-circle me-2"></i>검색 결과가 없습니다</div>';
+  };
+  const renderResults = (list) => {
+    results.innerHTML = list.map(r => `
+      <button type="button" class="navbar-search-modal-item" data-ticker="${escapeHtml(r.ticker)}">
+        <div class="navbar-search-modal-item-ticker">${escapeHtml(r.ticker)}</div>
+        <div class="navbar-search-modal-item-name">${escapeHtml(r.name || '')}</div>
+      </button>
+    `).join('');
+  };
+
+  const goToTicker = (ticker) => {
+    if (!ticker) return;
+    close();
+    router.push(`/etf/${encodeURIComponent(ticker)}`);
+  };
+
+  // 검색 실행 (debounce 300ms)
+  input.addEventListener('input', () => {
+    const q = input.value.trim();
+    if (debounceTimer) clearTimeout(debounceTimer);
+    if (!q) {
+      currentResults = [];
+      renderEmpty();
+      return;
+    }
+    renderLoading();
+    debounceTimer = setTimeout(async () => {
+      try {
+        const res = await fetch(`${API_BASE}/api/etf/search?q=${encodeURIComponent(q)}`);
+        const data = await res.json();
+        const list = Array.isArray(data) ? data : (data?.data || []);
+        currentResults = list;
+        if (list.length === 0) renderNoResults();
+        else renderResults(list);
+      } catch (e) {
+        currentResults = [];
+        renderNoResults();
+      }
+    }, 300);
+  });
+
+  // 엔터: 첫 결과 또는 입력값 그대로 이동
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const ticker = currentResults[0]?.ticker || input.value.trim().toUpperCase();
+      goToTicker(ticker);
+    } else if (e.key === 'Escape') {
+      close();
+    }
+  });
+
+  // 결과 클릭 (이벤트 위임)
+  results.addEventListener('click', (e) => {
+    const item = e.target.closest('[data-ticker]');
+    if (item) goToTicker(item.dataset.ticker);
+  });
+
+  // 모달 닫기 핸들러 (backdrop, X 버튼)
+  modal.querySelectorAll('[data-close]').forEach(el => el.addEventListener('click', close));
+
+  // 검색 버튼 클릭
+  btn.addEventListener('click', open);
+
+  // ⌘K / Ctrl+K 단축키
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+      e.preventDefault();
+      modal.hidden ? open() : close();
+    }
   });
 };
 

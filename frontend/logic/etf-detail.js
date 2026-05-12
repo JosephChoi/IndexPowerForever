@@ -390,8 +390,8 @@ window.__view_etf_detail = {
             {
               label: this.ticker,
               data: etfData,
-              borderColor: '#0d6efd',
-              borderWidth: 2,
+              borderColor: '#1a2b6d',
+              borderWidth: 2.4,
               fill: false,
               pointRadius: 0,
               tension: 0.1,
@@ -400,8 +400,9 @@ window.__view_etf_detail = {
             {
               label: 'S&P 500',
               data: spyData,
-              borderColor: '#198754',
+              borderColor: '#16a34a',
               borderWidth: 1.2,
+              borderDash: [5, 3],
               fill: false,
               pointRadius: 0,
               tension: 0.1,
@@ -410,8 +411,9 @@ window.__view_etf_detail = {
             {
               label: 'NASDAQ 100',
               data: qqqData,
-              borderColor: '#fd7e14',
+              borderColor: '#dc2626',
               borderWidth: 1.2,
+              borderDash: [3, 3],
               fill: false,
               pointRadius: 0,
               tension: 0.1,
@@ -440,7 +442,7 @@ window.__view_etf_detail = {
       const excess = this.compareData.chart.excess;
       const labels = excess.map(d => d.date);
       const data = excess.map(d => d.excess);
-      const bgColors = excess.map(d => d.excess >= 0 ? 'rgba(40,167,69,0.5)' : 'rgba(220,53,69,0.5)');
+      const bgColors = excess.map(d => d.excess >= 0 ? 'rgba(22,163,74,0.5)' : 'rgba(220,38,38,0.5)');
 
       // 기존 차트가 있으면 데이터만 업데이트
       if (this._excessChart) {
@@ -483,7 +485,7 @@ window.__view_etf_detail = {
       const yearly = this.compareData.winAnalysis.yearlyReturns;
       const labels = yearly.map(d => d.year);
       const data = yearly.map(d => d.diff);
-      const bgColors = yearly.map(d => d.win ? '#28a745' : '#dc3545');
+      const bgColors = yearly.map(d => d.win ? '#16a34a' : '#dc2626');
 
       // 기존 차트가 있으면 데이터만 업데이트
       if (this._annualChart) {

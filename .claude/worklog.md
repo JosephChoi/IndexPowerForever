@@ -2,6 +2,62 @@
 
 ---
 
+## 세션 #21 — 2026-05-13 03:11~03:30 KST
+
+### 목표
+- 디자인을 `simulation.indexwins.com` (SP500Simulator) 톤과 동일화
+- 레퍼런스: `/Users/joseph/AICording/SP500Simulator/.claude/docs/design-system.md`
+- 범위: **토큰 + 공통 컴포넌트만** (사용자 선택)
+- 추가: 글로벌 ETF 검색 모달 (navbar에서 호출)
+
+### 의사결정
+1. 디자인 무드: 딥 네이비(`#1a2b6d`) + 청록(`#26b4a8`) 액센트 + 골드(`#d4af37`) 보조
+2. 수익/손실 시맨틱은 한국 관례 도입 (`--color-profit: #e53935` 적, `--color-loss: #1565c0` 청)
+3. 단, `outperform/underperform` 은 "지수 승/패"라는 도메인 의미라 벤치마크 컬러와 매핑된 녹(`#16a34a`)/적(`#dc2626`) 사용 (의미가 다름)
+4. Pretendard CDN 도입
+
+### 변경 사항
+- `.claude/rules/design-guide.md` — **전면 재작성**. SP500 design-system.md 구조를 IPF 도메인에 맞춰 12 섹션으로 정리 (도메인 용어 차이 명시)
+- `frontend/index.html` — Pretendard Variable CDN 추가, theme-color → `#070d24`
+- `frontend/manifest.json` — theme/background → `#070d24`
+- `frontend/css/style.css`
+  - `:root` 토큰을 SP500 톤으로 교체 (navy/teal/gold + profit/loss + outperform/underperform 분리)
+  - 그림자 네이비 톤으로 (`rgba(26,43,109,…)`)
+  - 라운드 8/12/16
+  - body: Pretendard + `--color-bg` 배경
+  - `.btn-primary` override (네이비), `.btn-cta` 추가 (청록, 다크 위 CTA)
+  - `.card-base`, `.table-standard`, `.btn-group-selector`, `.sim-slider`, `.icon-badge`, `.section-tag/.section-title` 토큰 정렬
+  - `.kpi-card`, `.hero-*`, `.etf-header-banner/.etf-ticker-badge/.etf-bench-btn/.etf-tab`, `.rolling-card`, `.badge-win/lose`, `.result-badge`, `.explorer-*`, `.index-win-banner`, `.book-quote/.book-tag/.book-title/.book-final-quote` 톤 변경
+  - `.chart-canvas-box` 추가 (Chart.js 무한 확장 방지 표준 래퍼)
+- `frontend/logic/etf-detail.js` — 누적 수익률 차트 (navy/녹/적 + dash), 초과수익 영역 rgba, 연도별 막대 hex 갱신
+- `frontend/logic/fee-simulator.js` — 비용 시나리오 (navy/gold/red)
+- `frontend/logic/retirement.js` — 안전/SP/NDX (회색/녹/적)
+- `frontend/views/etf-detail.html` — 인라인 색 (legend-dot, drag-return-label, holding progress) navy/녹/적으로
+- `frontend/views/retirement.html` — 결과 카드 badge 인라인 색
+- `frontend/views/timing.html` — outperform 배경 rgba 정합성
+
+### 후속 조정 (사용자 피드백)
+1. **헤드라인 액센트** — 청록 단색 → 청록·민트 그라데이션 → 최종 `#4a9eff → #38d9a9` (기존 파랑·그린 톤으로 복귀, 다크 위 가독성 우선)
+2. **navbar 브랜드 `wins`** — 청록·골드 그라데이션 → 청록 단색
+3. **히어로 글로우** — 사각형으로 잘려 보이던 ellipse를 `closest-side` 원형 + `filter: blur(20px)`, 1200×700으로 확장하여 부드러운 발광
+4. **글로벌 ETF 검색 (신규)**
+   - 레퍼런스: SP500Simulator `frontend/components/navbar.html` + `logic/app.js` 검색 모달
+   - `components/navbar.html` — 좌측에 돋보기 검색 버튼(데스크톱은 아이콘 only, 모바일 햄버거 안에선 텍스트), 모달 마크업
+   - `logic/app.js` — `initNavbarSearch()` 추가. vanilla JS로 모달 제어 (Vue 외부), `/api/etf/search` debounce 300ms, Enter→첫 결과 이동, **⌘K/Ctrl+K** 글로벌 단축키
+   - `etf-detail.html` — 우측 상단 "← 검색으로" 버튼 제거 (navbar 검색 버튼으로 대체)
+   - CSS: 모달 패널 **두꺼운 4px 네이비 보더** (`#1a2b6d`) + 옅은 ring + 딥 네이비 드롭 섀도. 헤더("ETF 검색" 제목 + X) / 입력 박스(포커스 시 청록 ring) / 결과 리스트 분리 구조. 폭 760px (SP500 640px보다 큼)
+
+### 미적용 (의도적)
+- 이미지 자산(`book-cover.svg`, `favicon.svg`, `logo.svg`) — 옛 톤 그대로 (이미지 재작업은 별도 세션)
+- 페이지별 마크업 재구성 — 범위 외 ("토큰 + 공통 컴포넌트만"). 클래스 alias로 호환 유지
+- 홈 히어로의 기존 검색 박스 — 유지 (navbar 검색과 병존)
+
+### 검증 완료 (로컬 wrangler dev)
+- 홈/ETF 상세/시뮬레이터 톤 일관성 OK
+- 검색 모달 동작·디자인 OK (사용자 확인)
+
+---
+
 ## 세션 #20 — 2026-04-28 22:28 KST
 
 ### 목표

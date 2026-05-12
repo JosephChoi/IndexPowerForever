@@ -46,7 +46,8 @@ window.__view_fee_simulator = {
       if (!ctx) return;
 
       const yearLabels = Array.from({ length: this.years + 1 }, (_, i) => i);
-      const colors = ['#0d6efd', '#fd7e14', '#dc3545'];
+      // 비용 시나리오: 네이비(기준) → 골드(중) → 적(고비용)
+      const colors = ['#1a2b6d', '#d4af37', '#dc2626'];
       const datasets = this.scenarios.map((s, i) => ({
         label: `${s.label} (${s.fee}%)`,
         data: yearLabels.map(y =>

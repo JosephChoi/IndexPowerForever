@@ -29,11 +29,6 @@
     <div class="etf-header-banner">
       <div class="container py-4">
         <div class="position-relative">
-          <!-- 검색으로 버튼 — 오른쪽 상단 고정 -->
-          <button class="btn btn-outline-light btn-sm px-3 etf-back-btn" @click="navigateTo('/')">
-            <i class="bi bi-arrow-left me-1"></i>검색으로
-          </button>
-
           <!-- 티커 + 풀네임 + 메타 -->
           <div>
             <div class="etf-ticker-badge">{{ ticker }}</div>
@@ -164,9 +159,9 @@
             <div class="chart-card-header">
               <span class="chart-card-title">누적 수익률 비교</span>
               <div class="chart-legend">
-                <span class="legend-dot" style="background:#0d6efd"></span>{{ ticker }}
-                <span class="legend-dot ms-3" style="background:#198754"></span>S&P 500
-                <span class="legend-dot ms-3" style="background:#fd7e14"></span>NASDAQ 100
+                <span class="legend-dot" style="background:#1a2b6d"></span>{{ ticker }}
+                <span class="legend-dot ms-3" style="background:#16a34a"></span>S&P 500
+                <span class="legend-dot ms-3" style="background:#dc2626"></span>NASDAQ 100
               </div>
             </div>
             <div class="chart-container" style="height:320px;cursor:crosshair">
@@ -188,20 +183,20 @@
               </div>
               <div class="drag-select-returns">
                 <div class="drag-return-item">
-                  <span class="drag-return-label" style="color:#0d6efd">{{ ticker }}</span>
+                  <span class="drag-return-label" style="color:#1a2b6d">{{ ticker }}</span>
                   <span class="drag-return-value" :class="dragSelection.etfReturn >= 0 ? 'positive' : 'negative'">
                     {{ dragSelection.etfReturn > 0 ? '+' : '' }}{{ dragSelection.etfReturn.toFixed(1) }}%
                   </span>
                 </div>
                 <div class="drag-return-item">
-                  <span class="drag-return-label" style="color:#198754">S&P 500</span>
+                  <span class="drag-return-label" style="color:#16a34a">S&P 500</span>
                   <span v-if="dragSelection.spyReturn != null" class="drag-return-value" :class="dragSelection.spyReturn >= 0 ? 'positive' : 'negative'">
                     {{ dragSelection.spyReturn > 0 ? '+' : '' }}{{ dragSelection.spyReturn.toFixed(1) }}%
                   </span>
                   <span v-else class="drag-return-value text-muted">N/A</span>
                 </div>
                 <div class="drag-return-item">
-                  <span class="drag-return-label" style="color:#fd7e14">NASDAQ 100</span>
+                  <span class="drag-return-label" style="color:#dc2626">NASDAQ 100</span>
                   <span v-if="dragSelection.qqqReturn != null" class="drag-return-value" :class="dragSelection.qqqReturn >= 0 ? 'positive' : 'negative'">
                     {{ dragSelection.qqqReturn > 0 ? '+' : '' }}{{ dragSelection.qqqReturn.toFixed(1) }}%
                   </span>
@@ -525,7 +520,7 @@
                       <span class="fw-semibold">{{ (holding.weight * 100).toFixed(1) }}%</span>
                     </div>
                     <div class="progress" style="height:5px;border-radius:3px">
-                      <div class="progress-bar" style="background:#0d6efd" :style="{ width: (holding.weight * 100) + '%' }"></div>
+                      <div class="progress-bar" style="background:#1a2b6d" :style="{ width: (holding.weight * 100) + '%' }"></div>
                     </div>
                   </div>
                 </div>

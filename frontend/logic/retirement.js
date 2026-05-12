@@ -59,7 +59,8 @@ window.__view_retirement = {
       const ctx = this.$refs.retirementChart;
       if (!ctx) return;
       const labels = Array.from({ length: this.years + 1 }, (_, i) => i);
-      const colors = ['#6c757d', '#198754', '#fd7e14'];
+      // 시나리오: 회색(안전) → S&P 녹 → NASDAQ 적
+      const colors = ['#6c757d', '#16a34a', '#dc2626'];
       const datasets = this.scenarios.map((s, i) => ({
         label: s.label,
         data: labels.map(y => {
