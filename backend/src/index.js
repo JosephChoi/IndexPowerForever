@@ -6,6 +6,7 @@ import { compareRoute } from './routes/compare.js';
 import { rankingRoute } from './routes/ranking.js';
 import { presetsRoute } from './routes/presets.js';
 import { timingRoute } from './routes/timing.js';
+import { withdrawalRoute } from './routes/withdrawal.js';
 import { translateRoute } from './routes/translate.js';
 import { DailyUpdateService } from './services/DailyUpdateService.js';
 
@@ -20,6 +21,7 @@ app.route('/api/etf', compareRoute);
 app.route('/api/ranking', rankingRoute);
 app.route('/api/presets', presetsRoute);
 app.route('/api/timing', timingRoute);
+app.route('/api/withdrawal', withdrawalRoute);
 app.route('/api/translate', translateRoute);
 
 // 헬스체크

@@ -77,6 +77,7 @@ const routes = [
   { path: '/timing',         component: makeView('timing') },
   { path: '/fee-simulator',  component: makeView('fee-simulator') },
   { path: '/retirement',     component: makeView('retirement') },
+  { path: '/withdrawal',     component: makeView('withdrawal') },
   { path: '/insights',       component: makeView('insights') },
   { path: '/book',           component: makeView('book') },
   { path: '/:pathMatch(.*)*', redirect: '/' },

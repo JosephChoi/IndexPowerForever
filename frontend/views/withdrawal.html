@@ -1,0 +1,379 @@
+<div>
+  <div class="container py-4">
+    <div class="page-header">
+      <h1 class="page-title"><i class="bi bi-cash-coin me-2 text-primary"></i>인출전략 시뮬레이터</h1>
+      <p class="page-subtitle">은퇴 후 자산을 인출하며 살면, 그 돈은 얼마나 버틸까요?</p>
+    </div>
+
+    <div class="row g-4">
+      <!-- 입력 패널 -->
+      <div class="col-12 col-lg-4">
+        <div class="sim-panel">
+          <div class="sim-panel-title">투자 지수</div>
+          <div class="btn-group btn-group-selector w-100 mb-3" role="group">
+            <button type="button" class="btn" :class="{ active: ticker === 'SPY' }" @click="selectTicker('SPY')">S&amp;P 500</button>
+            <button type="button" class="btn" :class="{ active: ticker === 'QQQ' }" @click="selectTicker('QQQ')">NASDAQ 100</button>
+          </div>
+
+          <div class="sim-field">
+            <label class="sim-field__label" for="wInitial">초기 자산</label>
+            <div class="sim-input-group">
+              <input id="wInitial" type="number" inputmode="numeric" min="1000" max="1000000" step="1000"
+                     v-model.number="initial" @input="onInput" @blur="clampInitial" />
+              <span class="sim-input-group__unit">만원</span>
+            </div>
+            <div class="sim-field__echo"><strong>{{ formatAmount(initial) }}원</strong></div>
+            <div class="sim-chips">
+              <button type="button" class="sim-chip" :class="{ active: initial === c }" v-for="c in initialChips" :key="c" @click="setInitial(c)">
+                {{ formatAmount(c) }}
+              </button>
+            </div>
+          </div>
+
+          <div class="sim-panel-title mt-4">인출 조건</div>
+          <div class="btn-group btn-group-selector w-100 mb-3" role="group">
+            <button type="button" class="btn" :class="{ active: frequency === 'monthly' }" @click="selectFrequency('monthly')">매달 인출</button>
+            <button type="button" class="btn" :class="{ active: frequency === 'annual' }" @click="selectFrequency('annual')">매년 인출</button>
+          </div>
+
+          <div class="sim-field">
+            <label class="sim-field__label" for="wAmount">{{ frequency === 'monthly' ? '월' : '연' }} 인출액</label>
+            <div class="sim-input-group">
+              <input id="wAmount" type="number" inputmode="numeric" min="1" step="10"
+                     v-model.number="withdrawal" @input="onInput" @blur="clampWithdrawal" />
+              <span class="sim-input-group__unit">만원</span>
+            </div>
+            <div class="sim-field__echo">
+              연 <strong>{{ formatAmount(annualWithdrawal) }}원</strong> 인출
+            </div>
+            <div class="withdrawal-rate-hint" :class="rateClass">
+              <i class="bi" :class="rateIcon"></i>
+              연 인출률 {{ withdrawalRate.toFixed(1) }}% — {{ rateLabel }}
+            </div>
+          </div>
+
+          <div class="row g-2">
+            <div class="col-6">
+              <div class="sim-field">
+                <label class="sim-field__label" for="wInflation">물가상승률</label>
+                <div class="sim-input-group">
+                  <input id="wInflation" type="number" inputmode="decimal" min="0" max="5" step="0.5"
+                         v-model.number="inflation" @input="onInput" @blur="clampInflation" />
+                  <span class="sim-input-group__unit">%</span>
+                </div>
+                <div class="sim-field__echo">인출액 매년 증액</div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="sim-field">
+                <label class="sim-field__label" for="wStartYear">시작 연도</label>
+                <div class="sim-input-group">
+                  <input id="wStartYear" type="number" inputmode="numeric" :min="minYear" :max="maxStartYear" step="1"
+                         v-model.number="startYear" @input="onInput" @blur="clampStartYear" />
+                  <span class="sim-input-group__unit">년</span>
+                </div>
+                <div class="sim-field__echo">{{ minYear }}~{{ maxStartYear }}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="sim-panel-title mt-4 d-flex align-items-center justify-content-between">
+            <span>리저브 전략</span>
+            <div class="form-check form-switch mb-0">
+              <input class="form-check-input" type="checkbox" id="reserveSwitch" v-model="reserve" @change="onInput" />
+            </div>
+          </div>
+          <p class="withdrawal-reserve-desc">
+            인출액 일부를 현금으로 미리 빼두고, 하락장에는 그 현금으로 버텨 <strong>바닥에서 주식을 파는 일</strong>을 피하는 전략입니다.
+          </p>
+
+          <template v-if="reserve">
+            <div class="row g-2">
+              <div class="col-6">
+                <div class="sim-field">
+                  <label class="sim-field__label" for="wResYears">리저브 크기</label>
+                  <div class="sim-input-group">
+                    <input id="wResYears" type="number" inputmode="numeric" min="1" max="5" step="1"
+                           v-model.number="reserveYears" @input="onInput" @blur="clampReserve" />
+                    <span class="sim-input-group__unit">년치</span>
+                  </div>
+                  <div class="sim-field__echo"><strong>{{ formatAmount(reserveTargetAmount) }}원</strong></div>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="sim-field">
+                  <label class="sim-field__label" for="wResFloor">리필 하한선</label>
+                  <div class="sim-input-group">
+                    <input id="wResFloor" type="number" inputmode="decimal" min="0.5" :max="floorMax" step="0.5"
+                           v-model.number="reserveFloorYears" @input="onInput" @blur="clampReserve" />
+                    <span class="sim-input-group__unit">년치</span>
+                  </div>
+                  <div class="sim-field__echo"><strong>{{ formatAmount(reserveFloorAmount) }}원</strong></div>
+                </div>
+              </div>
+            </div>
+            <div class="sim-hint mb-3">리저브가 하한선 밑으로 떨어지면 주식을 팔아 다시 채웁니다.</div>
+
+            <div class="sim-field">
+              <label class="sim-field__label" for="wResRate">리저브 이자율 (파킹통장·MMF)</label>
+              <div class="sim-input-group">
+                <input id="wResRate" type="number" inputmode="decimal" min="0" max="6" step="0.5"
+                       v-model.number="reserveRate" @input="onInput" @blur="clampReserve" />
+                <span class="sim-input-group__unit">%</span>
+              </div>
+            </div>
+          </template>
+        </div>
+
+        <div class="sim-disclaimer mt-3">
+          <i class="bi bi-info-circle me-1"></i>본 시뮬레이션은 과거 실제 지수 데이터를 기반으로 하며, <strong>배당·세금·거래비용은 반영하지 않았습니다</strong>. 배당을 빼고 계산하므로 실제보다 보수적인 결과입니다. 과거 성과가 미래 수익을 보장하지 않습니다.
+        </div>
+      </div>
+
+      <!-- 결과 -->
+      <div class="col-12 col-lg-8">
+        <div class="alert alert-danger" v-if="error">
+          <i class="bi bi-exclamation-triangle me-2"></i>{{ error }}
+          <button class="btn btn-sm btn-outline-danger ms-2" @click="simulate">재시도</button>
+        </div>
+
+        <div class="loading-section-wrap">
+          <div v-if="isLoading" class="loading-section-overlay">
+            <div class="loading-context">
+              <i class="bi bi-arrow-repeat loading-icon"></i>
+              <div class="loading-msg">인출 시뮬레이션을 실행하는 중<span class="loading-dots"></span></div>
+              <div class="loading-sub">{{ startYear }}년부터의 {{ tickerLabel }} 데이터를 분석하고 있습니다</div>
+            </div>
+          </div>
+
+          <template v-if="result">
+            <!-- 요약 카드 -->
+            <div class="row g-2 g-md-3 mb-4">
+              <div class="col-6 col-lg-3">
+                <div class="withdrawal-stat" :class="{ 'withdrawal-stat--danger': summary.depletedAt }">
+                  <div class="withdrawal-stat__label">최종 자산</div>
+                  <div class="withdrawal-stat__value" v-if="!summary.depletedAt">{{ formatAmount(summary.finalAmount) }}</div>
+                  <div class="withdrawal-stat__value withdrawal-stat__value--danger" v-else>고갈</div>
+                  <div class="withdrawal-stat__sub">{{ summary.depletedLabel || summary.survivedLabel }}</div>
+                </div>
+              </div>
+              <div class="col-6 col-lg-3">
+                <div class="withdrawal-stat">
+                  <div class="withdrawal-stat__label">총 인출액</div>
+                  <div class="withdrawal-stat__value">{{ formatAmount(summary.totalWithdrawn) }}</div>
+                  <div class="withdrawal-stat__sub">원금 대비 {{ (summary.totalWithdrawn / initial * 100).toFixed(0) }}%</div>
+                </div>
+              </div>
+              <div class="col-6 col-lg-3">
+                <div class="withdrawal-stat">
+                  <div class="withdrawal-stat__label">최대 낙폭 (MDD)</div>
+                  <div class="withdrawal-stat__value withdrawal-stat__value--danger">{{ summary.mdd.toFixed(1) }}%</div>
+                  <div class="withdrawal-stat__sub">인출분 제외, 시장 손실만</div>
+                </div>
+              </div>
+              <div class="col-6 col-lg-3">
+                <div class="withdrawal-stat" :class="{ 'withdrawal-stat--warn': reserve && summary.forcedRefillCount > 0 }">
+                  <div class="withdrawal-stat__label">{{ reserve ? '강제 리필' : '연평균 수익률' }}</div>
+                  <div class="withdrawal-stat__value" v-if="reserve">{{ summary.forcedRefillCount }}회</div>
+                  <div class="withdrawal-stat__value" v-else>{{ summary.cagr.toFixed(1) }}%</div>
+                  <div class="withdrawal-stat__sub" v-if="reserve">손실 구간 매도 · 총 {{ summary.refillCount }}회 중</div>
+                  <div class="withdrawal-stat__sub" v-else>인출 포함 환산</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 리저브 효과 비교 배너 -->
+            <div class="withdrawal-compare" v-if="reserve && summary.baselineFinalAmount !== null">
+              <div class="withdrawal-compare__title">
+                <i class="bi me-1" :class="reserveVerdict.icon"></i>{{ reserveVerdict.title }}
+              </div>
+              <div class="withdrawal-compare__body">
+                <div class="withdrawal-compare__item">
+                  <span class="withdrawal-compare__label">리저브 없이</span>
+                  <span class="withdrawal-compare__val">
+                    {{ summary.baselineDepletedLabel || formatAmount(summary.baselineFinalAmount) }}
+                  </span>
+                </div>
+                <i class="bi bi-arrow-right withdrawal-compare__arrow"></i>
+                <div class="withdrawal-compare__item">
+                  <span class="withdrawal-compare__label">리저브 적용</span>
+                  <span class="withdrawal-compare__val withdrawal-compare__val--main">
+                    {{ summary.depletedLabel || formatAmount(summary.finalAmount) }}
+                  </span>
+                </div>
+              </div>
+              <div class="withdrawal-compare__note">{{ reserveVerdict.note }}</div>
+            </div>
+
+            <!-- 통합 차트 -->
+            <div class="card-base mb-4">
+              <h6 class="fw-bold mb-1">자산 · 인출 추이</h6>
+              <div class="text-muted mb-3" style="font-size:0.8rem;">
+                {{ startYear }}년 {{ formatAmount(initial) }}로 시작 · {{ tickerLabel }} 기준
+              </div>
+              <div class="chart-canvas-box withdrawal-chart-box"><canvas ref="withdrawalChart"></canvas></div>
+            </div>
+
+            <!-- 연도별 표 -->
+            <div class="card-base">
+              <h6 class="fw-bold mb-3">연도별 상세</h6>
+              <div class="withdrawal-legend" v-if="reserve">
+                <span class="withdrawal-legend__item"><i class="withdrawal-dot withdrawal-dot--cash"></i>리저브(현금)에서 인출 — 주식 안 건드림</span>
+                <span class="withdrawal-legend__item"><i class="withdrawal-dot withdrawal-dot--sell"></i>주식을 팔아 인출</span>
+              </div>
+
+              <div class="table-responsive d-none d-md-block">
+                <table class="table table-standard mb-0">
+                  <thead>
+                    <tr>
+                      <th>연차</th>
+                      <th class="text-end">지수</th>
+                      <th class="text-end">인출액</th>
+                      <th v-if="reserve" style="min-width:150px">인출 재원</th>
+                      <th v-if="reserve" style="min-width:130px">리저브 잔액</th>
+                      <th class="text-end">연말 자산</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(y, i) in result.yearly" :key="y.year" :class="rowClass(y)">
+                      <td class="fw-semibold">
+                        <span class="withdrawal-nth">{{ i + 1 }}년차</span>
+                        <small class="d-block text-muted">{{ y.year }}</small>
+                      </td>
+                      <td class="text-end fw-semibold" :class="y.indexReturn >= 0 ? 'text-outperform' : 'text-underperform'">
+                        {{ y.indexReturn >= 0 ? '+' : '' }}{{ y.indexReturn.toFixed(1) }}%
+                      </td>
+                      <td class="text-end">
+                        {{ formatAmount(y.withdrawn) }}
+                        <small class="d-block text-muted">누계 {{ formatAmount(y.withdrawnCum) }}</small>
+                      </td>
+
+                      <!-- 인출 재원: 현금/매도 비율을 막대로 -->
+                      <td v-if="reserve">
+                        <div class="withdrawal-src">
+                          <div class="withdrawal-src__bar">
+                            <span class="withdrawal-src__cash" :style="{ width: srcPct(y) + '%' }"></span>
+                            <span class="withdrawal-src__sell" :style="{ width: (100 - srcPct(y)) + '%' }"></span>
+                          </div>
+                          <div class="withdrawal-src__text">
+                            <span v-if="y.fromInvested < 1" class="text-outperform fw-semibold">전액 현금</span>
+                            <span v-else-if="y.fromReserve < 1" class="text-underperform fw-semibold">전액 매도</span>
+                            <span v-else>현금 {{ srcPct(y).toFixed(0) }}%</span>
+                          </div>
+                        </div>
+                      </td>
+
+                      <!-- 리저브 잔액: 목표 대비 게이지 + 리필 표시 -->
+                      <td v-if="reserve">
+                        <div class="withdrawal-res">
+                          <div class="withdrawal-res__gauge">
+                            <span class="withdrawal-res__fill" :class="{ 'is-low': y.reserveYearsLeft < reserveFloorYears }"
+                                  :style="{ width: resPct(y) + '%' }"></span>
+                            <span class="withdrawal-res__floor" :style="{ left: (reserveFloorYears / reserveYears * 100) + '%' }"></span>
+                          </div>
+                          <div class="withdrawal-res__text">
+                            <span :class="y.reserveYearsLeft < reserveFloorYears ? 'text-underperform fw-semibold' : ''">
+                              {{ y.reserveYearsLeft }}년치
+                            </span>
+                            <span v-if="y.refill" class="badge-sm ms-1"
+                                  :class="y.refill === 'forced' ? 'withdrawal-badge--forced' : 'withdrawal-badge--opp'"
+                                  :title="refillTip(y)">
+                              {{ y.refill === 'forced' ? '손실 매도' : '채움' }}
+                              <small v-if="y.refillDate">{{ y.refillDate.slice(5, 7) }}월</small>
+                            </span>
+                          </div>
+                        </div>
+                      </td>
+
+                      <td class="text-end fw-semibold">{{ formatAmount(y.endAsset) }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- 모바일 카드 레이아웃 -->
+              <div class="d-md-none">
+                <div class="withdrawal-ycard" v-for="(y, i) in result.yearly" :key="y.year" :class="{ 'withdrawal-ycard--forced': y.refill === 'forced' }">
+                  <div class="withdrawal-ycard__head">
+                    <span class="withdrawal-ycard__year">{{ i + 1 }}년차</span>
+                    <span class="text-muted" style="font-size:0.78rem">{{ y.year }}</span>
+                    <span class="fw-semibold" :class="y.indexReturn >= 0 ? 'text-outperform' : 'text-underperform'">
+                      {{ y.indexReturn >= 0 ? '+' : '' }}{{ y.indexReturn.toFixed(1) }}%
+                    </span>
+                    <span v-if="y.refill === 'forced'" class="badge-sm withdrawal-badge--forced">강제 리필</span>
+                    <span v-else-if="y.refill === 'opportunistic'" class="badge-sm withdrawal-badge--opp">기회 리필</span>
+                  </div>
+                  <div class="withdrawal-ycard__grid">
+                    <div><span>인출</span><strong>{{ formatAmount(y.withdrawn) }}</strong></div>
+                    <div><span>연말 자산</span><strong>{{ formatAmount(y.endAsset) }}</strong></div>
+                  </div>
+                  <template v-if="reserve">
+                    <div class="withdrawal-src mt-2">
+                      <div class="withdrawal-src__bar">
+                        <span class="withdrawal-src__cash" :style="{ width: srcPct(y) + '%' }"></span>
+                        <span class="withdrawal-src__sell" :style="{ width: (100 - srcPct(y)) + '%' }"></span>
+                      </div>
+                      <div class="withdrawal-src__text">
+                        <span v-if="y.fromInvested < 1" class="text-outperform fw-semibold">전액 현금으로 인출</span>
+                        <span v-else-if="y.fromReserve < 1" class="text-underperform fw-semibold">전액 주식 매도</span>
+                        <span v-else>현금 {{ srcPct(y).toFixed(0) }}% · 매도 {{ (100 - srcPct(y)).toFixed(0) }}%</span>
+                        <span class="text-muted ms-1">· 리저브 {{ y.reserveYearsLeft }}년치</span>
+                      </div>
+                    </div>
+                  </template>
+                </div>
+              </div>
+            </div>
+            <!-- 원리 설명 — 결과를 해석하는 데 필요한 최소 지식 -->
+            <div class="withdrawal-guide mt-4">
+              <button type="button" class="withdrawal-guide__toggle" @click="showGuide = !showGuide">
+                <i class="bi" :class="showGuide ? 'bi-chevron-down' : 'bi-chevron-right'"></i>
+                이 시뮬레이션은 어떻게 계산되나요?
+              </button>
+
+              <div class="withdrawal-guide__body" v-show="showGuide">
+                <h6>수익률 배열 위험 — 이 도구가 존재하는 이유</h6>
+                <p>
+                  적립할 때는 평균 수익률만 알면 결과를 계산할 수 있습니다. 그런데 <strong>인출할 때는 같은 평균이라도 순서에 따라 결과가 완전히 달라집니다.</strong>
+                  초반에 폭락이 오면 값이 떨어진 자산을 팔아 생활비를 만들어야 하고, 나중에 시장이 회복해도 그 혜택을 받을 원금이 이미 사라진 뒤입니다.
+                </p>
+                <p class="withdrawal-guide__hint">
+                  <i class="bi bi-lightbulb me-1"></i>
+                  시작 연도를 <strong>1999년(QQQ)</strong>과 <strong>2002년(SPY)</strong>으로 바꿔보세요. 같은 조건인데도 결과가 크게 갈립니다.
+                </p>
+
+                <h6>리저브 전략의 목적은 수익이 아니라 "안 파는 것"</h6>
+                <p>
+                  생활비를 현금(리저브)에서 꺼내 쓰면 하락장에도 주식을 건드리지 않습니다.
+                  리저브가 <strong>하한선 밑으로 떨어질 때만</strong> 주식을 팔아 다시 채웁니다.
+                  매번 가득 채우면 상승장 내내 주식을 팔아 현금으로 옮기게 되어 오히려 손해입니다.
+                </p>
+                <ul>
+                  <li><span class="badge-sm withdrawal-badge--opp">채움</span> 직전 매도가보다 <strong>높은</strong> 시점에 판 것 — 정상</li>
+                  <li><span class="badge-sm withdrawal-badge--forced">손실 매도</span> 직전 매도가보다 <strong>낮은</strong> 시점에 판 것 — 위험 신호</li>
+                </ul>
+                <p class="withdrawal-guide__hint">
+                  <i class="bi bi-exclamation-circle me-1"></i>
+                  연 수익률이 플러스인데 "손실 매도"가 뜰 수 있습니다. 연 수익률은 1~12월 전체 기준이고, 리필은 특정 월에 일어나기 때문입니다. 배지에 마우스를 올리면 실제 매도 시점을 확인할 수 있습니다.
+                </p>
+
+                <h6>계산에 반영하지 않은 것</h6>
+                <p>
+                  <strong>배당·세금·거래비용은 반영하지 않았습니다.</strong>
+                  특히 배당(SPY 약 1.3%, QQQ 약 0.6%)이 빠져 실제보다 보수적인 결과가 나옵니다.
+                  과거 데이터를 정확히 재현하지만, 앞으로 30년이 과거와 같으리라는 보장은 없습니다.
+                  <strong>의사결정의 근거가 아니라 리스크를 체감하는 도구로 사용하세요.</strong>
+                </p>
+              </div>
+            </div>
+          </template>
+
+          <div class="text-center text-muted py-5" v-else-if="!isLoading">
+            <i class="bi bi-play-circle display-3 d-block mb-2"></i>
+            조건을 설정하면 자동으로 시뮬레이션됩니다
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
