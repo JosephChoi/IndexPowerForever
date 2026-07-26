@@ -32,11 +32,7 @@ window.__view_etf_detail = {
   },
 
   mounted() {
-    const ticker = this.getParam('ticker');
-    if (!ticker) { this.navigateTo('/'); return; }
-    this.ticker = ticker.toUpperCase();
-    this.saveRecent(this.ticker);
-    this.loadData();
+    this.initTicker();
   },
 
   beforeUnmount() {
@@ -75,6 +71,13 @@ window.__view_etf_detail = {
   },
 
   watch: {
+    // 라우트의 ticker 변경 감시 — 같은 /etf/:ticker 라우트 안에서 종목만 바뀌면
+    // Vue가 컴포넌트를 재사용해 mounted가 다시 호출되지 않는다.
+    // (예: QQQ 상세에서 navbar 검색으로 SPY 선택) 이 감시가 없으면 새로고침해야 반영된다.
+    '$route.params.ticker'() {
+      if (this.$route.path.startsWith('/etf/')) this.initTicker();
+    },
+
     // 탭 전환 시 차트 렌더링 / 탐색기 데이터 로드
     activeTab(tab) {
       if (tab === 'comparison' || tab === 'analysis') {
@@ -87,6 +90,43 @@ window.__view_etf_detail = {
   },
 
   methods: {
+    // 라우트의 ticker를 읽어 상태를 초기화하고 데이터를 로드한다.
+    // mounted와 라우트 변경(watch) 양쪽에서 호출된다.
+    initTicker() {
+      const ticker = this.getParam('ticker');
+      if (!ticker) { this.navigateTo('/'); return; }
+
+      const upper = ticker.toUpperCase();
+      if (upper === this.ticker) return; // 동일 종목이면 재로드 불필요
+
+      this.ticker = upper;
+      this.saveRecent(upper);
+      this.resetTickerState();
+      this.loadData();
+    },
+
+    // 종목이 바뀔 때 이전 종목의 데이터·차트가 남지 않도록 정리한다.
+    // (기간·벤치마크·활성 탭 같은 사용자 선택은 유지)
+    resetTickerState() {
+      this.etfInfo = null;
+      this.compareData = null;
+      this.error = null;
+      this.descExpanded = false;
+      this.showTranslated = false;
+      this.translatedDesc = null;
+      this.isTranslating = false;
+      this.explorerData = null;
+      this.explorerLoading = false;
+      this.explorerStep = 1;
+      this.selectedDot = null;
+      this.dragSelection = null;
+
+      // 차트는 destroy 후 null로 — 남겨두면 이전 종목 데이터가 잔상으로 보인다
+      if (this._comparisonChart) { this._comparisonChart.destroy(); this._comparisonChart = null; }
+      if (this._excessChart) { this._excessChart.destroy(); this._excessChart = null; }
+      if (this._annualChart) { this._annualChart.destroy(); this._annualChart = null; }
+    },
+
     // 기본정보 + 비교 분석 병렬 로드
     async loadData() {
       this.isLoading = true;

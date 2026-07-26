@@ -105,50 +105,66 @@
         <template v-if="compareData">
 
           <!-- 핵심 지표 카드 4개 -->
-          <div class="row g-3 mb-4">
+          <div class="row g-3 mb-4 kpi-row">
             <div class="col-6 col-md-3">
               <div class="kpi-card">
-                <div class="kpi-label">총수익률</div>
+                <div class="kpi-label">
+                  총수익률
+                  <span class="kpi-info" tabindex="0" role="button" aria-label="총수익률 설명"
+                        data-tip="선택한 기간 동안 주가가 오른 비율입니다. 시작일 종가 대비 마지막 거래일 종가로 계산하며, 배당은 반영하지 않습니다."><i class="bi bi-info-circle"></i></span>
+                </div>
                 <div class="kpi-value" :class="compareData.stats.etf.totalReturn >= 0 ? 'positive' : 'negative'">
                   {{ compareData.stats.etf.totalReturn > 0 ? '+' : '' }}{{ compareData.stats.etf.totalReturn.toFixed(1) }}%
                 </div>
                 <div class="kpi-vs">
-                  S&P {{ compareData.stats.spy.totalReturn.toFixed(1) }}% /
-                  NDX {{ compareData.stats.qqq.totalReturn.toFixed(1) }}%
+                  S&P 500 {{ compareData.stats.spy.totalReturn.toFixed(1) }}% /
+                  NASDAQ 100 {{ compareData.stats.qqq.totalReturn.toFixed(1) }}%
                 </div>
               </div>
             </div>
             <div class="col-6 col-md-3">
               <div class="kpi-card">
-                <div class="kpi-label">CAGR (연평균)</div>
+                <div class="kpi-label">
+                  CAGR (연평균)
+                  <span class="kpi-info" tabindex="0" role="button" aria-label="CAGR 설명"
+                        data-tip="연평균 복리 수익률입니다. 총수익률을 기간으로 나눈 단순 평균이 아니라, 매년 이 비율로 꾸준히 불어났다면 같은 결과가 나오는 값입니다. 기간이 다른 종목을 공정하게 비교할 때 씁니다."><i class="bi bi-info-circle"></i></span>
+                </div>
                 <div class="kpi-value" :class="statClass('cagr','etf') ? 'positive' : ''">
                   {{ compareData.stats.etf.cagr.toFixed(2) }}%
                 </div>
                 <div class="kpi-vs">
-                  S&P {{ compareData.stats.spy.cagr.toFixed(2) }}% /
-                  NDX {{ compareData.stats.qqq.cagr.toFixed(2) }}%
+                  S&P 500 {{ compareData.stats.spy.cagr.toFixed(2) }}% /
+                  NASDAQ 100 {{ compareData.stats.qqq.cagr.toFixed(2) }}%
                 </div>
               </div>
             </div>
             <div class="col-6 col-md-3">
               <div class="kpi-card">
-                <div class="kpi-label">MDD (최대낙폭)</div>
+                <div class="kpi-label">
+                  MDD (최대낙폭)
+                  <span class="kpi-info" tabindex="0" role="button" aria-label="MDD 설명"
+                        data-tip="기간 중 고점에서 저점까지 가장 크게 떨어진 폭입니다. 하필 최악의 타이밍에 사서 바닥에 팔았다면 겪었을 손실이며, 이 종목을 들고 버티려면 감당해야 할 하락의 크기를 뜻합니다."><i class="bi bi-info-circle"></i></span>
+                </div>
                 <div class="kpi-value negative">{{ compareData.stats.etf.mdd.toFixed(1) }}%</div>
                 <div class="kpi-vs">
-                  S&P {{ compareData.stats.spy.mdd.toFixed(1) }}% /
-                  NDX {{ compareData.stats.qqq.mdd.toFixed(1) }}%
+                  S&P 500 {{ compareData.stats.spy.mdd.toFixed(1) }}% /
+                  NASDAQ 100 {{ compareData.stats.qqq.mdd.toFixed(1) }}%
                 </div>
               </div>
             </div>
             <div class="col-6 col-md-3">
               <div class="kpi-card">
-                <div class="kpi-label">샤프 비율</div>
+                <div class="kpi-label">
+                  샤프 비율
+                  <span class="kpi-info" tabindex="0" role="button" aria-label="샤프 비율 설명"
+                        data-tip="위험을 얼마나 감수하고 그 수익을 얻었는지 나타냅니다. (연평균 수익률 − 무위험수익률 4.5%)를 변동성으로 나눈 값으로, 높을수록 흔들림 대비 수익이 좋다는 뜻입니다. 통상 1 이상이면 양호하게 봅니다."><i class="bi bi-info-circle"></i></span>
+                </div>
                 <div class="kpi-value" :class="statClass('sharpe','etf') ? 'positive' : ''">
                   {{ compareData.stats.etf.sharpe.toFixed(2) }}
                 </div>
                 <div class="kpi-vs">
-                  S&P {{ compareData.stats.spy.sharpe.toFixed(2) }} /
-                  NDX {{ compareData.stats.qqq.sharpe.toFixed(2) }}
+                  S&P 500 {{ compareData.stats.spy.sharpe.toFixed(2) }} /
+                  NASDAQ 100 {{ compareData.stats.qqq.sharpe.toFixed(2) }}
                 </div>
               </div>
             </div>

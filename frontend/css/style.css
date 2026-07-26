@@ -1199,6 +1199,105 @@ a:hover { color: var(--color-teal-deep); }
   font-size: 0.72rem;
   color: var(--color-text-light);
   margin-top: 0.35rem;
+  /* 벤치마크 정식 명칭(S&P 500 / NASDAQ 100)이 길어 줄바꿈을 허용 */
+  line-height: 1.45;
+  word-break: keep-all;
+}
+
+/* ── 지표 설명 툴팁 (KPI 카드 라벨 옆 ⓘ) ────────── */
+.kpi-info {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 0.25rem;
+  color: var(--color-text-light);
+  cursor: help;
+  font-size: 0.8rem;
+  line-height: 1;
+  position: relative;
+  /* 라벨이 uppercase/letter-spacing이라 아이콘만 원래 자간으로 되돌린다 */
+  text-transform: none;
+  letter-spacing: normal;
+  vertical-align: middle;
+}
+.kpi-info:hover,
+.kpi-info:focus-visible { color: var(--color-teal); outline: none; }
+
+/* 말풍선이 아래쪽 형제 요소(차트 카드 등)에 가리지 않도록 호버 때만 카드를 위로 올린다.
+   평소엔 z-index를 주지 않아 다른 요소와의 겹침 순서를 건드리지 않는다. */
+.kpi-card:has(.kpi-info:hover),
+.kpi-card:has(.kpi-info:focus-visible) { position: relative; z-index: 200; }
+
+/* 말풍선 본체 — data-tip 내용을 그대로 노출 */
+.kpi-info::after {
+  content: attr(data-tip);
+  position: absolute;
+  /* 아래로 띄운다 — 위로 띄우면 sticky 탭 바(z-index:100)에 가린다.
+     카드 z-index를 올려도 조상의 stacking context에 갇혀 해결되지 않는다. */
+  top: calc(100% + 9px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: 260px;
+  padding: 0.6rem 0.75rem;
+  background: var(--color-navy-deep);
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 0.75rem;
+  font-weight: 400;
+  line-height: 1.55;
+  letter-spacing: -0.01em;
+  text-align: left;
+  white-space: normal;
+  word-break: keep-all;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-lg);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.15s, visibility 0.15s;
+  /* sticky 탭 바(z-index:100)보다 위에 떠야 가려지지 않는다 */
+  z-index: 200;
+  pointer-events: none;
+}
+
+/* 말풍선 꼬리 */
+.kpi-info::before {
+  content: '';
+  position: absolute;
+  top: calc(100% + 3px);
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-bottom-color: var(--color-navy-deep);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.15s, visibility 0.15s;
+  z-index: 200;
+  pointer-events: none;
+}
+
+.kpi-info:hover::after, .kpi-info:focus-visible::after,
+.kpi-info:hover::before, .kpi-info:focus-visible::before {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* 말풍선이 화면 밖으로 나가지 않도록 행의 좌우 끝 카드는 안쪽으로 정렬한다.
+   KPI는 데스크톱 4열(col-md-3) / 모바일 2열(col-6)이라 끝에 오는 카드가 서로 다르다. */
+
+/* 데스크톱 4열 — 1번은 왼쪽, 4번은 오른쪽 */
+@media (min-width: 768px) {
+  .kpi-row > div:nth-child(4n + 1) .kpi-info::after { left: 0; transform: none; }
+  .kpi-row > div:nth-child(4n) .kpi-info::after { left: auto; right: 0; transform: none; }
+}
+
+/* 모바일·태블릿 2열 — 홀수(왼쪽 칸)는 왼쪽, 짝수(오른쪽 칸)는 오른쪽 */
+@media (max-width: 767.98px) {
+  .kpi-row > div:nth-child(odd) .kpi-info::after { left: 0; transform: none; }
+  .kpi-row > div:nth-child(even) .kpi-info::after { left: auto; right: 0; transform: none; }
+}
+
+/* 모바일에서는 화면 폭을 넘지 않도록 축소 */
+@media (max-width: 576px) {
+  .kpi-info::after { max-width: 200px; font-size: 0.72rem; }
 }
 
 /* 차트 카드 */
