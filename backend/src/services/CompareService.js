@@ -10,7 +10,9 @@ export class CompareService {
 
   // 비교 분석 전체 실행 (KV 6h 캐시)
   async analyze(ticker, period = '5Y', benchmark = 'SPY') {
-    const cacheKey = `compare:${ticker}:${period}:${benchmark}`;
+    // v2: 무위험수익률 4.5% → 3.9% 변경으로 샤프 비율 산출이 달라져 구버전 캐시를 무효화한다.
+    // 계산식이 바뀌면 이 버전을 올릴 것 (안 올리면 TTL 6시간 동안 옛 값이 나온다)
+    const cacheKey = `compare:v2:${ticker}:${period}:${benchmark}`;
 
     const cached = await this.env.KV.get(cacheKey);
     if (cached) {

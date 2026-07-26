@@ -1,6 +1,8 @@
 // 핵심 계산 로직 서비스 — 모든 메서드는 정적(static)
-// 무위험 수익률: 4.5% 고정 (미국 단기 국채 기준)
-const RISK_FREE_RATE = 0.045;
+// 무위험 수익률: 3.9% 고정 (미국 3개월 만기 국채 T-Bill 기준, 2026-07 시점)
+// 샤프 비율의 표준 정의가 단기 무위험자산을 쓰므로 10년물(4.7%)이 아닌 3개월물을 적용한다.
+// 시장 금리가 크게 변하면 이 값을 갱신할 것.
+const RISK_FREE_RATE = 0.039;
 const TRADING_DAYS_PER_YEAR = 252;
 
 export class CalculationService {
