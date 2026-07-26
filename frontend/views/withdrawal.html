@@ -217,11 +217,6 @@
             <!-- 연도별 표 -->
             <div class="card-base">
               <h6 class="fw-bold mb-3">연도별 상세</h6>
-              <div class="withdrawal-legend" v-if="reserve">
-                <span class="withdrawal-legend__item"><i class="withdrawal-dot withdrawal-dot--cash"></i>리저브(현금)에서 인출 — 주식 안 건드림</span>
-                <span class="withdrawal-legend__item"><i class="withdrawal-dot withdrawal-dot--sell"></i>주식을 팔아 인출</span>
-              </div>
-
               <div class="table-responsive d-none d-md-block">
                 <table class="table table-standard mb-0">
                   <thead>
@@ -229,7 +224,6 @@
                       <th>연차</th>
                       <th class="text-end">지수</th>
                       <th class="text-end">인출액</th>
-                      <th v-if="reserve" style="min-width:150px">인출 재원</th>
                       <th v-if="reserve" style="min-width:130px">리저브 잔액</th>
                       <th class="text-end">연말 자산</th>
                     </tr>
@@ -246,21 +240,6 @@
                       <td class="text-end">
                         {{ formatAmount(y.withdrawn) }}
                         <small class="d-block text-muted">누계 {{ formatAmount(y.withdrawnCum) }}</small>
-                      </td>
-
-                      <!-- 인출 재원: 현금/매도 비율을 막대로 -->
-                      <td v-if="reserve">
-                        <div class="withdrawal-src">
-                          <div class="withdrawal-src__bar">
-                            <span class="withdrawal-src__cash" :style="{ width: srcPct(y) + '%' }"></span>
-                            <span class="withdrawal-src__sell" :style="{ width: (100 - srcPct(y)) + '%' }"></span>
-                          </div>
-                          <div class="withdrawal-src__text">
-                            <span v-if="y.fromInvested < 1" class="text-outperform fw-semibold">전액 현금</span>
-                            <span v-else-if="y.fromReserve < 1" class="text-underperform fw-semibold">전액 매도</span>
-                            <span v-else>현금 {{ srcPct(y).toFixed(0) }}%</span>
-                          </div>
-                        </div>
                       </td>
 
                       <!-- 리저브 잔액: 목표 대비 게이지 + 리필 표시 -->
@@ -308,16 +287,22 @@
                     <div><span>연말 자산</span><strong>{{ formatAmount(y.endAsset) }}</strong></div>
                   </div>
                   <template v-if="reserve">
-                    <div class="withdrawal-src mt-2">
-                      <div class="withdrawal-src__bar">
-                        <span class="withdrawal-src__cash" :style="{ width: srcPct(y) + '%' }"></span>
-                        <span class="withdrawal-src__sell" :style="{ width: (100 - srcPct(y)) + '%' }"></span>
+                    <div class="withdrawal-res mt-2">
+                      <div class="withdrawal-res__gauge">
+                        <span class="withdrawal-res__fill" :class="{ 'is-low': y.reserveYearsLeft < reserveFloorYears }"
+                              :style="{ width: resPct(y) + '%' }"></span>
+                        <span class="withdrawal-res__floor" :style="{ left: (reserveFloorYears / reserveYears * 100) + '%' }"></span>
                       </div>
-                      <div class="withdrawal-src__text">
-                        <span v-if="y.fromInvested < 1" class="text-outperform fw-semibold">전액 현금으로 인출</span>
-                        <span v-else-if="y.fromReserve < 1" class="text-underperform fw-semibold">전액 주식 매도</span>
-                        <span v-else>현금 {{ srcPct(y).toFixed(0) }}% · 매도 {{ (100 - srcPct(y)).toFixed(0) }}%</span>
-                        <span class="text-muted ms-1">· 리저브 {{ y.reserveYearsLeft }}년치</span>
+                      <div class="withdrawal-res__text">
+                        <span :class="y.reserveYearsLeft < reserveFloorYears ? 'text-underperform fw-semibold' : 'text-muted'">
+                          리저브 {{ y.reserveYearsLeft }}년치
+                        </span>
+                        <span v-if="y.refill" class="badge-sm ms-1"
+                              :class="y.refill === 'forced' ? 'withdrawal-badge--forced' : 'withdrawal-badge--opp'"
+                              :title="refillTip(y)">
+                          {{ y.refill === 'forced' ? '손실 매도' : '채움' }}
+                          <small v-if="y.refillDate">{{ y.refillDate.slice(5, 7) }}월</small>
+                        </span>
                       </div>
                     </div>
                   </template>

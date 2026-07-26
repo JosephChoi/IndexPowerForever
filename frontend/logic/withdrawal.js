@@ -150,12 +150,6 @@ window.__view_withdrawal = {
       return this.summary?.baselineSurvivedMonths ?? 0;
     },
 
-    // 그 해 인출 중 현금(리저브)에서 낸 비율 — 100%면 주식을 한 주도 팔지 않은 해
-    srcPct(y) {
-      if (!y.withdrawn || !Number.isFinite(y.fromReserve)) return 100;
-      return Math.max(0, Math.min(100, (y.fromReserve / y.withdrawn) * 100));
-    },
-
     // 리저브 잔액을 목표 대비 비율로 (게이지 폭)
     resPct(y) {
       if (!this.reserveYears) return 0;
@@ -294,22 +288,41 @@ window.__view_withdrawal = {
 
       const t = this.result.timeline;
       const labels = t.map(p => p.date);
-      // 선택 지수 색 — SPY 녹색 / QQQ 적색 (디자인 가이드 벤치마크 컬러)
-      const assetColor = this.ticker === 'SPY' ? '#16a34a' : '#dc2626';
 
-      const datasets = [
+      // 축 배치 — 규모가 비슷한 것끼리 묶는다.
+      //   좌축: 리저브·인출 누계 (작은 금액)
+      //   우축: 내 자산·리저브 없이·지수 평가금액 (큰 금액)
+      // 한 축에 몰면 자산 옆에서 리저브(자산의 1~5%)가 바닥에 눌려 리필 톱니가 안 보인다.
+      // 범례는 datasets 배열 순서를 따르므로 우축 → 좌축 순으로 담는다.
+      const rightAxis = [
         {
-          label: '내 자산 (총액)',
+          label: '내 자산 (총액) (우)',
           data: t.map(p => p.asset),
-          borderColor: assetColor,
+          // 이 차트의 주인공 선 — 적색 평가금액(대조선)과 대비되는 초록으로 강조
+          borderColor: '#16a34a',
           backgroundColor: 'transparent',
           borderWidth: 2.5,
           pointRadius: 0,
-          yAxisID: 'y',
+          yAxisID: 'yIndex',
           order: 1,
         },
         {
-          label: '인출 누계',
+          // 초기 자산을 전액 이 지수에 넣고 한 푼도 인출하지 않았을 때의 평가금액.
+          // 인출로 얼마를 못 불렸는지 대조하는 기준선이라 적색으로 강조한다.
+          label: `${this.ticker} 평가금액 (우)`,
+          data: t.map(p => p.index),
+          borderColor: '#dc2626',
+          borderWidth: 2,
+          borderDash: [5, 3],
+          pointRadius: 0,
+          yAxisID: 'yIndex',
+          order: 4,
+        },
+      ];
+
+      const leftAxis = [
+        {
+          label: '인출 누계 (좌)',
           data: t.map(p => p.withdrawnCum),
           borderColor: '#d4af37',
           borderWidth: 2,
@@ -318,27 +331,31 @@ window.__view_withdrawal = {
           yAxisID: 'y',
           order: 2,
         },
-        {
-          // 지수는 금액이 아니라 "몇 배 올랐나"가 의미 → 우측 배수 축으로 분리.
-          // 같은 축에 두면 6배 넘게 오른 지수가 Y축을 지배해 자산·인출 곡선이 눌린다.
-          label: `${this.ticker} 지수 (배수)`,
-          data: t.map(p => p.index / this.initial),
-          borderColor: '#a3aab8',
-          borderWidth: 1.5,
-          borderDash: [3, 3],
-          pointRadius: 0,
-          yAxisID: 'yIndex',
-          order: 4,
-        },
       ];
 
       // 리저브 잔액 — 영역으로 표시 (전략 ON일 때만)
       if (this.reserve) {
-        datasets.splice(1, 0, {
-          label: '리저브 (현금)',
+        // 리저브 없이 뒀을 때의 자산 — 전략 효과 대조선 (우축 계열 끝에)
+        if (this.result.baselineTimeline) {
+          const baseMap = new Map(this.result.baselineTimeline.map(p => [p.date, p.asset]));
+          rightAxis.push({
+            label: '리저브 없이 (비교) (우)',
+            data: labels.map(d => (baseMap.has(d) ? baseMap.get(d) : null)),
+            borderColor: 'rgba(90, 100, 120, 0.45)',
+            borderWidth: 1.5,
+            borderDash: [2, 3],
+            pointRadius: 0,
+            yAxisID: 'yIndex',
+            order: 5,
+          });
+        }
+
+        leftAxis.push({
+          label: '리저브 (현금) (좌)',
           data: t.map(p => p.reserve),
           borderColor: '#26b4a8',
-          backgroundColor: 'rgba(38, 180, 168, 0.18)',
+          // 좌축 분리로 영역이 커졌다 — 진하면 뒤쪽 선을 가리므로 옅게 깐다
+          backgroundColor: 'rgba(38, 180, 168, 0.10)',
           borderWidth: 1.5,
           pointRadius: t.map(p => (p.refill ? 4 : 0)),
           pointBackgroundColor: t.map(p => (p.refill === 'forced' ? '#dc2626' : '#26b4a8')),
@@ -348,24 +365,14 @@ window.__view_withdrawal = {
           yAxisID: 'y',
           order: 3,
         });
-
-        // 리저브 없이 뒀을 때의 자산 — 전략 효과 대조선
-        if (this.result.baselineTimeline) {
-          const baseMap = new Map(this.result.baselineTimeline.map(p => [p.date, p.asset]));
-          datasets.push({
-            label: '리저브 없이 (비교)',
-            data: labels.map(d => (baseMap.has(d) ? baseMap.get(d) : null)),
-            borderColor: 'rgba(90, 100, 120, 0.45)',
-            borderWidth: 1.5,
-            borderDash: [2, 3],
-            pointRadius: 0,
-            yAxisID: 'y',
-            order: 5,
-          });
-        }
       }
 
+      const datasets = [...rightAxis, ...leftAxis];
+
       const fmt = this.formatAmount;
+      const initial = this.initial;
+      // 좌·우 축 공통 눈금 표기 — 둘 다 금액이므로 같은 형식을 써야 비교가 된다
+      const axisAmount = (v) => (v >= 10000 ? `${(v / 10000).toFixed(1)}억` : `${v.toLocaleString()}만`);
 
       if (this._chart) {
         this._chart.data.labels = labels;
@@ -382,13 +389,25 @@ window.__view_withdrawal = {
           maintainAspectRatio: false,
           interaction: { mode: 'index', intersect: false },
           plugins: {
-            legend: { position: 'top', labels: { boxWidth: 12, font: { size: 11 } } },
+            legend: {
+              position: 'top',
+              labels: {
+                boxWidth: 12,
+                font: { size: 11 },
+                // Chart.js 기본 범례는 dataset의 order(그리기 순서)를 따른다.
+                // 범례는 축별로 묶어야 하므로 datasets 배열 순서(우축→좌축)로 정렬한다.
+                sort: (a, b) => a.datasetIndex - b.datasetIndex,
+              },
+            },
             tooltip: {
               callbacks: {
                 title: (items) => (items.length ? items[0].label.slice(0, 7) : ''),
-                label: (ctx) => (ctx.dataset.yAxisID === 'yIndex'
-                  ? `${ctx.dataset.label}: ${ctx.parsed.y.toFixed(2)}배`
-                  : `${ctx.dataset.label}: ${fmt(ctx.parsed.y)}원`),
+                // 모든 선이 금액. 평가금액 선에는 배수를 병기해 "몇 배 올랐나"도 보이게 한다.
+                label: (ctx) => {
+                  const base = `${ctx.dataset.label}: ${fmt(ctx.parsed.y)}원`;
+                  if (!ctx.dataset.label.includes('평가금액')) return base;
+                  return `${base} (${(ctx.parsed.y / initial).toFixed(2)}배)`;
+                },
               },
             },
           },
@@ -403,19 +422,21 @@ window.__view_withdrawal = {
               },
               grid: { display: false },
             },
+            // 좌축 — 리저브·인출 누계 (작은 금액)
             y: {
               beginAtZero: true,
               position: 'left',
-              title: { display: true, text: '금액', font: { size: 10 }, color: '#5a6478' },
-              ticks: { callback: (v) => (v >= 10000 ? `${(v / 10000).toFixed(1)}억` : `${v.toLocaleString()}만`) },
+              title: { display: true, text: '리저브 · 인출 (좌)', font: { size: 10 }, color: '#5a6478' },
+              ticks: { callback: axisAmount },
             },
-            // 지수 전용 축 — 시작 시점을 1배로 본 상대 성장
+            // 우축 — 자산·평가금액 (큰 금액). 둘 다 금액이지만 범위가 달라
+            // 범례의 (좌)/(우) 표기로 어느 눈금으로 읽을지 알린다.
             yIndex: {
               beginAtZero: true,
               position: 'right',
-              title: { display: true, text: '지수 배수', font: { size: 10 }, color: '#a3aab8' },
+              title: { display: true, text: '자산 · 평가금액 (우)', font: { size: 10 }, color: '#5a6478' },
               grid: { drawOnChartArea: false },
-              ticks: { color: '#a3aab8', callback: (v) => `${v}배` },
+              ticks: { callback: axisAmount },
             },
           },
         },

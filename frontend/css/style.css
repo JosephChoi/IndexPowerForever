@@ -2105,37 +2105,6 @@ a:hover { color: var(--color-teal-deep); }
 /* 연차 표기 — 시뮬레이션 경과 시간이 한눈에 들어오도록 */
 .withdrawal-nth { font-weight: 700; color: var(--color-navy); font-size: 0.85rem; }
 
-/* 표 범례 — 현금/매도 색이 무엇을 뜻하는지 */
-.withdrawal-legend {
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-  margin-bottom: 0.75rem;
-  font-size: 0.75rem;
-  color: var(--color-text-sub);
-}
-.withdrawal-legend__item { display: inline-flex; align-items: center; gap: 0.35rem; }
-.withdrawal-dot { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
-.withdrawal-dot--cash { background: var(--color-teal); }
-.withdrawal-dot--sell { background: var(--color-underperform); }
-
-/* 인출 재원 막대 — 현금(청록) vs 매도(적색) 비율 */
-.withdrawal-src__bar {
-  display: flex;
-  height: 8px;
-  border-radius: 4px;
-  overflow: hidden;
-  background: var(--color-border);
-}
-.withdrawal-src__cash { background: var(--color-teal); }
-.withdrawal-src__sell { background: var(--color-underperform); }
-.withdrawal-src__text {
-  font-size: 0.72rem;
-  color: var(--color-text-sub);
-  margin-top: 0.25rem;
-  line-height: 1.3;
-}
-
 /* 리저브 잔액 게이지 — 목표 대비 채움 정도 + 하한선 마커 */
 .withdrawal-res__gauge {
   position: relative;
