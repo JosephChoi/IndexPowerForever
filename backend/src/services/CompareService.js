@@ -10,9 +10,10 @@ export class CompareService {
 
   // 비교 분석 전체 실행 (KV 6h 캐시)
   async analyze(ticker, period = '5Y', benchmark = 'SPY') {
-    // v2: 무위험수익률 4.5% → 3.9% 변경으로 샤프 비율 산출이 달라져 구버전 캐시를 무효화한다.
+    // v3: 샤프 비율을 표준 정의(일별 초과수익률 산술평균 기반)로 변경하며 캐시 무효화.
+    //     v2는 무위험수익률 4.5% → 3.9% 변경 건이었다.
     // 계산식이 바뀌면 이 버전을 올릴 것 (안 올리면 TTL 6시간 동안 옛 값이 나온다)
-    const cacheKey = `compare:v2:${ticker}:${period}:${benchmark}`;
+    const cacheKey = `compare:v3:${ticker}:${period}:${benchmark}`;
 
     const cached = await this.env.KV.get(cacheKey);
     if (cached) {
@@ -104,21 +105,21 @@ export class CompareService {
           totalReturn: parseFloat((etfCumReturns.at(-1)?.return || 0).toFixed(2)),
           cagr: parseFloat((etfCAGR * 100).toFixed(2)),
           mdd: parseFloat(CalculationService.calcMDD(etfPrices).toFixed(2)),
-          sharpe: parseFloat(CalculationService.calcSharpe(etfCAGR, etfVol).toFixed(2)),
+          sharpe: parseFloat(CalculationService.calcSharpe(etfPrices).toFixed(2)),
           annualVolatility: parseFloat((etfVol * 100).toFixed(2)),
         },
         spy: {
           totalReturn: parseFloat((spyCumReturns.at(-1)?.return || 0).toFixed(2)),
           cagr: parseFloat((spyCAGR * 100).toFixed(2)),
           mdd: parseFloat(CalculationService.calcMDD(spyPrices).toFixed(2)),
-          sharpe: parseFloat(CalculationService.calcSharpe(spyCAGR, spyVol).toFixed(2)),
+          sharpe: parseFloat(CalculationService.calcSharpe(spyPrices).toFixed(2)),
           annualVolatility: parseFloat((spyVol * 100).toFixed(2)),
         },
         qqq: {
           totalReturn: parseFloat((qqqCumReturns.at(-1)?.return || 0).toFixed(2)),
           cagr: parseFloat((qqqCAGR * 100).toFixed(2)),
           mdd: parseFloat(CalculationService.calcMDD(qqqPrices).toFixed(2)),
-          sharpe: parseFloat(CalculationService.calcSharpe(qqqCAGR, qqqVol).toFixed(2)),
+          sharpe: parseFloat(CalculationService.calcSharpe(qqqPrices).toFixed(2)),
           annualVolatility: parseFloat((qqqVol * 100).toFixed(2)),
         },
       },

@@ -157,7 +157,7 @@
                 <div class="kpi-label">
                   샤프 비율
                   <span class="kpi-info" tabindex="0" role="button" aria-label="샤프 비율 설명"
-                        data-tip="위험을 얼마나 감수하고 그 수익을 얻었는지 나타냅니다. (연평균 수익률 − 무위험수익률 3.9%)를 변동성으로 나눈 값으로, 높을수록 흔들림 대비 수익이 좋다는 뜻입니다. 주가지수는 장기적으로 0.2~0.6 사이가 흔하므로, 절대값보다 아래 벤치마크와의 비교로 보세요."><i class="bi bi-info-circle"></i></span>
+                        data-tip="위험을 얼마나 감수하고 그 수익을 얻었는지 나타냅니다. 무위험수익률(3.9%)을 넘는 초과수익을 변동성으로 나눈 값으로, 높을수록 흔들림 대비 수익이 좋다는 뜻입니다. 배당을 빼고 계산하므로 배당까지 반영하는 외부 사이트보다 낮게 나옵니다. 절대값보다 아래 벤치마크와의 비교로 보세요."><i class="bi bi-info-circle"></i></span>
                 </div>
                 <div class="kpi-value" :class="statClass('sharpe','etf') ? 'positive' : ''">
                   {{ compareData.stats.etf.sharpe.toFixed(2) }}

@@ -59,10 +59,28 @@ export class CalculationService {
     return Math.sqrt(variance) * Math.sqrt(TRADING_DAYS_PER_YEAR);
   }
 
-  // Sharpe 비율: (CAGR - 무위험수익률) / 연환산변동성
-  static calcSharpe(cagr, annualVolatility) {
-    if (annualVolatility === 0) return 0;
-    return (cagr - RISK_FREE_RATE) / annualVolatility;
+  // Sharpe 비율 — 표준 정의: 일별 초과수익률의 산술평균 / 표준편차 × √252
+  //
+  // 분자에 CAGR(기하평균)을 쓰면 변동성이 클수록 산술평균보다 낮아져
+  // 샤프가 구조적으로 과소평가된다. (SPY 전체기간 0.26 vs 표준 0.34,
+  // 변동성이 큰 QQQ는 격차가 더 크다) 교과서·업계 표준을 따라 산술평균을 쓴다.
+  //
+  // 표본표준편차(n-1)를 쓰는 것도 표준 관례다.
+  static calcSharpe(prices) {
+    if (!prices || prices.length < 3) return 0;
+
+    const dailyRf = RISK_FREE_RATE / TRADING_DAYS_PER_YEAR;
+    const excess = [];
+    for (let i = 1; i < prices.length; i++) {
+      excess.push(prices[i].close / prices[i - 1].close - 1 - dailyRf);
+    }
+
+    const mean = excess.reduce((s, r) => s + r, 0) / excess.length;
+    const variance = excess.reduce((s, r) => s + Math.pow(r - mean, 2), 0) / (excess.length - 1);
+    const sd = Math.sqrt(variance);
+    if (sd === 0) return 0;
+
+    return (mean / sd) * Math.sqrt(TRADING_DAYS_PER_YEAR);
   }
 
   // 연도별 수익률 계산
