@@ -294,6 +294,12 @@ window.__view_withdrawal = {
       //   우축: 내 자산·리저브 없이·지수 평가금액 (큰 금액)
       // 한 축에 몰면 자산 옆에서 리저브(자산의 1~5%)가 바닥에 눌려 리필 톱니가 안 보인다.
       // 범례는 datasets 배열 순서를 따르므로 우축 → 좌축 순으로 담는다.
+      const maxAsset = Math.max(...t.map(p => p.asset));
+      const maxIndex = Math.max(...t.map(p => p.index));
+      // 장기 구간(24년 등)에서는 인출 안 한 평가금액이 자산의 몇 배로 벌어져
+      // 같은 우축에 두면 자산선이 바닥에 눌린다. 2배를 넘으면 배수 축으로 분리한다.
+      const splitIndexAxis = maxIndex > maxAsset * 2;
+
       const rightAxis = [
         {
           label: '내 자산 (총액) (우)',
@@ -309,13 +315,17 @@ window.__view_withdrawal = {
         {
           // 초기 자산을 전액 이 지수에 넣고 한 푼도 인출하지 않았을 때의 평가금액.
           // 인출로 얼마를 못 불렸는지 대조하는 기준선이라 적색으로 강조한다.
-          label: `${this.ticker} 평가금액 (우)`,
-          data: t.map(p => p.index),
+          label: splitIndexAxis
+            ? `${this.ticker} 평가금액 (배수)`
+            : `${this.ticker} 평가금액 (우)`,
+          data: splitIndexAxis
+            ? t.map(p => p.index / this.initial)
+            : t.map(p => p.index),
           borderColor: '#dc2626',
           borderWidth: 2,
           borderDash: [5, 3],
           pointRadius: 0,
-          yAxisID: 'yIndex',
+          yAxisID: splitIndexAxis ? 'yMult' : 'yIndex',
           order: 4,
         },
       ];
@@ -402,11 +412,15 @@ window.__view_withdrawal = {
             tooltip: {
               callbacks: {
                 title: (items) => (items.length ? items[0].label.slice(0, 7) : ''),
-                // 모든 선이 금액. 평가금액 선에는 배수를 병기해 "몇 배 올랐나"도 보이게 한다.
+                // 평가금액 선은 축이 배수일 수 있으므로 항상 금액과 배수를 함께 적는다.
                 label: (ctx) => {
-                  const base = `${ctx.dataset.label}: ${fmt(ctx.parsed.y)}원`;
-                  if (!ctx.dataset.label.includes('평가금액')) return base;
-                  return `${base} (${(ctx.parsed.y / initial).toFixed(2)}배)`;
+                  if (!ctx.dataset.label.includes('평가금액')) {
+                    return `${ctx.dataset.label}: ${fmt(ctx.parsed.y)}원`;
+                  }
+                  const amount = ctx.dataset.yAxisID === 'yMult'
+                    ? ctx.parsed.y * initial
+                    : ctx.parsed.y;
+                  return `${ctx.dataset.label}: ${fmt(amount)}원 (${(amount / initial).toFixed(2)}배)`;
                 },
               },
             },
@@ -434,9 +448,24 @@ window.__view_withdrawal = {
             yIndex: {
               beginAtZero: true,
               position: 'right',
-              title: { display: true, text: '자산 · 평가금액 (우)', font: { size: 10 }, color: '#5a6478' },
+              title: {
+                display: true,
+                text: splitIndexAxis ? '내 자산 (우)' : '자산 · 평가금액 (우)',
+                font: { size: 10 },
+                color: '#5a6478',
+              },
               grid: { drawOnChartArea: false },
               ticks: { callback: axisAmount },
+            },
+            // 평가금액이 자산의 2배를 넘을 때만 쓰는 배수 축.
+            // 금액으로 같이 두면 자산선이 눌리므로 "몇 배 올랐나"로 분리한다.
+            yMult: {
+              display: splitIndexAxis,
+              beginAtZero: true,
+              position: 'right',
+              title: { display: true, text: '평가금액 배수', font: { size: 10 }, color: '#dc2626' },
+              grid: { drawOnChartArea: false },
+              ticks: { color: '#dc2626', callback: (v) => `${v}배` },
             },
           },
         },
