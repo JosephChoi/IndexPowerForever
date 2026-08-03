@@ -10,10 +10,10 @@ export class CompareService {
 
   // 비교 분석 전체 실행 (KV 6h 캐시)
   async analyze(ticker, period = '5Y', benchmark = 'SPY') {
-    // v4: max 기간을 세 종목 공통 구간으로 정렬하며 캐시 무효화.
-    //     v3 샤프 표준정의 변경, v2 무위험수익률 4.5%→3.9% 변경.
+    // v5: 공통 구간 정렬 제거 — 각 종목을 자기 상장일부터 계산한다.
+    //     v4 공통 구간 정렬(제거됨), v3 샤프 표준정의 변경, v2 무위험수익률 4.5%→3.9%.
     // 계산식이 바뀌면 이 버전을 올릴 것 (안 올리면 TTL 6시간 동안 옛 값이 나온다)
-    const cacheKey = `compare:v4:${ticker}:${period}:${benchmark}`;
+    const cacheKey = `compare:v5:${ticker}:${period}:${benchmark}`;
 
     const cached = await this.env.KV.get(cacheKey);
     if (cached) {
@@ -31,19 +31,15 @@ export class CompareService {
       this.priceService.get('QQQ', period),
     ]);
 
-    // max: 세 종목의 공통 구간(= 가장 늦은 상장일)으로 정렬한다.
-    // ETF 시작일만 기준 삼으면 상장이 더 늦은 벤치마크는 자기 상장일부터 계산되어
-    // 서로 다른 기간을 비교하게 된다. (예: SPY 상세에서 SPY 1993~ vs QQQ 1999~)
-    // 그 경우 샤프·CAGR·MDD가 모두 불공정하게 대비되므로 시작점을 맞춘다.
-    if (period === 'max' && etfPrices.length > 0 && spyPrices.length > 0 && qqqPrices.length > 0) {
-      const commonStart = [etfPrices[0].date, spyPrices[0].date, qqqPrices[0].date]
-        .reduce((a, b) => (a > b ? a : b));
-      etfPrices = etfPrices.filter(p => p.date >= commonStart);
-      spyPrices = spyPrices.filter(p => p.date >= commonStart);
-      qqqPrices = qqqPrices.filter(p => p.date >= commonStart);
-    }
-
+    // max 기간은 각 종목을 자기 상장일부터 그대로 계산한다.
+    // 과거 v4에서 세 종목 공통 구간으로 잘랐으나, 그러면 화면에 보이지도 않는 종목이
+    // 대표 지표를 깎아버렸다. (예: SPY 상세인데 QQQ 상장일 1999-03-10로 잘려
+    // SPY 총수익률이 1,600% → 478%로 표시됨)
+    // 대신 기간이 어긋나면 아래 periodNotice로 사용자에게 알린다.
     const benchPrices = benchmark === 'QQQ' ? qqqPrices : spyPrices;
+
+    // 선택한 벤치마크와 시작일이 다르면 안내 문구를 생성한다 (max 기간에서만 의미 있음)
+    const periodNotice = this._buildPeriodNotice(period, ticker, etfPrices, benchPrices, benchmark);
 
     // 기간 계산 (년수) — 각 티커별 실제 데이터 기간 사용
     const years = this._calcYears(etfPrices);
@@ -97,6 +93,8 @@ export class CompareService {
         end: etfPrices.at(-1)?.date,
         years: parseFloat(years.toFixed(1)),
       },
+      // 종목과 벤치마크의 시작일이 다를 때만 채워진다 (없으면 null)
+      periodNotice,
       // 차트 데이터 (샘플링 적용)
       chart: {
         etf: chartEtf,
@@ -143,6 +141,30 @@ export class CompareService {
     await this.env.KV.put(cacheKey, JSON.stringify(result), { expirationTtl: 21600 });
 
     return result;
+  }
+
+  // 종목과 벤치마크의 시작일이 다를 때 안내 문구를 만든다.
+  // 각 종목을 자기 상장일부터 계산하므로, 기간이 다르면 CAGR·MDD·샤프 비교가
+  // 동일 조건이 아니라는 점을 사용자에게 알려야 한다.
+  // (예: SPY 1993~ vs QQQ 1999~ → NASDAQ 100 비교 시 기간이 6년 어긋남)
+  _buildPeriodNotice(period, ticker, etfPrices, benchPrices, benchmark) {
+    if (period !== 'max') return null;
+    const etfStart = etfPrices[0]?.date;
+    const benchStart = benchPrices[0]?.date;
+    if (!etfStart || !benchStart || etfStart === benchStart) return null;
+
+    const benchName = benchmark === 'QQQ' ? 'NASDAQ 100' : 'S&P 500';
+    const later = etfStart > benchStart ? ticker : benchName;
+    const laterDate = etfStart > benchStart ? etfStart : benchStart;
+
+    return {
+      etfStart,
+      benchStart,
+      benchName,
+      message: `${ticker}와 ${benchName}의 데이터 시작일이 다릅니다. `
+        + `각 종목은 자체 상장일부터 계산되며, ${later} 기준 시작일은 ${laterDate}입니다. `
+        + `기간이 다르므로 CAGR·MDD·샤프 비율은 동일 조건 비교가 아닙니다.`,
+    };
   }
 
   // 주간 샘플링 (매주 금요일 or 마지막 거래일)

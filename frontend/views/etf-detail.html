@@ -104,6 +104,12 @@
       <div v-show="activeTab === 'comparison'">
         <template v-if="compareData">
 
+          <!-- 종목과 벤치마크의 상장일이 다를 때만 노출 -->
+          <div class="period-notice mb-3" v-if="compareData.periodNotice">
+            <i class="bi bi-info-circle me-2"></i>
+            <span>{{ compareData.periodNotice.message }}</span>
+          </div>
+
           <!-- 핵심 지표 카드 4개 -->
           <div class="row g-3 mb-4 kpi-row">
             <div class="col-6 col-md-3">
