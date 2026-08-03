@@ -2322,3 +2322,133 @@ a:hover { color: var(--color-teal-deep); }
   .withdrawal-chart-box { height: 280px; }
   .withdrawal-stat__value { font-size: 1rem; }
 }
+
+/* ═══════════════════════════════════════════════
+   푸터
+   ═══════════════════════════════════════════════ */
+.site-footer {
+  background: var(--color-navy-deep);
+  color: rgba(255, 255, 255, 0.72);
+  padding: 1.75rem 0 1.25rem;
+  margin-top: 3rem;
+  font-size: 0.85rem;
+}
+
+.site-footer-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 2rem;
+  justify-content: space-between;
+  padding-bottom: 1.1rem;
+}
+
+.site-footer-brand {
+  max-width: 380px;
+}
+
+.site-footer-logo {
+  height: 24px;
+  vertical-align: middle;
+  margin-right: 0.5rem;
+}
+
+.site-footer-brand-text {
+  color: #ffffff;
+  font-size: 1.05rem;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  vertical-align: middle;
+}
+
+.site-footer-brand-text strong {
+  color: var(--color-teal);
+  font-weight: 800;
+}
+
+.site-footer-desc {
+  margin: 0.4rem 0 0;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+/* 링크는 한 줄 가로 배치 — 사이에 얇은 구분선 */
+.site-footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+}
+
+.site-footer-links .site-footer-link + .site-footer-link {
+  border-left: 1px solid rgba(255, 255, 255, 0.18);
+  padding-left: 1rem;
+}
+
+.site-footer-link {
+  color: rgba(255, 255, 255, 0.65);
+  text-decoration: none;
+  font-size: 0.82rem;
+  transition: color 0.15s ease;
+}
+
+.site-footer-link:hover {
+  color: var(--color-teal);
+}
+
+.site-footer-bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  padding-top: 0.9rem;
+}
+
+/* 문의 줄 — 서비스 메뉴와 구분해 하단에 별도 배치 */
+.site-footer-policy {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 1rem;
+  margin-bottom: 0.6rem;
+}
+
+.site-footer-policy .site-footer-link {
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+}
+
+.site-footer-policy .site-footer-link + .site-footer-link {
+  border-left: 1px solid rgba(255, 255, 255, 0.18);
+  padding-left: 1rem;
+}
+
+.site-footer-copy {
+  margin: 0;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.site-footer-note {
+  margin: 0.35rem 0 0;
+  font-size: 0.74rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* 푸터가 항상 화면 하단에 붙도록 — 콘텐츠가 짧아도 뜨지 않게 */
+html, body { height: 100%; }
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+body > #app { flex: 1 0 auto; }
+body > #footer-container { flex: none; }
+
+@media (max-width: 768px) {
+  /* 좁은 화면에선 링크가 여러 줄로 접히므로 구분선을 빼서 줄 앞에 남지 않게 한다 */
+  .site-footer-links .site-footer-link + .site-footer-link {
+    border-left: none;
+    padding-left: 0;
+  }
+  .site-footer-links { gap: 0.4rem 1.1rem; }
+}

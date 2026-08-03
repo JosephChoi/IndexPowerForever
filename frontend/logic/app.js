@@ -129,6 +129,19 @@ const loadNavbar = async () => {
   initNavbarSearch();
 };
 
+// 푸터 로드
+const loadFooter = async () => {
+  const res = await fetch('/components/footer.html');
+  const html = await res.text();
+  const container = document.getElementById('footer-container');
+  if (!container) return;
+  container.innerHTML = html;
+
+  // 스팸 봇의 주소 수집을 막기 위해 메일 주소는 표시하지 않고 조합해서 링크만 건다
+  const contact = document.getElementById('footerContactLink');
+  if (contact) contact.href = 'mailto:' + ['kunmin.choi', 'gmail.com'].join('@');
+};
+
 // ── 글로벌 ETF 검색 모달 (Vue 외부 — vanilla) ──
 const initNavbarSearch = () => {
   const btn = document.getElementById('navbarSearchBtn');
@@ -245,5 +258,6 @@ app.mixin(globalMixin);
 
 router.isReady().then(async () => {
   await loadNavbar();
+  await loadFooter();
   app.mount('#app');
 });
