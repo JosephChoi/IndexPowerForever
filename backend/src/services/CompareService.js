@@ -10,10 +10,11 @@ export class CompareService {
 
   // 비교 분석 전체 실행 (KV 6h 캐시)
   async analyze(ticker, period = '5Y', benchmark = 'SPY') {
-    // v5: 공통 구간 정렬 제거 — 각 종목을 자기 상장일부터 계산한다.
-    //     v4 공통 구간 정렬(제거됨), v3 샤프 표준정의 변경, v2 무위험수익률 4.5%→3.9%.
+    // v6: 벤치마크를 조회 중인 ETF의 시작일에 맞춰 자른다.
+    //     v5 정렬 전면 제거(벤치마크가 과도하게 길어짐), v4 세 종목 공통 구간(둘 다 폐기),
+    //     v3 샤프 표준정의 변경, v2 무위험수익률 4.5%→3.9%.
     // 계산식이 바뀌면 이 버전을 올릴 것 (안 올리면 TTL 6시간 동안 옛 값이 나온다)
-    const cacheKey = `compare:v5:${ticker}:${period}:${benchmark}`;
+    const cacheKey = `compare:v6:${ticker}:${period}:${benchmark}`;
 
     const cached = await this.env.KV.get(cacheKey);
     if (cached) {
@@ -31,14 +32,20 @@ export class CompareService {
       this.priceService.get('QQQ', period),
     ]);
 
-    // max 기간은 각 종목을 자기 상장일부터 그대로 계산한다.
-    // 과거 v4에서 세 종목 공통 구간으로 잘랐으나, 그러면 화면에 보이지도 않는 종목이
-    // 대표 지표를 깎아버렸다. (예: SPY 상세인데 QQQ 상장일 1999-03-10로 잘려
-    // SPY 총수익률이 1,600% → 478%로 표시됨)
-    // 대신 기간이 어긋나면 아래 periodNotice로 사용자에게 알린다.
+    // max: 기준은 언제나 조회 중인 ETF다. 벤치마크를 ETF 시작일에 맞춰 자른다.
+    // 세 종목 공통 구간으로 자르면(v4) 화면에 없는 종목이 지표를 깎고,
+    // 아무것도 자르지 않으면(v5) 벤치마크만 훨씬 긴 기간이라 ETF가 부당하게 져 보인다.
+    // (예: SMH 2000~ vs S&P 500 1993~ → S&P 500이 1,600%로 표시)
+    if (period === 'max' && etfPrices.length > 0) {
+      const etfStart = etfPrices[0].date;
+      spyPrices = spyPrices.filter(p => p.date >= etfStart);
+      qqqPrices = qqqPrices.filter(p => p.date >= etfStart);
+    }
+
     const benchPrices = benchmark === 'QQQ' ? qqqPrices : spyPrices;
 
-    // 선택한 벤치마크와 시작일이 다르면 안내 문구를 생성한다 (max 기간에서만 의미 있음)
+    // 벤치마크가 ETF보다 늦게 상장한 경우에만 기간이 어긋난다.
+    // (예: SPY 1993~ 상세에서 NASDAQ 100은 1999~ 밖에 없음)
     const periodNotice = this._buildPeriodNotice(period, ticker, etfPrices, benchPrices, benchmark);
 
     // 기간 계산 (년수) — 각 티커별 실제 데이터 기간 사용
@@ -143,27 +150,26 @@ export class CompareService {
     return result;
   }
 
-  // 종목과 벤치마크의 시작일이 다를 때 안내 문구를 만든다.
-  // 각 종목을 자기 상장일부터 계산하므로, 기간이 다르면 CAGR·MDD·샤프 비교가
-  // 동일 조건이 아니라는 점을 사용자에게 알려야 한다.
-  // (예: SPY 1993~ vs QQQ 1999~ → NASDAQ 100 비교 시 기간이 6년 어긋남)
+  // 벤치마크가 ETF보다 늦게 상장해 기간을 맞출 수 없을 때만 안내를 만든다.
+  // 벤치마크는 ETF 시작일에 맞춰 잘리므로 보통은 시작일이 같아진다.
+  // 다만 벤치마크 쪽 데이터가 더 짧으면 자를 수가 없어 기간이 어긋난다.
+  // (예: SPY 1993~ 상세에서 NASDAQ 100은 1999-03-10부터만 존재)
   _buildPeriodNotice(period, ticker, etfPrices, benchPrices, benchmark) {
     if (period !== 'max') return null;
     const etfStart = etfPrices[0]?.date;
     const benchStart = benchPrices[0]?.date;
-    if (!etfStart || !benchStart || etfStart === benchStart) return null;
+    if (!etfStart || !benchStart || benchStart <= etfStart) return null;
 
     const benchName = benchmark === 'QQQ' ? 'NASDAQ 100' : 'S&P 500';
-    const later = etfStart > benchStart ? ticker : benchName;
-    const laterDate = etfStart > benchStart ? etfStart : benchStart;
 
     return {
       etfStart,
       benchStart,
       benchName,
-      message: `${ticker}와 ${benchName}의 데이터 시작일이 다릅니다. `
-        + `각 종목은 자체 상장일부터 계산되며, ${later} 기준 시작일은 ${laterDate}입니다. `
-        + `기간이 다르므로 CAGR·MDD·샤프 비율은 동일 조건 비교가 아닙니다.`,
+      message: `${benchName}의 데이터는 ${benchStart}부터 존재해 `
+        + `${ticker}의 시작일(${etfStart})까지 거슬러 올라가지 않습니다. `
+        + `${benchName} 지표는 ${benchStart} 이후 구간만 반영되므로 `
+        + `CAGR·MDD·샤프 비율은 동일 조건 비교가 아닙니다.`,
     };
   }
 
