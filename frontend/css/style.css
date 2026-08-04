@@ -786,11 +786,46 @@ a:hover { color: var(--color-teal-deep); }
   color: #fff;
   background: rgba(38, 180, 168, 0.2);
 }
-.nav-link-book {
-  border: 1px solid rgba(255,255,255,0.15) !important;
+/* 책 소개 — 골드 강조 (디자인 가이드: 골드는 페이지당 1~2회 특별 강조) */
+.site-navbar .nav-link-book {
+  position: relative;
+  background: rgba(212, 175, 55, 0.14);
+  border: 1px solid rgba(212, 175, 55, 0.45) !important;
+  border-radius: 8px;
+  color: var(--color-gold) !important;
+  font-weight: 700;
+  padding-left: 0.85rem !important;
+  padding-right: 0.85rem !important;
+  transition: background 0.18s, border-color 0.18s, box-shadow 0.18s, transform 0.18s;
 }
-.nav-link-book:hover {
-  border-color: rgba(255,255,255,0.3) !important;
+.site-navbar .nav-link-book:hover,
+.site-navbar .nav-link-book:focus {
+  background: var(--color-gold);
+  border-color: var(--color-gold) !important;
+  color: var(--color-navy-deep) !important;
+  box-shadow: 0 6px 18px -6px rgba(212, 175, 55, 0.6);
+  transform: translateY(-1px);
+}
+/* 출간 예정 표시용 점 — 시선 유도 */
+.site-navbar .nav-link-book::after {
+  content: '';
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-gold);
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.22);
+}
+.site-navbar .nav-link-book:hover::after {
+  background: var(--color-navy-deep);
+  box-shadow: none;
+}
+/* 모바일(햄버거 메뉴)에서는 전체폭 스택이라 점·들뜸 효과 제거 */
+@media (max-width: 991.98px) {
+  .site-navbar .nav-link-book::after { display: none; }
+  .site-navbar .nav-link-book:hover { transform: none; }
 }
 
 /* ── 네비게이션 검색 버튼 (아이콘 only — 데스크톱) ── */
@@ -1956,6 +1991,106 @@ a:hover { color: var(--color-teal-deep); }
   transform: scale(1.05);
 }
 
+/* 연계 서비스 소개 — ETF Simulation */
+.sim-promo-section {
+  background: linear-gradient(135deg, var(--color-navy-deep) 0%, var(--color-navy) 100%);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: var(--shadow-lg);
+}
+.sim-promo-inner {
+  padding: var(--space-2xl) var(--space-xl);
+}
+.sim-promo-head {
+  text-align: center;
+  max-width: 720px;
+  margin: 0 auto var(--space-xl);
+}
+.sim-promo-badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 0.3rem 0.75rem;
+  border-radius: var(--radius-pill);
+  background: rgba(38, 180, 168, 0.18);
+  color: var(--color-teal);
+  margin-bottom: var(--space-md);
+}
+.sim-promo-title {
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #fff;
+  margin-bottom: var(--space-sm);
+}
+.sim-promo-desc {
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--text-on-dark);
+  margin-bottom: 0;
+}
+.sim-promo-desc strong {
+  color: var(--color-teal);
+  font-weight: 700;
+}
+.sim-promo-feature {
+  height: 100%;
+  padding: var(--space-lg);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: background 0.2s, transform 0.2s;
+}
+.sim-promo-feature:hover {
+  background: rgba(255, 255, 255, 0.09);
+  transform: translateY(-3px);
+}
+.sim-promo-icon {
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  background: rgba(38, 180, 168, 0.16);
+  color: var(--color-teal);
+  font-size: 1.15rem;
+  margin-bottom: var(--space-md);
+}
+.sim-promo-feature h6 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 0.35rem;
+}
+.sim-promo-feature p {
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: var(--text-on-dark-sub);
+  margin-bottom: 0;
+}
+.sim-promo-cta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-top: var(--space-xl);
+}
+.sim-promo-btn {
+  padding: 0.7rem 1.75rem;
+  font-weight: 700;
+}
+.sim-promo-note {
+  font-size: 0.8rem;
+  color: var(--text-on-dark-sub);
+}
+@media (max-width: 576px) {
+  .sim-promo-inner { padding: var(--space-xl) var(--space-md); }
+  .sim-promo-title { font-size: 1.3rem; }
+}
+
 /* 네비게이션 — 드롭다운 */
 .navbar-dropdown {
   background: #1a1f2e;
@@ -1991,6 +2126,19 @@ a:hover { color: var(--color-teal-deep); }
   font-size: 1rem;
   flex-shrink: 0;
   margin-top: 2px;
+}
+/* 다크 드롭다운 위 아이콘 — .text-primary(네이비)는 배경에 묻혀 청록 사용 */
+.navbar-dropdown-icon-teal {
+  color: var(--color-teal);
+}
+/* 외부 연계 서비스 — 인접한 청록과 구분되도록 골드 */
+.navbar-dropdown-icon-gold {
+  color: var(--color-gold);
+}
+.navbar-dropdown-divider {
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  opacity: 1;
+  margin: 0.4rem 0.25rem;
 }
 .navbar-dropdown-item small {
   font-size: 0.72rem;
