@@ -1991,6 +1991,228 @@ a:hover { color: var(--color-teal-deep); }
   transform: scale(1.05);
 }
 
+/* ── 서비스 이용 매뉴얼 (책 부록) ── */
+.manual-hero {
+  background: linear-gradient(135deg, var(--bg-dark-hero) 0%, var(--color-navy) 100%);
+  color: #fff;
+}
+.manual-hero-badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 0.3rem 0.75rem;
+  border-radius: var(--radius-pill);
+  background: rgba(212, 175, 55, 0.18);
+  color: var(--color-gold);
+}
+.manual-hero-title {
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin-bottom: var(--space-md);
+}
+.manual-hero-desc {
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--text-on-dark);
+}
+
+/* 좌측 목차 */
+.manual-toc {
+  position: sticky;
+  top: 84px;
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  box-shadow: var(--shadow-sm);
+}
+.manual-toc-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-light);
+  padding: 0 0.5rem;
+  margin-bottom: var(--space-sm);
+}
+.manual-toc-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.5rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.84rem;
+  color: var(--color-text-sub);
+  text-decoration: none;
+  border-left: 2px solid transparent;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.manual-toc-link:hover {
+  background: rgba(26, 43, 109, 0.05);
+  color: var(--color-navy);
+}
+.manual-toc-link.active {
+  background: rgba(38, 180, 168, 0.1);
+  border-left-color: var(--color-teal);
+  color: var(--color-navy);
+  font-weight: 700;
+}
+.manual-toc-link i { font-size: 0.9rem; flex-shrink: 0; }
+
+/* 본문 */
+.manual-section { scroll-margin-top: 84px; margin-bottom: var(--space-3xl); }
+.manual-body p { font-size: 0.95rem; line-height: 1.75; color: var(--color-text); }
+.manual-h2 {
+  font-size: 1.3rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--color-navy);
+  padding-bottom: var(--space-sm);
+  margin-bottom: var(--space-md);
+  border-bottom: 2px solid var(--color-border);
+}
+.manual-h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: var(--space-lg) 0 var(--space-sm);
+}
+.manual-steps, .manual-list {
+  font-size: 0.92rem;
+  line-height: 1.75;
+  color: var(--color-text);
+  padding-left: 1.25rem;
+}
+.manual-steps li, .manual-list li { margin-bottom: 0.4rem; }
+.manual-body code {
+  background: var(--color-primary-light);
+  color: var(--color-navy);
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+  font-size: 0.85em;
+}
+
+/* 스크린샷 */
+.manual-figure { margin: var(--space-lg) 0; }
+.manual-figure img {
+  width: 100%;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-md);
+}
+.manual-figure figcaption {
+  margin-top: var(--space-sm);
+  font-size: 0.82rem;
+  color: var(--color-text-sub);
+  text-align: center;
+}
+
+/* 콜아웃 */
+.manual-callout {
+  display: flex;
+  gap: 0.75rem;
+  padding: var(--space-md);
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+  line-height: 1.65;
+  margin: var(--space-lg) 0;
+}
+.manual-callout i { font-size: 1.05rem; flex-shrink: 0; margin-top: 2px; }
+.manual-callout strong { display: block; margin-bottom: 0.15rem; }
+.manual-callout-teal {
+  background: var(--color-accent-light);
+  color: var(--color-text);
+  border-left: 4px solid var(--color-teal);
+}
+.manual-callout-teal i { color: var(--color-teal-deep); }
+.manual-callout-navy {
+  background: var(--color-navy);
+  color: var(--text-on-dark);
+}
+.manual-callout-navy strong { color: #fff; }
+.manual-callout-navy i { color: var(--color-gold); }
+.manual-callout-muted {
+  background: var(--bg-light);
+  color: var(--color-text-sub);
+  border-left: 4px solid var(--color-border);
+}
+.manual-ref {
+  display: inline-block;
+  margin-left: 0.4rem;
+  font-size: 0.78rem;
+  opacity: 0.75;
+}
+
+/* ETF 상세 4탭 카드 */
+.manual-tab-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--space-md);
+  margin: var(--space-lg) 0;
+}
+.manual-tab-card {
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  box-shadow: var(--shadow-sm);
+}
+.manual-tab-card p { font-size: 0.86rem; line-height: 1.6; color: var(--color-text-sub); }
+.manual-tab-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: var(--space-sm);
+}
+.manual-tab-no {
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--color-navy);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.manual-tab-name { font-size: 0.92rem; font-weight: 700; color: var(--color-navy); }
+
+/* 메뉴 구조 표 */
+.manual-menu-link {
+  font-weight: 700;
+  color: var(--color-navy);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.manual-menu-link:hover { color: var(--color-teal-deep); }
+.manual-menu-link i { transition: transform 0.15s; }
+.manual-menu-link:hover i { transform: translateX(3px); }
+.manual-part-badge {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  background: var(--color-primary-light);
+  color: var(--color-navy);
+  white-space: nowrap;
+}
+
+.manual-cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin-top: var(--space-xl);
+}
+
+@media (max-width: 991.98px) {
+  .manual-toc { position: static; margin-bottom: var(--space-lg); }
+}
+
 /* 연계 서비스 소개 — ETF Simulation */
 .sim-promo-section {
   background: linear-gradient(135deg, var(--color-navy-deep) 0%, var(--color-navy) 100%);
@@ -2650,22 +2872,122 @@ body > #footer-container { flex: none; }
 }
 
 /* ═══════════════════════════════════════════════
-   인사이트 — 장 표기 / 출처
+   인사이트 카드
+   파트별 무지개 배지·컬러 이모지를 걷어내고
+   네이비/청록 단일 톤 + Bootstrap Icons로 통일한다.
    ═══════════════════════════════════════════════ */
-.insight-chapter {
-  font-size: 0.72rem;
-  font-weight: 600;
-  color: var(--color-text-sub);
-  background: var(--color-bg);
-  border-radius: 4px;
-  padding: 0.15rem 0.4rem;
+.insight-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.2s, transform 0.2s, border-color 0.2s;
+}
+.insight-card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: rgba(38, 180, 168, 0.4);
+  transform: translateY(-2px);
 }
 
-/* 출처 — 본문보다 한 단계 낮은 톤 */
+.insight-card-head {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-bottom: var(--space-md);
+}
+/* 아이콘 배지 — 카드 hover 시 청록으로 채워진다 */
+.insight-icon {
+  width: 38px;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: var(--radius-sm);
+  background: var(--color-primary-light);
+  color: var(--color-navy);
+  font-size: 1.05rem;
+  transition: background 0.2s, color 0.2s;
+}
+.insight-card:hover .insight-icon {
+  background: var(--color-teal);
+  color: #fff;
+}
+
+.insight-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  min-width: 0;
+}
+.insight-part {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--color-navy);
+  background: var(--color-primary-light);
+  border-radius: 4px;
+  padding: 0.15rem 0.45rem;
+  white-space: nowrap;
+}
+.insight-chapter {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--color-text-light);
+  white-space: nowrap;
+}
+
+.insight-title {
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.45;
+  letter-spacing: -0.02em;
+  color: var(--color-text);
+  margin-bottom: var(--space-sm);
+}
+.insight-message {
+  font-size: 0.88rem;
+  line-height: 1.65;
+  color: var(--color-text-sub);
+  margin-bottom: var(--space-md);
+}
+
+/* 하단 — 출처와 링크를 한 줄 양끝 정렬해 카드마다 바닥선을 맞춘다 */
+.insight-card-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: auto;
+  padding-top: var(--space-sm);
+  border-top: 1px solid var(--color-border);
+}
 .insight-source {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
   font-size: 0.74rem;
   color: var(--color-text-light);
+  margin-bottom: 0;
 }
+/* 출처가 없는 카드에서도 링크는 오른쪽 끝에 붙는다 */
+.insight-card-foot > .insight-link:only-child { margin-left: auto; }
+.insight-link {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--color-teal-deep);
+  text-decoration: none;
+}
+.insight-link i { transition: transform 0.15s; }
+.insight-link:hover { color: var(--color-navy); }
+.insight-link:hover i { transform: translateX(3px); }
 
 /* 히어로 배지 — Bootstrap bg-opacity가 navy override와 충돌해 직접 정의 */
 .book-hero-badge {

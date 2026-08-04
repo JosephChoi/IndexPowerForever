@@ -76,8 +76,8 @@ window.__view_book = {
           items: [
             { ch: '부록', title: '책의 내용을 데이터로 확인하는 매뉴얼', desc: '『이길 수 있는 투자만 하라』의 내용을 데이터로 확인하고 증명해 볼 수 있도록, 이 웹사이트의 사용법을 화면과 함께 설명합니다.' },
           ],
-          link: '/',
-          linkText: '지금 바로 확인해보기',
+          link: '/manual',
+          linkText: '이용 매뉴얼 보기',
         },
       ],
       // 원고에 실제로 실린 수치만 사용 (출처: 1장 SPIVA, 17장 Yahoo Finance)

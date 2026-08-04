@@ -1,0 +1,355 @@
+<div>
+  <!-- 히어로 -->
+  <section class="manual-hero">
+    <div class="container py-5">
+      <span class="manual-hero-badge mb-3">
+        <i class="bi bi-book me-1"></i>『이길 수 있는 투자만 하라』 부록
+      </span>
+      <h1 class="manual-hero-title">서비스 이용 매뉴얼</h1>
+      <p class="manual-hero-desc mb-0">
+        책에서 읽은 내용을 이 사이트에서 직접 데이터로 확인하는 방법을 화면과 함께 설명합니다.<br class="d-none d-md-block" />
+        로그인 없이 누구나 무료로 이용할 수 있습니다.
+      </p>
+    </div>
+  </section>
+
+  <div class="container py-5">
+    <div class="row g-4">
+      <!-- 좌측 목차 -->
+      <div class="col-12 col-lg-3">
+        <nav class="manual-toc">
+          <div class="manual-toc-title">목차</div>
+          <a
+            href="#"
+            class="manual-toc-link"
+            :class="{ active: activeId === t.id }"
+            v-for="t in toc"
+            :key="t.id"
+            @click.prevent="scrollTo(t.id)"
+          >
+            <i class="bi" :class="t.icon"></i><span>{{ t.label }}</span>
+          </a>
+        </nav>
+      </div>
+
+      <!-- 본문 -->
+      <div class="col-12 col-lg-9 manual-body">
+        <!-- 시작하기 -->
+        <section id="intro" class="manual-section">
+          <h2 class="manual-h2"><i class="bi bi-play-circle me-2"></i>시작하기</h2>
+          <p>
+            본 서비스는 『이길 수 있는 투자만 하라』의 핵심 메시지를 <strong>실제 데이터</strong>로 직접
+            확인할 수 있도록 만든 무료 웹서비스입니다. 책이 주장을 글로 설명했다면, 이 사이트는 같은 주장을
+            숫자로 재현합니다.
+          </p>
+          <div class="manual-callout manual-callout-teal">
+            <i class="bi bi-lightbulb"></i>
+            <div>
+              <strong>이렇게 쓰면 좋습니다.</strong>
+              책의 한 챕터를 읽은 뒤, 아래 <a href="#" @click.prevent="scrollTo('menu')">메뉴 구조 요약</a>에서
+              해당 PART와 연결된 메뉴를 열어 같은 결론이 데이터에서도 나오는지 직접 확인해보세요.
+            </div>
+          </div>
+        </section>
+
+        <!-- 1. 홈 -->
+        <section id="home" class="manual-section">
+          <h2 class="manual-h2"><i class="bi bi-house me-2"></i>1. 홈 — ETF 검색하기</h2>
+          <figure class="manual-figure">
+            <img src="/images/manual/m01_home.png" alt="홈 화면" loading="lazy" />
+            <figcaption>홈 화면 — 상단 검색창에서 바로 ETF를 분석할 수 있습니다.</figcaption>
+          </figure>
+          <h3 class="manual-h3">사용 방법</h3>
+          <ol class="manual-steps">
+            <li>검색창에 관심 있는 <strong>ETF 티커</strong>(예: SPY, QQQ, VTI)를 입력합니다.</li>
+            <li>입력하면 자동으로 <strong>검색 결과</strong>가 드롭다운으로 표시됩니다.</li>
+            <li>원하는 ETF를 클릭하거나 <strong>[분석하기]</strong> 버튼을 누르면 상세 분석 페이지로 이동합니다.</li>
+          </ol>
+          <h3 class="manual-h3">추가 기능</h3>
+          <ul class="manual-list">
+            <li><strong>인기 검색 ETF</strong> — 다른 이용자들이 많이 검색한 ETF를 바로 클릭할 수 있습니다.</li>
+            <li><strong>인기 비교 프리셋</strong> — "레버리지 ETF 비교", "배당 ETF 비교" 등 미리 준비된 비교 세트를 클릭하면 바로 분석 결과를 볼 수 있습니다.</li>
+            <li><strong>상단 검색 버튼</strong> — 어느 페이지에서든 네비게이션 바의 돋보기 아이콘(단축키 <code>⌘K</code>)으로 검색창을 열 수 있습니다.</li>
+          </ul>
+        </section>
+
+        <!-- 2. 랭킹 -->
+        <section id="ranking" class="manual-section">
+          <h2 class="manual-h2"><i class="bi bi-bar-chart-line me-2"></i>2. 랭킹 — 주요 ETF 성과 한눈에 비교</h2>
+          <p>상단 메뉴에서 <strong>[랭킹]</strong>을 클릭하면 이동합니다.</p>
+          <figure class="manual-figure">
+            <img src="/images/manual/m02_ranking.png" alt="랭킹 페이지" loading="lazy" />
+            <figcaption>미국 상장 AUM 상위 30개 ETF의 벤치마크 대비 성과</figcaption>
+          </figure>
+          <h3 class="manual-h3">사용 방법</h3>
+          <ol class="manual-steps">
+            <li><strong>기간 선택</strong> — 1Y / 3Y / 5Y / 10Y 버튼으로 분석 기간을 변경합니다.</li>
+            <li><strong>벤치마크 선택</strong> — [S&amp;P 500] 또는 [NASDAQ 100]으로 비교 기준 지수를 변경합니다.</li>
+            <li><strong>정렬</strong> — 각 컬럼 헤더(총수익률, 초과수익률, CAGR, MDD)를 클릭하면 해당 기준으로 정렬됩니다.</li>
+            <li><strong>상세 이동</strong> — ETF 티커를 클릭하면 해당 ETF의 상세 분석 페이지로 이동합니다.</li>
+          </ol>
+          <h3 class="manual-h3">주요 지표</h3>
+          <div class="table-responsive">
+            <table class="table-standard w-100">
+              <thead><tr><th style="width:22%">지표</th><th>의미</th></tr></thead>
+              <tbody>
+                <tr v-for="m in rankingMetrics" :key="m.name">
+                  <td class="fw-bold">{{ m.name }}</td>
+                  <td>{{ m.desc }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="manual-callout manual-callout-navy">
+            <i class="bi bi-key"></i>
+            <div>
+              <strong>핵심 포인트</strong>
+              초과수익률이 양수(녹색)면 그 기간 지수를 이긴 ETF, 음수(적색)면 진 ETF입니다.
+              장기간 지수를 꾸준히 이기는 ETF가 얼마나 드문지 직접 확인해보세요.
+            </div>
+          </div>
+        </section>
+
+        <!-- 3. ETF 상세 -->
+        <section id="detail" class="manual-section">
+          <h2 class="manual-h2"><i class="bi bi-graph-up me-2"></i>3. ETF 상세 분석 — 4가지 탭</h2>
+          <p>검색 또는 랭킹에서 ETF를 선택하면 상세 분석 페이지로 이동합니다.</p>
+          <figure class="manual-figure">
+            <img src="/images/manual/m03_etf.png" alt="ETF 상세 분석 화면" loading="lazy" />
+            <figcaption>ETF 상세 — 헤더에서 기간(1Y~전체)과 벤치마크를 바꿀 수 있습니다.</figcaption>
+          </figure>
+          <div class="manual-tab-grid">
+            <div class="manual-tab-card" v-for="(tab, i) in detailTabs" :key="tab.name">
+              <div class="manual-tab-head">
+                <span class="manual-tab-no">{{ i + 1 }}</span>
+                <span class="manual-tab-name"><i class="bi me-1" :class="tab.icon"></i>{{ tab.name }}</span>
+              </div>
+              <p class="mb-0">{{ tab.desc }}</p>
+            </div>
+          </div>
+          <figure class="manual-figure">
+            <img src="/images/manual/m04_winrate.png" alt="승률 탐색기 STEP 3" loading="lazy" />
+            <figcaption>승률 탐색기 STEP 3 — 각 점 하나가 "그날 투자를 시작했다면"의 결과입니다.</figcaption>
+          </figure>
+          <div class="manual-callout manual-callout-teal">
+            <i class="bi bi-lightbulb"></i>
+            <div>
+              <strong>활용 팁</strong>
+              보유 기간을 1년 → 3년 → 5년으로 늘려가며, 지수를 이기기가 더 어려워지는지 확인해보세요.
+            </div>
+          </div>
+        </section>
+
+        <!-- 4. 비용 -->
+        <section id="fee" class="manual-section">
+          <h2 class="manual-h2"><i class="bi bi-percent me-2"></i>4. 비용 시뮬레이터 — 보수 차이의 복리 효과</h2>
+          <p>상단 메뉴 <strong>[시뮬레이터] → [비용 시뮬레이터]</strong>로 이동합니다.</p>
+          <figure class="manual-figure">
+            <img src="/images/manual/m05_fee.png" alt="비용 시뮬레이터" loading="lazy" />
+            <figcaption>왼쪽 슬라이더를 조절하면 오른쪽 차트와 표가 즉시 갱신됩니다.</figcaption>
+          </figure>
+          <h3 class="manual-h3">설정 항목</h3>
+          <div class="table-responsive">
+            <table class="table-standard w-100">
+              <thead><tr><th>설정 항목</th><th>범위</th><th>기본값</th></tr></thead>
+              <tbody>
+                <tr><td class="fw-bold">초기 투자금</td><td>100 ~ 100,000만원</td><td>10,000만원</td></tr>
+                <tr><td class="fw-bold">연평균 수익률(세전)</td><td>1% ~ 20%</td><td>7%</td></tr>
+                <tr><td class="fw-bold">투자 기간</td><td>5 ~ 50년</td><td>30년</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 class="manual-h3">비교되는 3가지 시나리오</h3>
+          <div class="table-responsive">
+            <table class="table-standard w-100">
+              <thead><tr><th>시나리오</th><th>운용보수</th><th>설명</th></tr></thead>
+              <tbody>
+                <tr v-for="s in feeScenarios" :key="s.name">
+                  <td class="fw-bold">{{ s.name }}</td>
+                  <td>{{ s.fee }}</td>
+                  <td>{{ s.desc }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="manual-callout manual-callout-navy">
+            <i class="bi bi-key"></i>
+            <div>
+              <strong>핵심 포인트</strong>
+              연 1%의 보수 차이가 30년 후 수천만 원의 차이를 만듭니다. 이것이 보수의 복리 효과입니다.
+              <span class="manual-ref">본문 PART 2 참조</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- 5. 타이밍 -->
+        <section id="timing" class="manual-section">
+          <h2 class="manual-h2"><i class="bi bi-clock-history me-2"></i>5. 타이밍 시뮬레이터 — 시장 타이밍의 위험성</h2>
+          <p>상단 메뉴 <strong>[시뮬레이터] → [타이밍 시뮬레이터]</strong>로 이동합니다.</p>
+          <figure class="manual-figure">
+            <img src="/images/manual/m06_timing.png" alt="타이밍 시뮬레이터" loading="lazy" />
+            <figcaption>상위 상승일을 놓쳤을 때 수익률이 어떻게 무너지는지 보여줍니다.</figcaption>
+          </figure>
+          <h3 class="manual-h3">사용 방법</h3>
+          <ol class="manual-steps">
+            <li><strong>시작 연도</strong>와 <strong>종료 연도</strong> 슬라이더로 분석 기간을 설정합니다.</li>
+            <li>슬라이더를 움직이면 결과가 자동으로 다시 계산됩니다.</li>
+          </ol>
+          <h3 class="manual-h3">결과 보는 법</h3>
+          <ul class="manual-list">
+            <li><strong>전체 투자 시</strong> — 기간 내내 한 번도 빠지지 않고 투자했을 때의 수익률</li>
+            <li><strong>상위 10일 / 20일 / 30일 / 50일 제외</strong> — 수익률이 가장 높았던 날을 놓쳤을 때의 수익률</li>
+          </ul>
+          <div class="manual-callout manual-callout-navy">
+            <i class="bi bi-key"></i>
+            <div>
+              <strong>핵심 포인트</strong>
+              전체 거래일 중 상위 30일만 놓쳐도 수익이 손실로 바뀝니다.
+              시장에 머무르는 것(Time in the market)이 시장을 맞추는 것(Timing the market)보다 중요합니다.
+              <span class="manual-ref">본문 PART 3 참조</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- 6. 퇴직연금 -->
+        <section id="retirement" class="manual-section">
+          <h2 class="manual-h2"><i class="bi bi-piggy-bank me-2"></i>6. 퇴직연금 시뮬레이터 — 원리금보장 vs 인덱스 펀드</h2>
+          <p>상단 메뉴 <strong>[시뮬레이터] → [퇴직연금 시뮬레이터]</strong>로 이동합니다.</p>
+          <figure class="manual-figure">
+            <img src="/images/manual/m07_retirement.png" alt="퇴직연금 시뮬레이터" loading="lazy" />
+            <figcaption>같은 원금을 넣어도 운용 방식에 따라 퇴직 시점의 자산이 크게 달라집니다.</figcaption>
+          </figure>
+          <h3 class="manual-h3">설정 항목</h3>
+          <div class="table-responsive">
+            <table class="table-standard w-100">
+              <thead><tr><th>설정 항목</th><th>범위</th><th>기본값</th></tr></thead>
+              <tbody>
+                <tr><td class="fw-bold">현재 적립금</td><td>0 ~ 50,000만원</td><td>5,000만원</td></tr>
+                <tr><td class="fw-bold">월 납입액</td><td>0 ~ 500만원</td><td>50만원</td></tr>
+                <tr><td class="fw-bold">운용 기간</td><td>5 ~ 40년</td><td>20년</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 class="manual-h3">비교되는 3가지 전략</h3>
+          <div class="table-responsive">
+            <table class="table-standard w-100">
+              <thead><tr><th>전략</th><th>연수익률 가정</th><th>설명</th></tr></thead>
+              <tbody>
+                <tr v-for="s in retirementStrategies" :key="s.name">
+                  <td class="fw-bold">{{ s.name }}</td>
+                  <td>{{ s.rate }}</td>
+                  <td>{{ s.desc }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="manual-callout manual-callout-navy">
+            <i class="bi bi-key"></i>
+            <div>
+              <strong>핵심 포인트</strong>
+              동일한 원금이라도 20년 후 원리금보장과 S&amp;P 500의 차이는 수억 원에 달할 수 있습니다.
+              퇴직연금이야말로 장기 인덱스 투자의 가장 좋은 그릇입니다.
+              <span class="manual-ref">본문 PART 4 참조</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- 7. 인출전략 -->
+        <section id="withdrawal" class="manual-section">
+          <h2 class="manual-h2"><i class="bi bi-cash-coin me-2"></i>7. 인출전략 시뮬레이터 — 은퇴 후 얼마나 버틸까</h2>
+          <p>상단 메뉴 <strong>[시뮬레이터] → [인출전략 시뮬레이터]</strong>로 이동합니다.</p>
+          <figure class="manual-figure">
+            <img src="/images/manual/m08_withdrawal.png" alt="인출전략 시뮬레이터" loading="lazy" />
+            <figcaption>실제 지수 데이터로, 은퇴 자산을 인출하며 살 때의 결과를 시뮬레이션합니다.</figcaption>
+          </figure>
+          <h3 class="manual-h3">사용 방법</h3>
+          <ol class="manual-steps">
+            <li><strong>투자 지수</strong>를 S&amp;P 500 또는 NASDAQ 100 중에서 고릅니다.</li>
+            <li><strong>초기 자산</strong>과 <strong>인출 조건</strong>(매달 / 매년, 인출액, 물가상승률, 시작 연도)을 입력합니다.</li>
+            <li><strong>리저브 전략</strong>을 켜면, 인출액 일부를 현금으로 미리 빼두었다가 하락장에서 그 현금으로 버팁니다. 바닥에서 주식을 파는 일을 피하는 전략입니다.</li>
+          </ol>
+          <h3 class="manual-h3">결과 보는 법</h3>
+          <ul class="manual-list">
+            <li><strong>최종 자산 · 총 인출액</strong> — 기간이 끝난 시점에 남은 돈과, 그동안 꺼내 쓴 총액</li>
+            <li><strong>최대 낙폭(MDD)</strong> — 인출분을 제외한 순수 시장 손실</li>
+            <li><strong>강제 리필</strong> — 리저브가 바닥나 어쩔 수 없이 주식을 판 횟수</li>
+            <li><strong>리저브 비용</strong> — 리저브 전략을 쓴 대가로 포기한 수익. 안정성의 대가를 숫자로 보여줍니다.</li>
+          </ul>
+          <div class="manual-callout manual-callout-navy">
+            <i class="bi bi-key"></i>
+            <div>
+              <strong>핵심 포인트</strong>
+              모으는 단계만큼 <strong>꺼내 쓰는 단계</strong>의 설계도 중요합니다.
+              같은 자산이라도 인출률과 시작 시점에 따라 버티는 기간이 크게 달라집니다.
+              <span class="manual-ref">본문 PART 4 참조</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- 8. 인사이트 -->
+        <section id="insights" class="manual-section">
+          <h2 class="manual-h2"><i class="bi bi-lightbulb me-2"></i>8. 인사이트 — 책의 핵심 메시지를 데이터로</h2>
+          <p>상단 메뉴 <strong>[인사이트]</strong>를 클릭합니다.</p>
+          <figure class="manual-figure">
+            <img src="/images/manual/m09_insights.png" alt="인사이트 페이지" loading="lazy" />
+            <figcaption>각 카드의 [데이터로 확인하기] 버튼이 해당 메시지를 검증할 페이지로 연결됩니다.</figcaption>
+          </figure>
+          <p>
+            책의 각 PART별 핵심 메시지를 카드로 정리했습니다. 상단 필터로 PART 1~5를 골라 볼 수 있고,
+            각 카드에는 <strong>출처</strong>가 함께 표기되어 있어 원고의 어느 대목에서 나온 수치인지 확인할 수 있습니다.
+          </p>
+        </section>
+
+        <!-- 9. 메뉴 구조 -->
+        <section id="menu" class="manual-section">
+          <h2 class="manual-h2"><i class="bi bi-list-ul me-2"></i>9. 메뉴 구조 요약</h2>
+          <p>책의 각 PART와 이 사이트의 메뉴가 어떻게 연결되는지 정리했습니다. 메뉴 이름을 클릭하면 바로 이동합니다.</p>
+          <div class="table-responsive">
+            <table class="table-standard w-100">
+              <thead><tr><th>메뉴</th><th>기능</th><th style="width:15%">관련 챕터</th></tr></thead>
+              <tbody>
+                <tr v-for="m in menuMap" :key="m.menu">
+                  <td>
+                    <a href="#" class="manual-menu-link" @click.prevent="navigateTo(m.link)">
+                      {{ m.menu }}<i class="bi bi-arrow-right-short"></i>
+                    </a>
+                  </td>
+                  <td>{{ m.fn }}</td>
+                  <td><span class="manual-part-badge">{{ m.part }}</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- 이용 안내 -->
+        <section id="guide" class="manual-section">
+          <h2 class="manual-h2"><i class="bi bi-info-circle me-2"></i>이용 안내</h2>
+          <ul class="manual-list">
+            <li><strong>접속 주소</strong> — www.indexwins.com</li>
+            <li><strong>이용 요금</strong> — 무료</li>
+            <li><strong>회원가입</strong> — 불필요 (로그인 없이 모든 기능 이용 가능)</li>
+            <li><strong>지원 기기</strong> — PC, 태블릿, 스마트폰 (반응형 디자인)</li>
+            <li><strong>데이터 출처</strong> — Yahoo Finance</li>
+          </ul>
+          <div class="manual-callout manual-callout-muted">
+            <i class="bi bi-exclamation-triangle"></i>
+            <div>
+              본 서비스의 모든 데이터와 시뮬레이션 결과는 과거 실적에 기반한 참고 자료이며,
+              미래 수익률을 보장하지 않습니다.
+            </div>
+          </div>
+
+          <div class="manual-cta">
+            <button class="btn btn-primary" @click="navigateTo('/book')">
+              <i class="bi bi-book me-1"></i>책 소개로 돌아가기
+            </button>
+            <button class="btn btn-outline-primary" @click="navigateTo('/')">
+              <i class="bi bi-search me-1"></i>지금 바로 ETF 검색하기
+            </button>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+</div>

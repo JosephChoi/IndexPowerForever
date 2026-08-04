@@ -80,6 +80,7 @@ const routes = [
   { path: '/withdrawal',     component: makeView('withdrawal') },
   { path: '/insights',       component: makeView('insights') },
   { path: '/book',           component: makeView('book') },
+  { path: '/manual',         component: makeView('manual') },
   { path: '/:pathMatch(.*)*', redirect: '/' },
 ];
 
