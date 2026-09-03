@@ -138,7 +138,22 @@ const applySeo = (path) => {
   setMeta('link[rel="canonical"]', 'href', canonical);
 };
 
-router.afterEach((to) => applySeo(to.path));
+// ── GA4 page_view 전송 (SPA) ──
+// index.html에서 send_page_view:false로 설정했으므로 라우트 변경 시 직접 보낸다.
+// applySeo가 document.title을 갱신한 뒤에 호출해야 제목이 정확히 기록된다.
+const sendPageView = (path) => {
+  if (!window.__gaEnabled || typeof window.gtag !== 'function') return;
+  window.gtag('event', 'page_view', {
+    page_title: document.title,
+    page_path: path,
+    page_location: window.location.href,
+  });
+};
+
+router.afterEach((to) => {
+  applySeo(to.path);
+  sendPageView(to.fullPath);
+});
 
 // navigateTo + getParam 글로벌 mixin
 const globalMixin = {
