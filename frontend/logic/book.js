@@ -97,7 +97,8 @@ window.__view_book = {
         { no: 6, title: '뉴스에 과도하게 반응하지 않는다', desc: '대부분의 정보는 이미 가격에 반영되어 있다.' },
         { no: 7, title: '시간을 아군으로 만든다', desc: '복리는 시간이 축적될 때 비로소 진가를 드러낸다.' },
       ],
-      purchaseUrl: '#',
+      // 교보문고 상품 페이지 (실제 판매 링크)
+      purchaseUrl: 'https://product.kyobobook.co.kr/detail/S000221161799',
     };
   },
 };

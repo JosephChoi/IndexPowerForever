@@ -2772,13 +2772,22 @@ a:hover { color: var(--color-teal-deep); }
   padding-top: 0.9rem;
 }
 
+/* 하단 한 줄 — 좌: 저작권 / 우: 문의 */
+.site-footer-bottom-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem 1rem;
+  margin-bottom: 0.6rem;
+}
+
 /* 문의 줄 — 서비스 메뉴와 구분해 하단에 별도 배치 */
 .site-footer-policy {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.4rem 1rem;
-  margin-bottom: 0.6rem;
+  gap: 0.4rem 0.6rem;
 }
 
 .site-footer-policy .site-footer-link {
@@ -2789,6 +2798,12 @@ a:hover { color: var(--color-teal-deep); }
 .site-footer-policy .site-footer-link + .site-footer-link {
   border-left: 1px solid rgba(255, 255, 255, 0.18);
   padding-left: 1rem;
+}
+
+/* 문의 링크 옆 메일 주소 — JS로 채워 넣는다 */
+.site-footer-mail {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.6);
 }
 
 .site-footer-copy {

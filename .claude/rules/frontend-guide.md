@@ -85,6 +85,8 @@ backgroundColor: (ctx) => {
 
 1. `frontend/logic/app.js`의 라우터에 경로 추가
 2. `frontend/components/navbar.html`에 메뉴 항목 추가 (해당하는 경우)
+3. `backend/src/services/SeoService.js`의 `PAGE_SEO`에 title/description 추가 (sitemap·메타 주입 공통 소스)
+4. `backend/wrangler.toml`의 `[assets] run_worker_first` 배열에 경로 추가 — 누락 시 SEO 메타가 주입되지 않는다
 
 ## 금지 패턴
 

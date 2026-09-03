@@ -2,10 +2,10 @@
 const { createApp, defineComponent, ref } = Vue;
 const { createRouter, createWebHistory } = VueRouter;
 
-// API Base URL — 운영은 same-origin(상대경로), 로컬 dev(프론트 8080)는 백엔드(8787)로 분기
-const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-  ? 'http://localhost:8787'
-  : '';
+// API Base URL — 운영/로컬 wrangler dev는 same-origin(상대경로).
+// 프론트를 별도 정적 서버(8080)로 띄운 경우에만 백엔드(8787)로 분기.
+const isLocalHost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+const API_BASE = (isLocalHost && window.location.port === '8080') ? 'http://localhost:8787' : '';
 
 // $api 플러그인 — JWT 없는 단순 fetch wrapper
 const apiPlugin = {
@@ -90,6 +90,56 @@ const router = createRouter({
   scrollBehavior: () => ({ top: 0 }),
 });
 
+// ── SPA 내부 이동 시 SEO 메타 갱신 ──
+// 라우트별 메타 원본은 Worker(SeoService)가 <script id="seo-map">으로 내려준다.
+const SEO_ORIGIN = 'https://indexwins.com';
+
+const readSeoMap = () => {
+  const el = document.getElementById('seo-map');
+  if (!el) return {};
+  try {
+    return JSON.parse(el.textContent);
+  } catch (e) {
+    return {};
+  }
+};
+
+const seoMap = readSeoMap();
+
+const setMeta = (selector, attr, value) => {
+  const el = document.head.querySelector(selector);
+  if (el) el.setAttribute(attr, value);
+};
+
+const applySeo = (path) => {
+  const etfMatch = path.match(/^\/etf\/([A-Za-z0-9.^-]{1,10})\/?$/);
+  let title, description, canonical;
+
+  if (etfMatch) {
+    const ticker = etfMatch[1].toUpperCase();
+    title = `${ticker} vs S&P 500 / NASDAQ 100 지수 성과 비교 — indexwins`;
+    description = `${ticker}가 S&P 500·NASDAQ 100 지수를 이겼는지 장기 데이터로 비교합니다. 누적수익률, CAGR, MDD, 연도별 승패, 롤링 승률을 확인하세요.`;
+    canonical = `${SEO_ORIGIN}/etf/${ticker}`;
+  } else {
+    const meta = seoMap[path] || seoMap['/'];
+    if (!meta) return;
+    title = meta.title;
+    description = meta.description;
+    canonical = `${SEO_ORIGIN}${path === '/' ? '/' : path}`;
+  }
+
+  document.title = title;
+  setMeta('meta[name="description"]', 'content', description);
+  setMeta('meta[property="og:title"]', 'content', title);
+  setMeta('meta[property="og:description"]', 'content', description);
+  setMeta('meta[property="og:url"]', 'content', canonical);
+  setMeta('meta[name="twitter:title"]', 'content', title);
+  setMeta('meta[name="twitter:description"]', 'content', description);
+  setMeta('link[rel="canonical"]', 'href', canonical);
+};
+
+router.afterEach((to) => applySeo(to.path));
+
 // navigateTo + getParam 글로벌 mixin
 const globalMixin = {
   methods: {
@@ -139,8 +189,11 @@ const loadFooter = async () => {
   container.innerHTML = html;
 
   // 스팸 봇의 주소 수집을 막기 위해 메일 주소는 표시하지 않고 조합해서 링크만 건다
+  const mailAddress = ['contact', 'soopasset.com'].join('@');
   const contact = document.getElementById('footerContactLink');
-  if (contact) contact.href = 'mailto:' + ['kunmin.choi', 'gmail.com'].join('@');
+  if (contact) contact.href = 'mailto:' + mailAddress;
+  const contactMail = document.getElementById('footerContactMail');
+  if (contactMail) contactMail.textContent = mailAddress;
 };
 
 // ── 글로벌 ETF 검색 모달 (Vue 외부 — vanilla) ──

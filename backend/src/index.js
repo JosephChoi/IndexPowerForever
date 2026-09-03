@@ -9,11 +9,22 @@ import { timingRoute } from './routes/timing.js';
 import { withdrawalRoute } from './routes/withdrawal.js';
 import { translateRoute } from './routes/translate.js';
 import { DailyUpdateService } from './services/DailyUpdateService.js';
+import { injectSeo, buildSitemap, getIndexableTickers, PAGE_SEO } from './services/SeoService.js';
 
 const app = new Hono();
 
 // 미들웨어
 app.use('*', corsMiddleware);
+
+// 도메인 정규화 — 검색엔진 중복 색인을 막기 위해 www 는 apex(indexwins.com)로 301
+app.use('*', async (c, next) => {
+  const url = new URL(c.req.url);
+  if (url.hostname === 'www.indexwins.com') {
+    url.hostname = 'indexwins.com';
+    return c.redirect(url.toString(), 301);
+  }
+  await next();
+});
 
 // 라우트 마운트
 app.route('/api/etf', etfRoute);
@@ -52,16 +63,41 @@ app.get('/api/admin/test-update', async (c) => {
   }
 });
 
+// ── SEO ──
+
+// sitemap.xml — 정적 페이지 + D1에 등록된 ETF 상세 페이지를 매 요청 시 생성
+app.get('/sitemap.xml', async (c) => {
+  const tickers = await getIndexableTickers(c.env);
+  return c.body(buildSitemap(tickers), 200, {
+    'Content-Type': 'application/xml; charset=utf-8',
+    'Cache-Control': 'public, max-age=3600',
+  });
+});
+
+// SPA 페이지 요청 — index.html에 라우트별 title/description/canonical 을 주입해 응답한다
+const spaPaths = [...Object.keys(PAGE_SEO), '/etf/:ticker'];
+spaPaths.forEach((path) => {
+  app.get(path, async (c) => {
+    const indexUrl = new URL('/index.html', c.req.url);
+    const res = await c.env.ASSETS.fetch(new Request(indexUrl, { headers: c.req.raw.headers }));
+    return injectSeo(res, new URL(c.req.url).pathname);
+  });
+});
+
 // 에러 핸들러
 app.onError(errorHandler);
 
-// 404 핸들러 — /api/* 만 JSON 404, 나머지는 SPA 폴백(index.html)
-app.notFound((c) => {
+// 404 핸들러 — /api/* 는 JSON 404.
+// 그 외 알 수 없는 경로는 SPA 폴백(index.html)을 주되 상태코드는 404로 둔다.
+// 정식 라우트는 모두 위에서 처리되므로, 200을 주면 검색엔진이 soft 404로 판단한다.
+app.notFound(async (c) => {
   const { pathname } = new URL(c.req.url);
   if (pathname.startsWith('/api/')) {
     return c.json({ error: 'NotFoundError', message: '요청한 경로를 찾을 수 없습니다.' }, 404);
   }
-  return c.env.ASSETS.fetch(c.req.raw);
+  const indexUrl = new URL('/index.html', c.req.url);
+  const res = await c.env.ASSETS.fetch(new Request(indexUrl, { headers: c.req.raw.headers }));
+  return new Response(res.body, { status: 404, headers: res.headers });
 });
 
 export default {
