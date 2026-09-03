@@ -11,16 +11,16 @@ export const OG_IMAGE = `${SITE_ORIGIN}/images/og-image.png`;
 // 정적 라우트별 SEO 메타 — sitemap 생성과 메타 주입이 이 맵 하나를 공유한다
 export const PAGE_SEO = {
   '/': {
-    title: 'indexwins — ETF vs S&P 500 / NASDAQ 100 지수 성과 비교',
+    title: 'indexwins — ETF와 S&P 500·나스닥 100 비교',
     description:
-      'ETF를 검색하면 S&P 500·NASDAQ 100 지수와 20년 성과를 비교 분석합니다. 누적수익률·CAGR·MDD·연도별 승패를 무료로, 로그인 없이 확인하세요.',
+      'ETF를 검색하면 S&P 500·나스닥 100 지수와 장기 성과를 비교합니다. 수익률·CAGR·MDD를 무료로 확인하세요.',
     changefreq: 'daily',
     priority: '1.0',
   },
   '/ranking': {
     title: '주요 ETF 성과비교 랭킹 — indexwins',
     description:
-      '미국 상장 AUM 상위 30개 ETF가 S&P 500·NASDAQ 100 지수를 이겼는지 기간별로 비교합니다. 초과수익률 기준 랭킹을 한눈에 확인하세요.',
+      '미국 상장 AUM 상위 30개 ETF가 지수를 이겼는지 기간별로 비교합니다. 초과수익률 랭킹을 확인하세요.',
     changefreq: 'daily',
     priority: '0.9',
   },
@@ -48,21 +48,21 @@ export const PAGE_SEO = {
   '/withdrawal': {
     title: '인출전략 시뮬레이터 — 은퇴 자산은 얼마나 버틸까',
     description:
-      '은퇴 후 자산을 인출하며 살 때 그 돈이 얼마나 버티는지 과거 지수 데이터로 시뮬레이션합니다. 인출률·물가상승률·리저브 전략을 조합해 확인하세요.',
+      '은퇴 후 자산을 인출하며 살 때 그 돈이 얼마나 버티는지 과거 지수 데이터로 시뮬레이션합니다.',
     changefreq: 'monthly',
     priority: '0.8',
   },
   '/insights': {
     title: '인사이트 — 지수 투자의 근거를 데이터로',
     description:
-      '『이길 수 있는 투자만 하라』의 핵심 메시지를 SPIVA·장기 수익률 데이터로 검증합니다. 액티브 펀드의 승률과 지수의 장기 우월성을 확인하세요.',
+      '『이길 수 있는 투자만 하라』의 핵심 메시지를 SPIVA·장기 수익률 데이터로 검증합니다.',
     changefreq: 'weekly',
     priority: '0.8',
   },
   '/book': {
     title: '이길 수 있는 투자만 하라 — 김대중·최근민 지음',
     description:
-      '증권사와 투자자문사에서 일하며 자본시장 한가운데에 서 있던 저자들이 20년 데이터를 분석해 내린 결론. 왜 인덱스 투자만이 승산 있는 게임인지 설명합니다.',
+      '증권사·투자자문사에서 20년간 일한 저자들이 데이터로 내린 결론. 왜 인덱스 투자만이 승산 있는 게임인가.',
     changefreq: 'monthly',
     priority: '0.9',
   },
@@ -77,8 +77,8 @@ export const PAGE_SEO = {
 
 // ETF 상세는 티커가 동적이므로 별도 생성
 const etfSeo = (ticker) => ({
-  title: `${ticker} vs S&P 500 / NASDAQ 100 지수 성과 비교 — indexwins`,
-  description: `${ticker}가 S&P 500·NASDAQ 100 지수를 이겼는지 장기 데이터로 비교합니다. 누적수익률, CAGR, MDD, 연도별 승패, 롤링 승률을 확인하세요.`,
+  title: `${ticker} vs S&P 500·나스닥 100 성과 비교`,
+  description: `${ticker}가 S&P 500·나스닥 100 지수를 이겼는지 장기 데이터로 비교합니다. 수익률·CAGR·MDD 확인.`,
 });
 
 // 경로 → SEO 메타. 매칭되는 라우트가 없으면 홈 메타를 쓴다.

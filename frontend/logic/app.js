@@ -117,8 +117,8 @@ const applySeo = (path) => {
 
   if (etfMatch) {
     const ticker = etfMatch[1].toUpperCase();
-    title = `${ticker} vs S&P 500 / NASDAQ 100 지수 성과 비교 — indexwins`;
-    description = `${ticker}가 S&P 500·NASDAQ 100 지수를 이겼는지 장기 데이터로 비교합니다. 누적수익률, CAGR, MDD, 연도별 승패, 롤링 승률을 확인하세요.`;
+    title = `${ticker} vs S&P 500·나스닥 100 성과 비교`;
+    description = `${ticker}가 S&P 500·나스닥 100 지수를 이겼는지 장기 데이터로 비교합니다. 수익률·CAGR·MDD 확인.`;
     canonical = `${SEO_ORIGIN}/etf/${ticker}`;
   } else {
     const meta = seoMap[path] || seoMap['/'];
