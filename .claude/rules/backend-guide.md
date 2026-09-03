@@ -69,6 +69,27 @@ if (!/^[A-Z0-9\^\.]{1,10}$/.test(upper)) {
 // 절대 직접 fetch 하지 말고 YahooService 통해서만 접근
 ```
 
+> ⚠️ **죽은 티커 주의** — 종목이 티커를 변경하면 Yahoo는 옛 심볼에 대해 **에러가 아니라 빈 시계열**
+> (`timestamp`는 있고 `close`가 전부 `null`)을 반환한다. 크론·보충 로직은 이를 "새 데이터 없음"으로
+> 처리하므로 갱신이 조용히 멈춘다. 판별 단서는 `meta.regularMarketTime`(변경 시점에 정지)과
+> `meta.firstTradeDate`(엉뚱한 최근 날짜로 리셋).
+> 실제 사례: SPLG → SPYM (2025-10-31), 7주간 미갱신 — 세션 #22 참조
+
+## KV 캐시 키 규칙
+
+캐시 키는 **각 서비스에서 빌더 함수를 `export`** 하고, 무효화 측(`DailyUpdateService`)은
+그 빌더를 import해 재사용한다. 키 문자열을 양쪽에 각각 하드코딩하면 버전 접두어(`compare:v6:` 등)를
+올릴 때 한쪽만 바뀌어 무효화가 조용히 실패한다.
+
+```javascript
+// RankingService.js
+export const rankingCacheKey = (period, benchmark) => `ranking:v2:${period}:${benchmark}`;
+
+// DailyUpdateService.js
+import { rankingCacheKey } from './RankingService.js';
+keys.push(rankingCacheKey(period, bench));
+```
+
 ## 캐시 전략
 
 | 데이터 | KV TTL | D1 저장 |
