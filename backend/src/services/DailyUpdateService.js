@@ -1,4 +1,7 @@
 import { YahooService } from './YahooService.js';
+import { priceCacheKey } from './PriceService.js';
+import { compareCacheKey } from './CompareService.js';
+import { rankingCacheKey } from './RankingService.js';
 
 // 매일 KST 07:00 자동 실행 — 주요 종목 가격 데이터 D1 업데이트
 const BATCH_SIZE = 100;
@@ -103,9 +106,9 @@ export class DailyUpdateService {
 
     for (const ticker of tickers) {
       for (const period of periods) {
-        keys.push(`price:${ticker}:${period}`);
+        keys.push(priceCacheKey(ticker, period));
         for (const bench of benchmarks) {
-          keys.push(`compare:${ticker}:${period}:${bench}`);
+          keys.push(compareCacheKey(ticker, period, bench));
         }
       }
     }
@@ -113,7 +116,7 @@ export class DailyUpdateService {
     // 랭킹 캐시도 무효화
     for (const period of periods) {
       for (const bench of benchmarks) {
-        keys.push(`ranking:${period}:${bench}`);
+        keys.push(rankingCacheKey(period, bench));
       }
     }
 

@@ -1,5 +1,10 @@
 import { CompareService } from './CompareService.js';
 
+// 랭킹 KV 캐시 키 — 무효화 측(DailyUpdateService)과 정의를 공유한다
+// v2: SPLG→SPYM 티커 교체(2026-09-03)로 기존 캐시 폐기
+export const rankingCacheKey = (period, benchmark) => `ranking:v2:${period}:${benchmark}`;
+
+
 // 기간별 ETF 성과 랭킹 서비스
 export class RankingService {
   constructor(env) {
@@ -9,7 +14,7 @@ export class RankingService {
 
   // 랭킹 계산 (KV 6h 캐시)
   async getRanking(period = '3Y', benchmark = 'SPY') {
-    const cacheKey = `ranking:${period}:${benchmark}`;
+    const cacheKey = rankingCacheKey(period, benchmark);
 
     const cached = await this.env.KV.get(cacheKey);
     if (cached) {

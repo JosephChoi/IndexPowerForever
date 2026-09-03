@@ -1,5 +1,9 @@
 import { YahooService } from './YahooService.js';
 
+// 가격 KV 캐시 키 — 무효화 측(DailyUpdateService)과 정의를 공유한다
+export const priceCacheKey = (ticker, period) => `price:${ticker}:${period}`;
+
+
 // 가격 데이터 조회 서비스 — KV(1h) + D1 영구 캐시 + Yahoo 보충
 export class PriceService {
   constructor(env) {
@@ -9,7 +13,7 @@ export class PriceService {
 
   // 가격 데이터 조회 (KV → D1 → Yahoo 보충)
   async get(ticker, period = '5Y') {
-    const cacheKey = `price:${ticker}:${period}`;
+    const cacheKey = priceCacheKey(ticker, period);
 
     // KV 캐시 확인 (1h) — 기간 커버리지 + 최신성 검증
     const cached = await this.env.KV.get(cacheKey);

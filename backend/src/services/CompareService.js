@@ -1,6 +1,10 @@
 import { PriceService } from './PriceService.js';
 import { CalculationService } from './CalculationService.js';
 
+// 비교 분석 KV 캐시 키 — 무효화 측(DailyUpdateService)과 정의를 공유한다
+export const compareCacheKey = (ticker, period, benchmark) => `compare:v6:${ticker}:${period}:${benchmark}`;
+
+
 // ETF vs 지수 비교 분석 서비스
 export class CompareService {
   constructor(env) {
@@ -14,7 +18,7 @@ export class CompareService {
     //     v5 정렬 전면 제거(벤치마크가 과도하게 길어짐), v4 세 종목 공통 구간(둘 다 폐기),
     //     v3 샤프 표준정의 변경, v2 무위험수익률 4.5%→3.9%.
     // 계산식이 바뀌면 이 버전을 올릴 것 (안 올리면 TTL 6시간 동안 옛 값이 나온다)
-    const cacheKey = `compare:v6:${ticker}:${period}:${benchmark}`;
+    const cacheKey = compareCacheKey(ticker, period, benchmark);
 
     const cached = await this.env.KV.get(cacheKey);
     if (cached) {
