@@ -34,6 +34,14 @@
 - 프론트 `API_BASE`는 운영 시 `''`(상대경로). `https://api.indexwins.com` 등 절대 URL 하드코딩 금지
 - **GitHub Actions 워크플로우 신규 생성 금지** — Workers Builds가 유일한 자동 배포 수단. `.github/workflows/`에 deploy 워크플로우를 다시 만들면 같은 커밋이 2번 배포됨
 
+## 분석 (GA4)
+
+- 측정 ID `G-0CEXV75HNR` — `frontend/index.html` 상단 스니펫
+- **SPA라 자동 page_view는 끔** (`send_page_view: false`). `logic/app.js`의 `router.afterEach`에서 `applySeo()` 직후 직접 전송
+- 새 페이지를 추가해도 GA 관련 추가 작업은 없음 (라우터가 자동 처리)
+- `localhost`/`127.0.0.1`은 GA 스크립트 미로드 → 로컬 작업은 통계에 안 잡힘
+- 책 QR 유입은 `utm_source=book&utm_medium=qr`로 구분 (네이버 동적 QR 목적지에 설정)
+
 ## 구조
 
 - `frontend/views/*.html` ↔ `frontend/logic/*.js` 1:1 매칭 필수

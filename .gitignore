@@ -8,6 +8,7 @@ dist/
 
 # 책 원본 PDF (저작권/용량 — 로컬 보관용)
 출간 최종본_*.pdf
+*_본문_*.pdf
 preview-*.pdf
 
 # Playwright MCP 브라우저 검증 산출물

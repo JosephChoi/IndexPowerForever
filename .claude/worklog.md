@@ -2,6 +2,55 @@
 
 ---
 
+## 세션 #22 — 2026-09-03 ~14:13 KST
+
+### 목표
+- Google Analytics 4 연동 (SPA 대응)
+- 책자 QR코드를 통한 유입을 GA4에서 구분 가능하게 만들기
+
+### 배경
+- 『이길 수 있는 투자만 하라』 2026-09-02 출간. 책에 실린 QR로 사이트 유입이 시작됨
+- 기존에는 분석 도구가 전혀 없어 유입 경로·페이지별 이용 현황 파악 불가
+
+### 의사결정
+1. **GA4 자동 page_view를 끄고 라우터에서 직접 전송** (`send_page_view: false`)
+   - Vue Router history 모드라 자동 전송은 `document.title` 갱신 전에 발사됨
+   - ETF 상세처럼 티커별로 제목이 달라지는 페이지에서 잘못된 제목이 기록되는 문제
+   - `router.afterEach`에서 `applySeo()` 직후 전송하도록 순서 보장
+2. **localhost/127.0.0.1은 GA 스크립트 자체를 미로드** — 로컬 확인 작업이 통계를 오염시키지 않도록
+3. **스니펫을 IIFE로 캡슐화** — 전역에 변수를 흘리면 다른 인라인 스크립트와 충돌 위험
+4. **책 QR은 UTM 없이 인쇄되었으나, 네이버 동적 QR이라 사후 대응 가능**
+   - QR 실체는 `m.site.naver.com/2dLMN` 경유 링크 → 인쇄물은 그대로 두고 목적지만 변경
+   - 목적지를 `?utm_source=book&utm_medium=qr&utm_campaign=book_1st` 로 교체
+
+### 변경 사항
+- `frontend/index.html` — GA4 gtag 스니펫 추가 (측정 ID `G-0CEXV75HNR`), IIFE 캡슐화 + 로컬 가드
+- `frontend/logic/app.js` — `sendPageView()` 추가, `router.afterEach`에서 `applySeo` → `sendPageView` 순차 호출
+- `.claude/launch.json` — 로컬 프리뷰 설정. 실행 중 wrangler dev(8788)에 attach하는 구성 + 직접 실행 구성 분리
+- `backend/wrangler.dev-local.toml` — 로컬 UI 확인 전용 (AI 바인딩·크론 제외)
+- `.gitignore` — 책 원본 PDF 패턴 추가
+
+### 검증 완료 (운영 사이트)
+- GA 스크립트 로드 확인 (`googletagmanager.com/gtag/js?id=G-0CEXV75HNR`)
+- 첫 진입 page_view 1건 (`/insights` 직접 진입)
+- ETF 상세 동적 제목 정확히 기록 (`/etf/SCHD` → "SCHD vs S&P 500·나스닥 100 성과 비교")
+- SPA 내부 이동 시 경로별 1건씩, 중복 없음
+- UTM 주소 접속 시 `page_location`에 UTM 3종 그대로 실려 전송됨
+- 로컬(127.0.0.1)에서 GA 미로드 확인
+
+### 미해결 / 다음 세션 확인 필요
+1. **UTM 수집 결과 확인 (2026-09-04)** — GA4 획득 > 트래픽 획득에서 세션 소스/매체 `book / qr` 집계 확인
+   - 실시간 보고서는 "첫 사용자 소스/매체" 계열 차원만 제공해 검증에 부적합했음
+   - DebugView는 debug_mode 신호가 있어야 표시되므로 일반 방문으로는 확인 불가
+2. **[!] 향상된 측정의 "브라우저 기록 이벤트 기반 페이지 변경" 끄기** — 켜져 있으면 라우트 이동 1회가 2건으로 집계됨 (사용자 직접 수행)
+3. **[!] GA4 속성 계정 이동 검토** — 현재 "유학코칭" 계정 하위에 생성됨. 이동해도 측정 ID는 유지되어 코드 수정 불필요
+
+### 참고
+- 네이버 QR 관리의 총 조회수(스캔 수) ↔ GA4 세션 수 차이 = 랜딩 이탈 지표로 활용 가능
+- UTM 적용 이전(2026-09-02 출간일 ~ 09-03 오전) 스캔 유입은 소급 구분 불가
+
+---
+
 ## 세션 #21 — 2026-05-13 03:11~03:30 KST
 
 ### 목표
