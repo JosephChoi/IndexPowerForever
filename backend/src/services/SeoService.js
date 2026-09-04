@@ -101,11 +101,18 @@ const canonicalFor = (pathname) => {
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
 // index.html 응답에 라우트별 메타를 주입해 새 Response 반환
-export const injectSeo = (response, pathname) => {
+// noindex: D1에 데이터가 없는 ETF 티커처럼 색인 가치가 없는 페이지에 true를 준다.
+// 존재하지 않는 티커도 URL만 바꾸면 무한히 만들어지므로, 색인되면 크롤 예산이 낭비된다.
+export const injectSeo = (response, pathname, { noindex = false } = {}) => {
   const seo = seoForPath(pathname);
   const canonical = canonicalFor(pathname);
 
   return new HTMLRewriter()
+    .on('meta[name="robots"]', {
+      element(el) {
+        if (noindex) el.setAttribute('content', 'noindex, follow');
+      },
+    })
     .on('title', {
       element(el) { el.setInnerContent(seo.title); },
     })
@@ -140,6 +147,26 @@ export const injectSeo = (response, pathname) => {
       },
     })
     .transform(response);
+};
+
+// 해당 티커의 데이터가 D1에 있는지 확인 — 색인/상태코드 판단에 쓴다.
+// etf_info(기본정보) 또는 price_cache(가격) 중 하나라도 있으면 실체가 있는 종목으로 본다.
+// 조회 실패 시에는 색인을 막지 않도록 true로 폴백한다(가용성 우선).
+export const hasTickerData = async (env, ticker) => {
+  try {
+    const row = await env.DB
+      .prepare(
+        `SELECT 1 AS found FROM etf_info WHERE ticker = ?
+         UNION ALL
+         SELECT 1 FROM price_cache WHERE ticker = ? LIMIT 1`
+      )
+      .bind(ticker, ticker)
+      .first();
+    return !!row;
+  } catch (e) {
+    console.log('[SEO] 티커 존재 확인 실패:', e.message);
+    return true;
+  }
 };
 
 // 색인 대상 ETF 티커 — D1에 정보가 쌓인 종목만 sitemap에 포함한다.

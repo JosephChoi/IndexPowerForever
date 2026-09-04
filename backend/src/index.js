@@ -9,7 +9,7 @@ import { timingRoute } from './routes/timing.js';
 import { withdrawalRoute } from './routes/withdrawal.js';
 import { translateRoute } from './routes/translate.js';
 import { DailyUpdateService } from './services/DailyUpdateService.js';
-import { injectSeo, buildSitemap, getIndexableTickers, PAGE_SEO } from './services/SeoService.js';
+import { injectSeo, buildSitemap, getIndexableTickers, PAGE_SEO, hasTickerData } from './services/SeoService.js';
 
 const app = new Hono();
 
@@ -24,6 +24,15 @@ app.use('*', async (c, next) => {
     return c.redirect(url.toString(), 301);
   }
   await next();
+});
+
+// API 응답은 검색 결과에 노출될 이유가 없다.
+// robots.txt 의 Disallow 는 Cloudflare 가 앞에 자동 주입하는 블록 때문에 `User-agent: *` 그룹이
+// 둘로 나뉘어, 그룹을 병합하지 않는 크롤러에는 적용되지 않을 수 있다.
+// 응답 헤더로 직접 막으면 robots.txt 해석 방식과 무관하게 색인되지 않는다.
+app.use('/api/*', async (c, next) => {
+  await next();
+  c.header('X-Robots-Tag', 'noindex, nofollow');
 });
 
 // 라우트 마운트
@@ -75,13 +84,29 @@ app.get('/sitemap.xml', async (c) => {
 });
 
 // SPA 페이지 요청 — index.html에 라우트별 title/description/canonical 을 주입해 응답한다
-const spaPaths = [...Object.keys(PAGE_SEO), '/etf/:ticker'];
-spaPaths.forEach((path) => {
+const fetchIndexHtml = (c) => {
+  const indexUrl = new URL('/index.html', c.req.url);
+  return c.env.ASSETS.fetch(new Request(indexUrl, { headers: c.req.raw.headers }));
+};
+
+Object.keys(PAGE_SEO).forEach((path) => {
   app.get(path, async (c) => {
-    const indexUrl = new URL('/index.html', c.req.url);
-    const res = await c.env.ASSETS.fetch(new Request(indexUrl, { headers: c.req.raw.headers }));
+    const res = await fetchIndexHtml(c);
     return injectSeo(res, new URL(c.req.url).pathname);
   });
+});
+
+// ETF 상세 — 티커는 URL만 바꾸면 무한히 만들어지므로, D1에 데이터가 있는 종목만 색인 대상으로 둔다.
+// 데이터가 없으면 noindex + 404 상태로 응답한다. 본문은 그대로 내려가므로 사용자 화면은 정상 동작하고,
+// 조회 결과가 D1에 쌓이면 이후 요청부터 자연히 200 + 색인 대상이 된다.
+app.get('/etf/:ticker', async (c) => {
+  const { pathname } = new URL(c.req.url);
+  const ticker = c.req.param('ticker').toUpperCase();
+  const known = await hasTickerData(c.env, ticker);
+  const res = await fetchIndexHtml(c);
+  const injected = injectSeo(res, pathname, { noindex: !known });
+  if (known) return injected;
+  return new Response(injected.body, { status: 404, headers: injected.headers });
 });
 
 // 에러 핸들러

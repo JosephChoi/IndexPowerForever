@@ -1,3 +1,8 @@
+# 주의: 운영 응답에는 Cloudflare(AI Crawl Control / Content Signals)가
+# 이 파일 앞에 자체 블록을 자동으로 덧붙인다. 그 결과 `User-agent: *` 그룹이 둘이 되므로,
+# /api/ 차단은 이 파일에만 의존하지 않고 Worker 의 X-Robots-Tag 헤더로도 이중 적용한다.
+# (backend/src/index.js 의 '/api/*' 미들웨어)
+
 User-agent: *
 Allow: /
 Disallow: /api/
