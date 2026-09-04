@@ -88,6 +88,13 @@ backgroundColor: (ctx) => {
 3. `backend/src/services/SeoService.js`의 `PAGE_SEO`에 title/description 추가 (sitemap·메타 주입 공통 소스)
 4. `backend/wrangler.toml`의 `[assets] run_worker_first` 배열에 경로 추가 — 누락 시 SEO 메타가 주입되지 않는다
 
+> ⚠️ **동적 파라미터 라우트**(`/etf/:ticker` 처럼 URL만 바꿔 무한 생성 가능한 경로)를 추가할 때는
+> 실체 유무를 확인해 색인 여부를 판단해야 한다. 그러지 않으면 존재하지 않는 URL이 200 + `index` 로
+> 응답해 soft 404 가 되고 크롤 예산이 낭비된다.
+> 기준 구현: `index.js` 의 `/etf/:ticker` 핸들러 — `hasTickerData()` 로 D1 데이터를 확인해
+> 없으면 `injectSeo(res, path, { noindex: true })` + 404 상태로 응답한다.
+> 404 여도 HTML 본문은 그대로 내려가므로 SPA 화면은 정상 동작한다.
+
 ## 금지 패턴
 
 - `fetch()` 직접 호출 — 반드시 `this.$api` 사용

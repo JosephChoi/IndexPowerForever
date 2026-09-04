@@ -2,6 +2,77 @@
 
 ---
 
+## 세션 #23 — 2026-09-05 ~02:54 KST
+
+### 목표
+- ego-browser로 운영 사이트(indexwins.com) 전반 디버깅
+- 발견된 SEO 이슈 수정
+
+### 점검 결과 — 이상 없음
+전 라우트(11개)에서 **JS 에러 0건 / 실패 요청 0건**.
+
+| 항목 | 결과 |
+|---|---|
+| 렌더링 | 11개 라우트 정상, 로딩 지연 없음 |
+| 차트 | ETF 상세 2개 정상 렌더(빈 캔버스 아님), 탭 전환 시 리사이즈 정상 |
+| 기간·벤치마크 전환 | 3Y/10Y, S&P500↔NASDAQ100 KPI 갱신 확인 |
+| 검색 | API·UI 모달 정상 |
+| 시뮬레이터 | 슬라이더 조작 시 결과 갱신 정상(타이밍·비용·퇴직연금) |
+| 모바일(390px) | 가로 스크롤 없음 |
+| 성능 | FCP ~1.0s, DCL ~0.5s, 요청 25개 / 10~72KB |
+| API 응답 | 0.4~1.2초, 잘못된 입력은 전부 400 |
+| sitemap | 62개 URL, SPYM 반영·SPLG 제거 확인 (세션 #22 수정 반영됨) |
+
+### 수정 1 — 미등록 ETF 티커 soft 404 차단
+
+**문제**: `/etf/{아무거나}` 가 200 + `index, follow` + 고유 canonical/title/description 을 반환.
+URL만 바꾸면 무한히 색인 가능한 상태였다. `wrangler.toml` 에 명시한 soft 404 방지 의도와 어긋났다.
+(`/no-such-page` 는 404를 정상 반환하고 있었으므로, ETF 동적 라우트만의 문제)
+
+**해결**
+- `SeoService.hasTickerData(env, ticker)` — `etf_info` / `price_cache` 에 데이터 유무 확인.
+  조회 실패 시 색인을 막지 않도록 `true` 폴백 (가용성 우선)
+- `injectSeo(res, path, { noindex })` 옵션 추가 — robots 메타를 `noindex, follow` 로 교체
+- `index.js` 의 `/etf/:ticker` 를 정적 라우트 루프에서 분리해 전용 핸들러로 전환.
+  데이터 없으면 noindex + 404 상태, 본문은 그대로 전달
+
+**설계 의도**: 404 상태여도 HTML 본문은 내려가므로 SPA는 정상 동작한다.
+미수집이지만 유효한 티커도 사용자에게는 완전한 페이지가 보이고, 조회 결과가 D1에 쌓이면
+다음 요청부터 자연히 200 + 색인 대상이 된다.
+
+### 수정 2 — API 색인 차단 (robots.txt 그룹 분리 대응)
+
+**문제**: 저장소의 `frontend/robots.txt` 는 정상이지만, 운영 응답에는 Cloudflare(AI Crawl Control /
+Content Signals)가 앞에 자체 블록을 자동 주입한다. 그 결과 `User-agent: *` 그룹이 둘로 나뉘고
+**첫 그룹에는 `Disallow: /api/` 가 없다.** 그룹을 병합하지 않는 크롤러에는 차단이 적용되지 않는다.
+
+**해결**: `/api/*` 응답에 `X-Robots-Tag: noindex, nofollow` 헤더 추가 (robots.txt 해석 방식과 무관).
+robots.txt 에는 자동 주입 상황을 주석으로 명시.
+
+### 검증 완료 (운영)
+
+| 대상 | 상태 | robots |
+|---|---|---|
+| `/etf/QQQ`, `/etf/SPYM`, `/etf/VOO`, `/etf/SCHD` | 200 | index, follow |
+| `/etf/ZZZZZ`, `/etf/FAKE1`, `/etf/SPLG`(죽은 티커) | 404 | noindex, follow |
+| `/api/*` | 200 | X-Robots-Tag: noindex, nofollow |
+
+**미수집 유효 티커 시나리오 (AVUV)** — 설계 가정 검증
+- 첫 접근: 404 + noindex 이지만 화면은 완전 정상 (종목명·AUM·설정일·차트 2개·KPI 4개, JS 에러 0)
+- D1에 데이터가 쌓인 뒤 재요청: **200 + index, follow 로 자동 전환**
+
+### 유지 결정 (수정하지 않음)
+- **타이밍 시뮬레이터 종료 연도 상한 2025** — `frontend/logic/timing.js` 의 `getFullYear() - 1`.
+  진행 중인 해는 부분 데이터라 제외하는 의도이며, 사용자 확인 후 현행 유지.
+  (백엔드 `routes/timing.js` 는 `getFullYear()` 까지 허용해 상한이 서로 다르다는 점은 인지된 상태)
+
+### 관찰 사항 (문제 아님)
+- `/no-such-page` 는 상태코드 404가 정상이나 화면은 홈으로 리다이렉트 — 사용자에게 안내 없음
+- `/withdrawal` 만 슬라이더 대신 숫자 입력(7개) — 다른 시뮬레이터 3종과 조작 방식 상이
+- `/timing` 은 차트 없이 카드로 결과 표시 — 의도된 설계로 보임
+
+---
+
 ## 세션 #22 — 2026-09-03 ~19:27 KST
 
 ### 목표
